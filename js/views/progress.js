@@ -6,6 +6,7 @@ import { head, toast, sheet } from "../ui.js";
 import { overall, rawToBand, nextHalfBand, writingBand, speakingBand, minAverageFor } from "../bands.js";
 import { bandBlock } from "./bandblock.js";
 import { ikat } from "./welcome.js";
+import { reportCard } from "../report.js";
 
 export const live = true;
 const f1 = (x) => (x == null ? "–" : Number(x).toFixed(1));
@@ -15,12 +16,13 @@ const HALVES = Array.from({ length: 15 }, (_, i) => 9 - i * 0.5);
 export default async function (ctx) {
   const S = store.S;
   const root = h("div");
-  root.append(head("Progress", { sub: "Where you stand against band 8" }));
+  root.append(head("Progress", { sub: "Where you stand against band 8.5" }));
   root.append(bandBlock());
 
   const cur = store.currentSkills();
   root.append(h("div", { class: "row-actions", style: { marginTop: "6px" } }, h("button", { class: "btn primary", onclick: addResult }, icon("plus", 18), "Add a result")));
 
+  root.append(reportCard());
   root.append(calculator(cur));
   root.append(routes());
   root.append(checkpoints(cur));
@@ -65,7 +67,7 @@ function calculator(cur) {
   const upd = () => {
     const o = overall(vals.listening, vals.reading, vals.writing, vals.speaking), avg = (vals.listening + vals.reading + vals.writing + vals.speaking) / 4;
     out.textContent = f1(o);
-    need.textContent = `Average ${avg.toFixed(3).replace(/0+$/, "").replace(/\.$/, "")}. Overall 8 needs an average of ${minAverageFor(8)}, because .75 rounds up.`;
+    need.textContent = `Average ${avg.toFixed(3).replace(/0+$/, "").replace(/\.$/, "")}. Overall ${S.config.target} needs an average of ${minAverageFor(S.config.target)}, because .25 rounds up.`;
     const nb = nextHalfBand(vals);
     next.replaceChildren(...SKILLS.map(([k, l]) => nb.bySkill[k] ? h("div", null, `${l} +0.5: overall ${f1(nb.bySkill[k].overall)}${nb.bySkill[k].gain > 0 ? ", it moves the overall" : ", no change to the overall"}`) : null));
   };
@@ -85,13 +87,13 @@ function calculator(cur) {
 // ---------- routes A to E ----------
 function routes() {
   const S = store.S, cur = store.currentSkills();
-  return h("section", { class: "section" }, h("div", { class: "shead" }, h("h2", null, "Routes to 8 and 8.5")),
-    h("p", { class: "small muted" }, "Every route assumes listening holds at 8.5."),
+  return h("section", { class: "section" }, h("div", { class: "shead" }, h("h2", null, "Routes to 8.5 and to 8")),
+    h("p", { class: "small muted" }, "Routes D and E reach 8.5. Every route assumes listening holds at 8.5; your aims are 9 in listening and reading, 8 in writing and speaking."),
     h("table", { class: "t" }, h("thead", null, h("tr", null, ["Route", "Reading", "Writing", "Speaking", "Overall"].map((x) => h("th", null, x)))),
       h("tbody", null, S.plan.routes.map((r) => {
         const ok = (k) => cur[k] != null && cur[k] >= r[k];
         const c = (k) => h("td", { class: "n", style: { color: ok(k) ? "var(--ok)" : "" } }, f1(r[k]), ok(k) ? h("span", { class: "sr" }, " reached") : null);
-        return h("tr", null, h("td", null, h("b", null, r.route)), c("reading"), c("writing"), c("speaking"), h("td", { class: "n" }, f1(r.overall)));
+        return h("tr", null, h("td", null, h("b", null, r.route), r.overall >= S.config.target ? h("span", { class: "pill accent", style: { marginLeft: "8px" } }, "8.5") : null), c("reading"), c("writing"), c("speaking"), h("td", { class: "n" }, f1(r.overall)));
       }))));
 }
 
@@ -116,7 +118,7 @@ function checkpoints(cur) {
   return sec;
 }
 // pass or miss per skill, from the latest result on or before the checkpoint's last day
-function cpResults(cp, cur) {
+export function cpResults(cp, cur) {
   const S = store.S, upto = (s) => s.date <= cp.to && !s.baseline;
   const latest = (skill) => S.scores.filter((s) => s.skill === skill && upto(s)).sort((a, b) => a.date.localeCompare(b.date)).at(-1);
   const out = {};
@@ -129,13 +131,14 @@ function cpResults(cp, cur) {
   out.Reading = rd?.raw != null ? { text: `${rd.raw}/40`, pass: rd.raw >= rmin } : { text: "–", pass: null };
   const ls = latest("listening");
   out.Listening = ls?.raw != null ? { text: `${ls.raw}/40`, pass: ls.raw >= 36 } : { text: "–", pass: null };
+  if (todayISO() < cp.from) for (const k of Object.keys(out)) out[k] = { text: "–", pass: null };
   return out;
 }
 function printReport(cur) {
   const S = store.S, e = store.estimate();
   const doc = h("div", { class: "fullscreen", style: { background: "#fff", color: "#000" } },
     h("div", { class: "inner" }, h("div", { class: "no-print row-actions", style: { marginBottom: "12px" } }, h("button", { class: "btn primary", onclick: () => window.print() }, "Print or save as PDF"), h("button", { class: "btn", onclick: () => doc.remove() }, "Close")),
-      h("h1", null, "Eight, checkpoint report"), h("p", null, `${store.setting("name") || ""} ${todayISO()}`),
+      h("h1", null, "8.5, checkpoint report"), h("p", null, `${store.setting("name") || ""} ${todayISO()}`),
       h("p", null, `Estimated overall: ${f1(e.overall)}. Target: ${S.config.target}.${e.assumed ? " Speaking is not scored yet." : ""}`),
       ...S.plan.checkpoints.map((cp) => { const r = cpResults(cp, cur); return h("div", null, h("h2", { style: { marginTop: "16px" } }, `${cp.name}, ${cp.dates}`),
         h("table", { class: "t" }, h("tbody", null, ["Speaking", "Writing", "Reading", "Listening"].map((sk) => h("tr", null, h("td", null, sk), h("td", null, cp.targets[sk]), h("td", { class: "n" }, r[sk].text), h("td", null, r[sk].pass == null ? "Not yet" : r[sk].pass ? "Passed" : "Missed")))))); })));

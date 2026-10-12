@@ -1,6 +1,6 @@
-// Service worker: makes Eight work offline. The build script fills in ASSETS and VERSION.
-const VERSION = "202610120308";
-const ASSETS = ["./","css/app.css","data/config.json","data/plan.json","data/speaking-bank.json","fonts/display.woff2","fonts/text.woff2","icons/apple-touch-icon.png","icons/favicon-32.png","icons/icon-192.png","icons/icon-512.png","icons/icon.svg","icons/maskable-512.png","index.html","js/bands.js","js/db.js","js/ics.js","js/main.js","js/srs.js","js/store.js","js/tasks.js","js/ui.js","js/util.js","js/views/bandblock.js","js/views/errors.js","js/views/lesson.js","js/views/plan.js","js/views/practice.js","js/views/progress.js","js/views/readlog.js","js/views/review.js","js/views/session.js","js/views/settings.js","js/views/speak.js","js/views/timer.js","js/views/today.js","js/views/watch.js","js/views/welcome.js","js/views/write.js","manifest.webmanifest","vendor/ts-fsrs.mjs"];
+// Service worker: makes 8.5 work offline. The build script fills in ASSETS and VERSION.
+const VERSION = "202610120409";
+const ASSETS = ["./","css/app.css","data/config.json","data/plan.json","data/speaking-bank.json","fonts/display.woff2","fonts/text.woff2","icons/apple-touch-icon.png","icons/favicon-32.png","icons/icon-192.png","icons/icon-512.png","icons/icon.svg","icons/maskable-512.png","index.html","js/bands.js","js/db.js","js/ics.js","js/main.js","js/report.js","js/srs.js","js/store.js","js/tasks.js","js/ui.js","js/util.js","js/views/bandblock.js","js/views/errors.js","js/views/lesson.js","js/views/plan.js","js/views/practice.js","js/views/progress.js","js/views/readlog.js","js/views/review.js","js/views/session.js","js/views/settings.js","js/views/speak.js","js/views/timer.js","js/views/today.js","js/views/watch.js","js/views/welcome.js","js/views/write.js","manifest.webmanifest","report/template.html","vendor/ts-fsrs.mjs"];
 const CACHE = "eight-" + VERSION;
 
 self.addEventListener("install", (e) => {

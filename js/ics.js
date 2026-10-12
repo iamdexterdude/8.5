@@ -8,7 +8,7 @@ const esc = (s) => String(s).replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace
 
 export function buildIcs() {
   const S = store.S, link = store.setting("meetingLink"), mins = Number(store.setting("lessonMinutes")) || 90;
-  const out = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Eight//IELTS Month 1//EN", "CALSCALE:GREGORIAN", "X-WR-CALNAME:Eight, IELTS Month 1"];
+  const out = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//8.5//IELTS Month 1//EN", "CALSCALE:GREGORIAN", "X-WR-CALNAME:8.5, IELTS Month 1"];
   const stamp = utc(new Date());
   for (const d of S.plan.days) {
     if (d.lessonNo) {
@@ -27,6 +27,6 @@ export function buildIcs() {
 }
 export function downloadIcs() {
   const blob = new Blob([buildIcs()], { type: "text/calendar" });
-  const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(blob), download: "eight-month-1.ics" });
+  const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(blob), download: "8.5-month-1.ics" });
   document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
 }

@@ -53,7 +53,7 @@ async function render({ keepScroll = false } = {}) {
     clear(viewEl).append(node);
     setActiveTab(tab);
     window.scrollTo(0, y);
-    if (!keepScroll) { document.title = "Eight"; viewEl.focus({ preventScroll: true }); }
+    if (!keepScroll) { document.title = "8.5"; viewEl.focus({ preventScroll: true }); }
   } catch (e) {
     console.error(e);
     clear(viewEl).append(h("div", { class: "empty" }, h("h1", null, "Something went wrong"), h("p", null, "Reload the page. Your data is saved on this device."), h("pre", { class: "tiny" }, String(e && e.message))));

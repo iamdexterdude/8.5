@@ -1,2 +1,2 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#0B1120"/>
-<circle cx="50" cy="37.5" r="27" fill="none" stroke="#8FAEFF" stroke-width="7.5"/><circle cx="50" cy="62.5" r="27" fill="none" stroke="#3ECFC8" stroke-width="7.5"/><circle cx="50" cy="50" r="2.8" fill="#F4F1E8"/></svg>
+<text x="50" y="66" text-anchor="middle" font-family="Bahnschrift, 'Segoe UI', system-ui, sans-serif" font-weight="700" font-size="50" letter-spacing="-2"><tspan fill="#8FAEFF">8</tspan><tspan fill="#3ECFC8">.</tspan><tspan fill="#8FAEFF">5</tspan></text></svg>

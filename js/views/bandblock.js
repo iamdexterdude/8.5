@@ -1,4 +1,4 @@
-// The signature element: her current estimate and her distance to band 8, set large.
+// The signature element: her current estimate and her distance to band 8.5, set large.
 import { h, reducedMotion } from "../util.js";
 import * as store from "../store.js";
 
@@ -22,13 +22,14 @@ export function bandBlock({ detail = true } = {}) {
   const root = h("section", { class: "section", "aria-label": "Band estimate" }, h("div", { class: "band" }, big, side));
   if (!detail) return root;
 
-  const rows = [["Listening", e.skills.listening, "Hold"], ["Reading", e.skills.reading], ["Writing", e.skills.writing], ["Speaking", e.skills.speaking, e.assumed ? "assumed" : null]];
-  root.append(h("div", { class: "skillbars" }, rows.map(([name, v, note]) =>
+  const aims = S.config.skillTargets;
+  const rows = [["Listening", e.skills.listening, "listening"], ["Reading", e.skills.reading, "reading"], ["Writing", e.skills.writing, "writing"], ["Speaking", e.skills.speaking, "speaking", e.assumed]];
+  root.append(h("div", { class: "skillbars" }, rows.map(([name, v, key, assumed]) =>
     h("div", { class: "skillbar" }, h("span", null, name),
-      h("div", { class: "track", role: "img", "aria-label": `${name} ${f1(v)}, target ${target}` },
-        h("div", { class: "fill", style: { width: `${(Math.min(9, v ?? 0) / 9) * 100}%`, opacity: note === "assumed" ? .45 : 1 } }),
-        h("div", { class: "tick", style: { left: `${(target / 9) * 100}%` } })),
-      h("b", { class: "num" }, f1(v))))));
+      h("div", { class: "track", role: "img", "aria-label": `${name} ${f1(v)}, aim ${aims[key]}` },
+        h("div", { class: "fill", style: { width: `${(Math.min(9, v ?? 0) / 9) * 100}%`, opacity: assumed ? .45 : 1 } }),
+        h("div", { class: "tick", style: { left: `${(aims[key] / 9) * 100}%` } })),
+      h("span", { class: "num", style: { textAlign: "right" } }, h("b", null, f1(v)), h("span", { class: "faint tiny" }, ` / ${aims[key]}`))))));
   if (e.assumed) root.append(h("p", { class: "tiny faint", style: { marginTop: "8px" } }, "Speaking is set in Lesson 1. Until then it is assumed to match your writing."));
   return root;
 }
