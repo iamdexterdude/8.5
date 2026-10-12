@@ -1,0 +1,6 @@
+node_modules/
+dist/
+build-private/
+course/
+.env
+*.session

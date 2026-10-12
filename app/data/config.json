@@ -1,0 +1,33 @@
+{
+  "appName": "Eight",
+  "target": 8,
+  "stretchTarget": 8.5,
+  "tz": "Asia/Tashkent",
+  "defaults": {
+    "lessonTime": "19:00",
+    "lessonMinutes": 90,
+    "meetingLink": "",
+    "newCardsPerDay": 15,
+    "desiredRetention": 0.9,
+    "quickReviewMinutes": 5,
+    "theme": "system"
+  },
+  "rawToBand": {
+    "_note": "Commonly published Academic Reading and Listening conversions (ielts.org). Upper ranges verified against the mock: 37/40 listening = 8.5, 33/40 reading = 7.5. Check against ielts.org before relying on lower rows.",
+    "reading": [[39, 9], [37, 8.5], [35, 8], [33, 7.5], [30, 7], [27, 6.5], [23, 6], [19, 5.5], [15, 5], [13, 4.5], [10, 4], [8, 3.5], [6, 3], [4, 2.5]],
+    "listening": [[39, 9], [37, 8.5], [35, 8], [32, 7.5], [30, 7], [26, 6.5], [23, 6], [18, 5.5], [16, 5], [13, 4.5], [11, 4], [8, 3.5], [6, 3], [4, 2.5]]
+  },
+  "patterns": {
+    "Task": { "label": "Task", "hint": "Answering the question, overview, structure" },
+    "Article": { "label": "Article", "hint": "a / an / the / no article" },
+    "Collocation": { "label": "Collocation", "hint": "Words that go together" },
+    "Grammar": { "label": "Grammar", "hint": "Verb forms, agreement, structure" },
+    "Template": { "label": "Template", "hint": "Memorised phrases to cut" }
+  },
+  "baseline": [
+    { "skill": "listening", "raw": 37, "band": 8.5, "date": "2026-10-11", "note": "Autumn mock" },
+    { "skill": "reading", "raw": 33, "band": 7.5, "date": "2026-10-11", "note": "Autumn mock" },
+    { "skill": "writing1", "band": 6, "date": "2026-10-11", "note": "Autumn mock, Task 1" },
+    { "skill": "writing2", "band": 6.5, "date": "2026-10-11", "note": "Autumn mock, Task 2" }
+  ]
+}
