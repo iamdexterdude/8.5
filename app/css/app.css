@@ -1,4 +1,4 @@
-/* Eight — styles. Palette from Rishtan ceramics: cobalt, turquoise, warm white; ink-dark at night. */
+/* 8.5 — styles. Palette from Rishtan ceramics: cobalt, turquoise, warm white; ink-dark at night. */
 
 @font-face { font-family: "Bricolage"; src: url("../fonts/display.woff2") format("woff2"); font-weight: 200 800; font-display: swap; }
 @font-face { font-family: "Instrument"; src: url("../fonts/text.woff2") format("woff2"); font-weight: 400 700; font-display: swap; }
@@ -77,7 +77,7 @@ main#view { flex: 1; width: 100%; max-width: 760px; margin: 0 auto; padding: 16p
   #app { flex-direction: row; }
   .nav { position: sticky; top: 0; height: 100dvh; width: 96px; flex: none; grid-template-columns: 1fr; grid-auto-rows: 72px; align-content: start; padding: 88px 8px 0; border-top: 0; border-right: 1px solid var(--line); }
   .nav a[aria-current="page"]::before { left: -9px; top: 18px; width: 3px; height: 36px; border-radius: 0 3px 3px 0; }
-  .brand { display: block; position: absolute; top: 24px; left: 0; right: 0; text-align: center; font: 600 28px var(--f-display); color: var(--accent); }
+  .brand { display: block; position: absolute; top: 28px; left: 0; right: 0; text-align: center; font: 600 24px var(--f-display); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; color: var(--accent); }
   main#view { max-width: 980px; padding: 28px 40px 64px; margin: 0 auto; }
   main#view:has(.two-col) { max-width: 1280px; }
 }
@@ -150,7 +150,7 @@ a.row:hover .title { color: var(--accent); }
 .band .side { display: grid; gap: 4px; padding-bottom: 6px; }
 .band .gap { font: 600 22px var(--f-display); font-variant-numeric: tabular-nums; }
 .skillbars { display: grid; gap: 10px; margin-top: 12px; }
-.skillbar { display: grid; grid-template-columns: 84px 1fr 44px; align-items: center; gap: 10px; font-size: 14px; }
+.skillbar { display: grid; grid-template-columns: 84px 1fr 62px; align-items: center; gap: 10px; font-size: 14px; }
 .skillbar .track { position: relative; height: 8px; border-radius: 8px; background: var(--surface-2); overflow: visible; }
 .skillbar .fill { height: 100%; border-radius: 8px; background: var(--accent); transition: width .5s var(--ease); }
 .skillbar .tick { position: absolute; top: -4px; width: 2px; height: 16px; background: var(--text); opacity: .6; }

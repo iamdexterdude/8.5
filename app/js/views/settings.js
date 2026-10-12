@@ -4,6 +4,7 @@ import * as store from "../store.js";
 import * as db from "../db.js";
 import { head, toast, confirmSheet } from "../ui.js";
 import { downloadIcs } from "../ics.js";
+import { reportCard } from "../report.js";
 
 export const live = false;
 
@@ -60,9 +61,11 @@ export default async function (ctx) {
     h("div", { class: "field", style: { marginTop: "14px" } }, h("label", null, "Import a backup"), importIn),
     h("div", { style: { marginTop: "12px" } }, h("button", { class: "btn danger", onclick: () => confirmSheet("Start again?", "This deletes your progress, essays and recordings on this device and restores the plan's starting state.", "Delete and start again", async () => { await store.resetAll(); toast("Reset."); location.hash = "#/today"; }, { danger: true }) }, "Delete my data"))));
 
+  root.append(reportCard());
+
   // course pack
   root.append(packSection(ctx));
-  root.append(h("p", { class: "footer-note" }, "Eight is private. No accounts, no tracking, and nothing leaves your device unless you export it."));
+  root.append(h("p", { class: "footer-note" }, "8.5 is private. No accounts, no tracking, and nothing leaves your device unless you export it."));
   return root;
 }
 
@@ -74,10 +77,10 @@ function download(name, content, type = "application/json") {
 function installSection() {
   const ios = /iphone|ipad|ipod/i.test(navigator.userAgent), standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone;
   const sec = h("section", { class: "section" }, h("div", { class: "shead" }, h("h2", null, "Install the app")));
-  if (standalone) { sec.append(h("p", { class: "muted" }, "Eight is installed on this device.")); return sec; }
-  if (window.__installPrompt) sec.append(h("button", { class: "btn primary", onclick: async () => { window.__installPrompt.prompt(); await window.__installPrompt.userChoice; window.__installPrompt = null; } }, "Install Eight"));
+  if (standalone) { sec.append(h("p", { class: "muted" }, "8.5 is installed on this device.")); return sec; }
+  if (window.__installPrompt) sec.append(h("button", { class: "btn primary", onclick: async () => { window.__installPrompt.prompt(); await window.__installPrompt.userChoice; window.__installPrompt = null; } }, "Install 8.5"));
   else if (ios) sec.append(h("p", null, "On iPhone: open this page in Safari, tap the Share button, then Add to Home Screen. Notifications and offline use work after that (iOS 16.4 or later)."));
-  else sec.append(h("p", null, "On Chrome or Edge: open the browser menu and choose Install Eight (or Apps, then Install this site as an app). On Android: menu, then Add to Home screen."));
+  else sec.append(h("p", null, "On Chrome or Edge: open the browser menu and choose Install 8.5 (or Apps, then Install this site as an app). On Android: menu, then Add to Home screen."));
   return sec;
 }
 

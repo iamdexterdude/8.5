@@ -26,7 +26,8 @@ export function runWelcome() {
     const root = h("div", { class: "welcome", role: "dialog", "aria-label": "Welcome" });
     const pattern = ikat({ opacity: 0 }); pattern.classList.add("ikat");
     const stage = h("div", { class: "stage" });
-    const skip = h("button", { class: "skip", onclick: () => finish() }, "Skip");
+    let chosen = ""; // the name she typed, kept so Skip never loses it
+    const skip = h("button", { class: "skip", onclick: () => finish(chosen || input.value.trim()) }, "Skip");
     root.append(pattern, skip, stage);
     document.body.append(root);
     let finished = false; const timers = [];
@@ -53,7 +54,7 @@ export function runWelcome() {
 
     // step 2: the month, about ten seconds
     function play(name) {
-      stage.replaceChildren(); skip.onclick = () => finish(name);
+      chosen = name; stage.replaceChildren();
       const line = h("div", { class: "line" }); const sub = h("div", { class: "sub" });
       stage.append(line, sub);
       pattern.style.transition = "opacity 2.4s ease"; pattern.style.opacity = reducedMotion() ? .12 : .22;
@@ -67,7 +68,7 @@ export function runWelcome() {
         [2400, "28 days.", "Monday 12 October to Sunday 8 November."],
         [4600, "12 lessons.", "Three a week, with the rest at your own pace."],
         [6800, "One target.", ""],
-        [8400, "Band 8.", "Let's begin.", true],
+        [8400, "Band 8.5.", "Let's begin.", true],
       ];
       for (const [t, a, b, c] of seq) later(t, () => show(a, b, c));
       later(10600, () => { sub.replaceChildren(); stage.append(h("div", { class: "row-actions", style: { justifyContent: "center", marginTop: "20px" } }, h("button", { class: "btn primary", onclick: () => finish(name) }, "Open today"))); });

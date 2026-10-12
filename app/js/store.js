@@ -202,7 +202,7 @@ export async function exportAll() {
   return out;
 }
 export async function importAll(obj) {
-  if (obj?.app !== "eight" || !obj.data) throw new Error("This file is not an Eight backup.");
+  if (obj?.app !== "eight" || !obj.data) throw new Error("This file is not an 8.5 backup.");
   for (const [name, rows] of Object.entries(obj.data)) {
     if (!db.storeNames.includes(name) || name === "pack") continue;
     await db.clear(name);

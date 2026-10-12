@@ -1,4 +1,4 @@
-# Eight
+# 8.5
 
 A private, local-first IELTS training companion that installs on a phone or a PC.
 
@@ -27,3 +27,7 @@ Open http://localhost:8123. Add `?date=2026-10-14` to pretend it is another day 
 ## Notes
 
 Course material is not part of this repository. The app can load a private *course pack* file from Settings; it stays in the browser that loaded it.
+
+## Progress report
+
+Progress, Settings and the Sunday rest screen can build a single self-contained HTML dashboard (`app/js/report.js`, `app/report/template.html`): scores against her aims (9, 9, 8, 8 for an overall 8.5), a day-by-day calendar, effort, essays she can open and read, recordings, reading causes, review stats and the error log, with a list of what needs the teacher's attention. It is built on her device and shared by her.

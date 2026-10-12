@@ -6,6 +6,7 @@ import { head, toast, taskRow, skillName } from "../ui.js";
 import { toolFor, needsEvidence, minimumTasks, minimumTool, watchFor } from "../tasks.js";
 import { bandBlock } from "./bandblock.js";
 import { watchRow } from "./watch.js";
+import { reportCard } from "../report.js";
 
 const TYPE_LABEL = { lesson: "Lesson day", self: "Self-study", test: "Test day", fullmock: "Full mock", light: "Light day", off: "Rest day", other: "" };
 
@@ -172,7 +173,8 @@ function restScreen(today) {
     h("div", { class: "skillbars", style: { maxWidth: "360px", margin: "24px auto 0", textAlign: "left" } },
       h("div", { class: "row", style: { minHeight: "auto" } }, h("div", { class: "grow" }, "Tasks done this week"), h("b", { class: "num" }, `${done} of ${total}`)),
       h("div", { class: "row", style: { minHeight: "auto" } }, h("div", { class: "grow" }, "Minutes timed"), h("b", { class: "num" }, minutes)),
-      h("div", { class: "row", style: { minHeight: "auto" } }, h("div", { class: "grow" }, "Day streak"), h("b", { class: "num" }, store.streak(today)))));
+      h("div", { class: "row", style: { minHeight: "auto" } }, h("div", { class: "grow" }, "Day streak"), h("b", { class: "num" }, store.streak(today)))),
+    h("div", { style: { maxWidth: "460px", margin: "28px auto 0", textAlign: "left" } }, reportCard()));
 }
 
 function sidePanel(today) {

@@ -1,4 +1,4 @@
-// Service worker: makes Eight work offline. The build script fills in ASSETS and VERSION.
+// Service worker: makes 8.5 work offline. The build script fills in ASSETS and VERSION.
 const VERSION = "__VERSION__";
 const ASSETS = "__ASSETS__";
 const CACHE = "eight-" + VERSION;
