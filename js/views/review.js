@@ -1,5 +1,5 @@
 // Review: spaced repetition with FSRS. Quick review (five minutes), a full session, or by tag.
-import { h, icon, mmss, todayISO, uid } from "../util.js";
+import { h, icon, mmss, todayISO, uid, fmtShort } from "../util.js";
 import * as store from "../store.js";
 import * as srs from "../srs.js";
 import { head, toast, makeTimer, sheet, segLinks } from "../ui.js";
@@ -18,32 +18,32 @@ export default async function (ctx) {
 
 // ---------- hub ----------
 function hub(ctx) {
-  const S = store.S, due = srs.queue(), total = S.cards.length;
-  const learned = S.cards.filter((c) => c.fsrs).length, leeches = S.cards.filter(srs.isLeech);
+  const S = store.S, today = todayISO(), due = srs.queue();
+  const decks = store.activeDecks(today).map((d) => ({ ...d, st: srs.deckStats(d.id) })).filter((d) => d.st.total > 0 || ["mistakes", "mine"].includes(d.id));
   const root = h("div");
   root.append(head("Review", { sub: "Words, phrases and fixes" }));
   root.append(segLinks("Review sections", [["cards", "Cards", "#/review"], ["errors", "Error log", "#/errors"]], "cards"));
 
   root.append(h("section", { class: "section", style: { marginTop: 0 } },
-    h("div", { class: "band" }, h("div", { class: "big num", "aria-label": `${due.length} cards ready` }, String(due.length)), h("div", { class: "side" }, h("div", { class: "kicker" }, "cards ready"), h("div", { class: "kicker" }, `${srs.newRemaining()} new allowed today`))),
+    h("div", { class: "band" }, h("div", { class: "big num", "aria-label": `${due.length} cards ready` }, String(due.length)), h("div", { class: "side" }, h("div", { class: "kicker" }, "cards ready in all decks"))),
     h("div", { class: "row-actions" },
-      h("a", { class: "btn primary", href: "#/review/session?mode=quick", "aria-disabled": due.length ? null : "true" }, icon("play", 18), "Quick review, 5 min"),
-      h("a", { class: "btn", href: "#/review/session?mode=full" }, "Full session"))));
-  if (!due.length) root.append(h("p", { class: "muted", style: { marginTop: "10px" } }, "Nothing is due. Come back tomorrow, or add a card from something you read today."));
+      h("a", { class: "btn primary", href: "#/review/session?mode=quick" }, icon("play", 18), "Quick review, 5 min"),
+      h("a", { class: "btn", href: "#/review/session?mode=full" }, "Review everything"))));
+  if (!due.length) root.append(h("p", { class: "muted", style: { marginTop: "10px" } }, "Nothing is due. New decks arrive on the day they are assigned."));
 
-  root.append(h("section", { class: "section" }, h("div", { class: "shead" }, h("h2", null, "By tag")),
-    h("div", { class: "row-actions" }, TAGS.map(([k, l]) => { const n = srs.queue({ tag: k }).length, all = S.cards.filter((c) => c.tag === k).length;
-      return all ? h("a", { class: "btn small", href: `#/review/session?mode=full&tag=${k}` }, patternOf({ tag: k }) ? patternMark(patternOf({ tag: k })) : null, `${l} `, h("span", { class: "faint num" }, String(n))) : null; }))));
+  const row = (d) => h("li", null, h("div", { class: "row deckrow", style: { flexWrap: "wrap", alignItems: "flex-start" } },
+    h("div", { class: "grow" }, h("div", { class: "title" }, d.name),
+      h("div", { class: "counts", style: { marginTop: "2px" } }, h("span", null, h("b", null, d.st.fresh), " new"), h("span", null, h("b", null, d.st.due), " due"), h("span", null, h("b", null, d.st.total), " cards"), d.date > "0001" ? h("span", { class: "faint" }, "from " + fmtShort(d.date)) : null),
+      d.source ? h("div", { class: "tiny faint" }, d.source.url ? h("a", { href: d.source.url, target: "_blank", rel: "noopener" }, d.source.title) : d.source.title) : (d.note ? h("div", { class: "tiny faint" }, d.note) : null)),
+    d.st.total ? h("a", { class: "btn small" + (d.st.fresh + d.st.due ? " primary" : ""), href: `#/review/session?deck=${encodeURIComponent(d.id)}` }, d.st.fresh + d.st.due ? "Review" : "Practise") : null));
+  const todayDecks = decks.filter((d) => d.date === today), others = decks.filter((d) => d.date !== today).sort((a, b) => b.date.localeCompare(a.date));
+  if (todayDecks.length) root.append(h("section", { class: "section" }, h("div", { class: "shead" }, h("h2", null, "Today's decks"), h("a", { class: "btn small", href: `#/review/session?day=${today}` }, "Review them all")), h("ul", { class: "rows" }, todayDecks.map(row))));
+  root.append(h("section", { class: "section" }, h("div", { class: "shead" }, h("h2", null, "All decks"), h("span", { class: "kicker num" }, `${others.length} decks`)),
+    others.length ? h("ul", { class: "rows" }, others.map(row)) : h("p", { class: "muted" }, "Your decks will appear here."),
+    h("div", { class: "row-actions", style: { marginTop: "12px" } }, h("button", { class: "btn", onclick: addCardSheet }, icon("plus", 18), "Add a card")),
+    S.pack ? null : h("p", { class: "small muted", style: { marginTop: "12px" } }, "Load the course pack in Settings to get a named deck for each model answer and reading passage.")));
 
-  const inb = srs.inbox();
-  if (inb.length) root.append(h("section", { class: "section" }, h("div", { class: "row", style: { borderTop: "1px solid var(--line)", borderBottom: "1px solid var(--line)" } },
-    h("div", { class: "grow" }, h("div", { class: "title num" }, `${inb.length} suggested cards from the course`), h("div", { class: "sub" }, "Nothing joins your deck until you approve it.")),
-    h("a", { class: "btn", href: "#/review/inbox" }, "Open the card inbox"))));
-
-  root.append(h("section", { class: "section" }, h("div", { class: "shead" }, h("h2", null, "Your deck")),
-    h("div", { class: "small muted num" }, `${total} cards, ${learned} started`, leeches.length ? `, ${leeches.length} you keep missing` : ""),
-    h("div", { class: "row-actions", style: { marginTop: "10px" } }, h("button", { class: "btn", onclick: addCardSheet }, icon("plus", 18), "Add a card"))));
-
+  const leeches = S.cards.filter(srs.isLeech);
   if (leeches.length) root.append(h("section", { class: "section" }, h("div", { class: "shead" }, h("h2", null, "Cards you keep missing")), h("p", { class: "small muted" }, "Failed five times or more. Good material for the next lesson warm-up."),
     h("ul", { class: "rows" }, leeches.slice(0, 8).map((c) => h("li", null, h("div", { class: "row" }, h("div", { class: "grow" }, h("div", { class: "small" }, c.front), h("div", { class: "sub" }, c.back))))))));
   return root;
@@ -76,8 +76,9 @@ function inbox(ctx) {
 
 // ---------- session ----------
 async function session(ctx) {
-  const q = ctx.query, quick = q.mode === "quick", tag = q.tag || null;
-  let queue = srs.queue({ tag }); const total = queue.length;
+  const q = ctx.query, quick = q.mode === "quick", tag = q.tag || null, deckId = q.deck || null, dayId = q.day || null;
+  let queue = srs.queue({ tag, deck: deckId, day: dayId }); const total = queue.length;
+  const deckName = deckId ? (store.deckById(deckId)?.name || "Deck") : dayId ? "Today's new words" : null;
   const root = h("div");
   const back = q.session ? "#/session" : q.task ? "#/today" : "#/review";
   const limit = quick ? Number(store.setting("quickReviewMinutes")) * 60 : 0;
@@ -86,7 +87,7 @@ async function session(ctx) {
   const clock = h("span", { class: "faint num small" });
   const bar = h("i", { style: { width: "0%" } });
   const body = h("div");
-  root.append(head(quick ? "Quick review" : "Review", { back, sub: tag ? (TAGS.find((t) => t[0] === tag) || [])[1] : null, actions: limit ? clock : null }), h("div", { class: "progressline" }, bar), body);
+  root.append(head(deckName || (quick ? "Quick review" : "Review"), { back: deckId || dayId ? "#/review" : back, sub: tag ? (TAGS.find((t) => t[0] === tag) || [])[1] : (deckName && deckId ? `${total} cards` : null), actions: limit ? clock : null }), h("div", { class: "progressline" }, bar), body);
 
   let timer = null;
   if (limit) { timer = makeTimer(limit, { onTick: (s) => { clock.textContent = mmss(s); }, onEnd: () => finish("Five minutes are up. Well done.") }); timer.start(); }
@@ -97,6 +98,7 @@ async function session(ctx) {
     const spent = Math.max(1, Math.round((Date.now() - startedAt) / 60000));
     if (done) store.addStudy(spent, "review");
     if (q.task && (done || !total)) store.markDone(q.task);
+    if ((done || !total) && (deckId || dayId)) store.markCourseTasks({ deck: deckId, day: dayId });
     const nextDue = store.S.cards.filter((c) => c.fsrs).map((c) => new Date(c.fsrs.due)).filter((d) => d > new Date()).sort((a, b) => a - b)[0];
     body.replaceChildren(h("div", { class: "rest" }, h("h1", null, done ? "Session complete" : "Nothing to review"), h("p", { class: "lead muted" }, msg || (done ? `${done} ${done === 1 ? "card" : "cards"} reviewed.` : "Come back when new cards are due.")),
       done ? h("p", { class: "muted num" }, `${done - again} remembered, ${again} to see again soon.`) : null,
@@ -110,19 +112,19 @@ async function session(ctx) {
     revealed = false; busy = false;
     bar.style.width = `${total ? (done / (done + queue.length)) * 100 : 0}%`;
     const patt = patternOf(current);
-    const typed = h("textarea", { rows: 2, placeholder: "Type the correct version, or say it aloud (optional)", "aria-label": "Your answer", spellcheck: false, autocomplete: "off", style: { maxWidth: "480px", margin: "0 auto" } });
+    const typed = h("textarea", { rows: 2, placeholder: ["fix", "swap"].includes(current.type) ? "Type the correct version, or say it aloud (optional)" : "Write one sentence of your own with it (optional)", "aria-label": "Your answer", spellcheck: false, autocomplete: "off", style: { maxWidth: "480px", margin: "0 auto" } });
     const flash = h("div", { class: "flash", role: "group", "aria-label": "Card" },
       h("div", { class: "tagchip", style: { justifySelf: "center" } }, patt ? patternMark(patt) : null, labelOf(current)),
       h("div", { class: "kicker" }, current.prompt || ""),
       h("div", { class: "q" }, current.front),
       (current.type === "chunk" || current.type === "vocab") ? h("button", { class: "btn small quiet", style: { justifySelf: "center" }, onclick: () => speak(current.type === "chunk" ? current.back : current.front.split(/[\n(]/)[0]) }, icon("headphones", 18), "Listen") : null,
-      ["fix", "swap"].includes(current.type) ? typed : null);
+      ["fix", "swap", "chunk", "vocab"].includes(current.type) ? typed : null);
     const reveal = h("button", { class: "btn primary block", style: { marginTop: "16px" }, onclick: doReveal }, "Show answer ", h("span", { class: "kbd" }, "Space"));
     const answerArea = h("div");
     body.replaceChildren(flash, answerArea, reveal);
     function doReveal() {
       if (revealed) return; revealed = true;
-      flash.classList.add("flip"); flash.append(h("div", { class: "a", style: { whiteSpace: "pre-line" } }, current.back), current.source ? h("div", { class: "tiny faint" }, current.source) : null);
+      flash.classList.add("flip"); flash.append(h("div", { class: "a", style: { whiteSpace: "pre-line" } }, current.back), current.source ? h("div", { class: "tiny faint" }, (store.deckById(current.deck)?.name ? store.deckById(current.deck).name + ", " : "") + current.source) : null);
       reveal.remove();
       const pv = srs.preview(current), R = srs.Rating;
       const btn = (rating, label, cls) => h("button", { class: cls, onclick: () => rate(rating), "aria-label": `${label}, next in ${srs.humanInterval(pv[rating])}` }, h("span", null, label), h("small", null, srs.humanInterval(pv[rating])), h("span", { class: "kbd", "aria-hidden": "true", style: { justifySelf: "center" } }, String(rating)));

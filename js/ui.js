@@ -82,7 +82,7 @@ export function makeTimer(seconds, { onTick, onEnd } = {}) {
   };
 }
 
-const SK = { speak: "Speak", write: "Write", read: "Read", fix: "Fix", listen: "Listen", homework: "Homework", lesson: "Lesson", other: "Other" };
+const SK = { course: "Course homework", speak: "Speak", write: "Write", read: "Read", fix: "Fix", listen: "Listen", homework: "Homework", lesson: "Lesson", other: "Other" };
 export const skillName = (b) => SK[b] || b;
 
 // beeps from WebAudio, so a finished timer is heard even with the screen dim

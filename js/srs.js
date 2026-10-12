@@ -37,14 +37,16 @@ export function humanInterval(due, now = new Date()) {
 }
 
 export function newToday() { const t = todayISO(); return store.S.cards.filter((c) => c.introduced === t).length; }
-export function newRemaining() { return Math.max(0, Number(store.setting("newCardsPerDay")) - newToday()); }
+export function newRemaining() { const cap = Number(store.setting("newCardsPerDay")); return cap > 0 ? Math.max(0, cap - newToday()) : Infinity; } // 0 = no limit
 
 // Cards for a session: learned cards that are due, then new ones up to today's cap.
-export function queue({ tag = null, includeNew = true } = {}) {
+export function queue({ tag = null, deck = null, day = null, includeNew = true } = {}) {
   const now = new Date();
-  const ok = (c) => !c.suspended && (!tag || c.tag === tag || c.type === tag);
+  const dayDecks = day ? new Set((store.S.pack?.decks || []).filter((d) => d.date === day).map((d) => d.id)) : null;
+  const ok = (c) => !c.suspended && (!tag || c.tag === tag || c.type === tag) && (!deck || c.deck === deck) && (!dayDecks || dayDecks.has(c.deck));
   const due = store.S.cards.filter((c) => ok(c) && c.fsrs && new Date(c.fsrs.due) <= now).sort((a, b) => new Date(a.fsrs.due) - new Date(b.fsrs.due));
-  const fresh = includeNew ? store.S.cards.filter((c) => ok(c) && !c.fsrs).slice(0, newRemaining()) : [];
+  const room = newRemaining();
+  const fresh = includeNew ? store.S.cards.filter((c) => ok(c) && !c.fsrs).slice(0, Number.isFinite(room) ? room : undefined) : [];
   return [...due, ...fresh];
 }
 export function dueCount() { return queue().length; }
@@ -74,11 +76,15 @@ export async function grade(card, rating) {
 export const isLeech = (card) => (card.fsrs?.lapses || 0) >= 5;
 
 export async function addCard({ type = "custom", front, back, tag = "", prompt = "", source = "Added by you" }) {
-  const card = { id: "c-" + uid(), type, tag, front, back, prompt: prompt || "Say or write it, then check.", source, fsrs: null, introduced: null, suspended: false };
+  const card = { id: "c-" + uid(), deck: "mine", type, tag, front, back, prompt: prompt || "Say or write it, then check.", source, fsrs: null, introduced: null, suspended: false };
   store.S.cards.push(card); await db.put("cards", card); store.changed(); return card;
 }
 export async function removeCard(id) { store.S.cards = store.S.cards.filter((c) => c.id !== id); await db.del("cards", id); store.changed(); }
 
 // cards from the course pack's vocabulary land here for approval before joining her deck
-export function inbox() { return (store.S.pack?.cards || []).filter((c) => !store.S.cards.some((x) => x.id === c.id) && !store.S.kv["rej-" + c.id]); }
+export function inbox() { return []; } // course cards now arrive in named decks on the day they are assigned
+export function deckStats(id) {
+  const cs = store.S.cards.filter((c) => c.deck === id && !c.suspended), now = new Date();
+  return { total: cs.length, fresh: cs.filter((c) => !c.fsrs).length, due: cs.filter((c) => c.fsrs && new Date(c.fsrs.due) <= now).length, started: cs.filter((c) => c.fsrs).length };
+}
 export async function approve(c) { const card = { ...c, fsrs: null, introduced: null, suspended: false }; store.S.cards.push(card); await db.put("cards", card); store.changed(); }

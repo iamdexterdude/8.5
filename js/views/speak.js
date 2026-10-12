@@ -39,8 +39,9 @@ export default async function (ctx) {
   function courseCards() { return (S.pack?.cueCards || []).map((c) => ({ ...c, say: ["what it is, or who it is", "when and where", "what happened, or what it is like", "and explain why it matters to you"] })); }
 
   const steps = [];
-  if (mode === "part1") for (const qn of part1For(from).slice(0, 6)) steps.push({ part: 1, text: qn, speak: 30 });
-  else if (mode === "part3") for (const qn of part3Qs([q.theme || info.part3?.[0] || "work"], 6)) steps.push({ part: 3, text: qn, speak: 60 });
+  const unit = q.unit ? store.unitById(q.unit) : null;
+  if (mode === "part1") for (const qn of (unit?.questions?.length ? unit.questions : part1For(from)).slice(0, 8)) steps.push({ part: 1, text: qn, speak: 30 });
+  else if (mode === "part3") for (const qn of (unit?.questions?.length ? unit.questions : part3Qs([q.theme || info.part3?.[0] || "work"], 6)).slice(0, 8)) steps.push({ part: 3, text: qn, speak: 60 });
   else if (mode === "part2") { const c = cardById(q.card) || bank.cards[info.cards?.[0]] || Object.values(bank.cards)[0]; steps.push({ part: 2, card: c, prep: 60, speak: 120 }); }
   else if (mode === "mock") {
     const d = store.dayByDate(from) || store.dayByDate(todayISO()); const l1 = d?.questions;

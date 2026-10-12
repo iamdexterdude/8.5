@@ -6,7 +6,7 @@
     "lessonTime": "19:00",
     "lessonMinutes": 90,
     "meetingLink": "",
-    "newCardsPerDay": 15,
+    "newCardsPerDay": 0,
     "desiredRetention": 0.9,
     "quickReviewMinutes": 5,
     "theme": "system"

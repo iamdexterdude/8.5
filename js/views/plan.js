@@ -4,6 +4,7 @@ import * as store from "../store.js";
 import { head, taskRow, skillName, segLinks } from "../ui.js";
 import { toolFor, watchFor } from "../tasks.js";
 import { watchRow } from "./watch.js";
+import { courseWork } from "./coursework.js";
 
 const SHORT = { lesson: "Lesson", self: "Self-study", test: "Test day", fullmock: "Full mock", light: "Light day", off: "Off", other: "" };
 
@@ -128,6 +129,7 @@ function dayView(ctx, date) {
       const tool = toolFor(t);
       return taskRow(t, { onToggle: async (x) => { if (store.isDone(x.key)) await store.unmarkDone(x.key); else if (tool.evidence) { location.hash = tool.href; } else await store.markDone(x.key); }, startHref: tool.href, startLabel: tool.label, evidence: tool.evidence });
     }))));
+  root.append(...courseWork(d.date));
   root.append(...dayContent(d));
   const vids = watchFor(d.date);
   if (vids.length) root.append(h("section", { class: "section" }, h("div", { class: "shead" }, h("h2", null, "Watch")), h("ul", { class: "rows" }, vids.map((v) => watchRow(v, d.date)))));

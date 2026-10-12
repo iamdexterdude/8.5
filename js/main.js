@@ -13,7 +13,7 @@ const TABS = [
 const ROUTES = {
   today: ["today", "today"], plan: ["plan", "plan"], lesson: ["lesson", "plan"],
   practice: ["practice", "practice"], write: ["write", "practice"], speak: ["speak", "practice"], read: ["readlog", "practice"], timer: ["timer", "practice"], session: ["session", "today"],
-  review: ["review", "review"], errors: ["errors", "review"],
+  model: ["model", "today"], review: ["review", "review"], errors: ["errors", "review"],
   progress: ["progress", "progress"], settings: ["settings", "today"], watch: ["watch", "today"],
 };
 
