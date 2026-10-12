@@ -1,0 +1,1876 @@
+{
+ "title": "IELTS 8 — Month 1 Plan",
+ "start": "2026-10-12",
+ "end": "2026-11-08",
+ "tz": "Asia/Tashkent",
+ "mock": [
+  {
+   "skill": "Listening",
+   "result": "37/40",
+   "band": "8.5",
+   "target": "Hold"
+  },
+  {
+   "skill": "Reading",
+   "result": "33/40",
+   "band": "7.5",
+   "target": "9"
+  },
+  {
+   "skill": "Writing",
+   "result": "Task 1: 6 · Task 2: 6.5",
+   "band": "6.5",
+   "target": "7.5–8"
+  },
+  {
+   "skill": "Speaking",
+   "result": "Not tested yet",
+   "band": "Set in Lesson 1",
+   "target": "7.5–8"
+  }
+ ],
+ "routes": [
+  {
+   "route": "A",
+   "reading": 8,
+   "writing": 7,
+   "speaking": 7.5,
+   "overall": 8
+  },
+  {
+   "route": "B",
+   "reading": 8.5,
+   "writing": 7,
+   "speaking": 7,
+   "overall": 8
+  },
+  {
+   "route": "C",
+   "reading": 7.5,
+   "writing": 7.5,
+   "speaking": 7.5,
+   "overall": 8
+  },
+  {
+   "route": "D",
+   "reading": 9,
+   "writing": 7.5,
+   "speaking": 8,
+   "overall": 8.5
+  },
+  {
+   "route": "E",
+   "reading": 8.5,
+   "writing": 8,
+   "speaking": 8,
+   "overall": 8.5
+  }
+ ],
+ "checkpoints": [
+  {
+   "id": "cp1",
+   "name": "Checkpoint 1",
+   "dates": "23–24 Oct",
+   "from": "2026-10-23",
+   "to": "2026-10-24",
+   "targets": {
+    "Speaking": "Half a band above baseline",
+    "Writing": "7 on at least one task",
+    "Reading": "35+/40",
+    "Listening": "36+/40"
+   }
+  },
+  {
+   "id": "cp2",
+   "name": "Checkpoint 2",
+   "dates": "5–6 Nov",
+   "from": "2026-11-05",
+   "to": "2026-11-06",
+   "targets": {
+    "Speaking": "7–7.5",
+    "Writing": "7 on both tasks, timed",
+    "Reading": "36–37/40",
+    "Listening": "36+/40"
+   }
+  }
+ ],
+ "roadmap": [
+  {
+   "phase": "Foundations",
+   "week": 1,
+   "dates": "12–18 Oct",
+   "focus": "Part 2 and Part 3, essay structure, Task 1 maps"
+  },
+  {
+   "phase": "Development",
+   "week": 2,
+   "dates": "19–25 Oct",
+   "focus": "Abstract Part 3, vocabulary range, body paragraphs"
+  },
+  {
+   "phase": "Precision",
+   "week": 3,
+   "dates": "26 Oct – 1 Nov",
+   "focus": "Accuracy in writing, pronunciation, higher-band moves"
+  },
+  {
+   "phase": "Test conditions",
+   "week": 4,
+   "dates": "2–8 Nov",
+   "focus": "Everything timed, last weak spots, Month 2 targets"
+  }
+ ],
+ "gates": [
+  {
+   "gate": "Baseline",
+   "date": "12 Oct",
+   "what": "Speaking mock 1"
+  },
+  {
+   "gate": "Checkpoint 1",
+   "date": "23–24 Oct",
+   "what": "Speaking mock 2, full mock"
+  },
+  {
+   "gate": "Checkpoint 2",
+   "date": "5–6 Nov",
+   "what": "Full mock, final speaking mock; the 6 Nov review sets Month 2"
+  }
+ ],
+ "rhythm": [
+  {
+   "day": "Mon",
+   "what": "Lesson + homework",
+   "time": "1.5 h + 1.5 h"
+  },
+  {
+   "day": "Tue",
+   "what": "Self-study",
+   "time": "3 h"
+  },
+  {
+   "day": "Wed",
+   "what": "Lesson + homework",
+   "time": "1.5 h + 1.5 h"
+  },
+  {
+   "day": "Thu",
+   "what": "Self-study",
+   "time": "3 h"
+  },
+  {
+   "day": "Fri",
+   "what": "Lesson + homework",
+   "time": "1.5 h + 1.5 h"
+  },
+  {
+   "day": "Sat",
+   "what": "Test day",
+   "time": "3 h"
+  },
+  {
+   "day": "Sun",
+   "what": "Off",
+   "time": "0"
+  }
+ ],
+ "rules": [
+  "Every piece of writing is marked within 24 hours and rewritten. Unmarked writing doesn't count.",
+  "All speaking homework is recorded. Listening back is half the exercise.",
+  "Timed means timed: phone in another room, no dictionary.",
+  "The error log is updated every day.",
+  "On a bad day the minimum is 45 minutes: one Part 2 recording, one reading passage, 10 minutes of error log. Never zero.",
+  "Sunday is off. Fatigue costs more than one rest day."
+ ],
+ "materials": [
+  {
+   "resource": "The course (Telegram)",
+   "usedFor": "Technique lessons, model answers, topic lists, extra practice",
+   "note": "Exact lessons get mapped to each day once the course is catalogued"
+  },
+  {
+   "resource": "Cambridge IELTS Academic 15–20",
+   "usedFor": "Full reading and listening tests, Task 1 visuals",
+   "note": "Skip tests already done, including the Beechwood Farm one (Cambridge 20)"
+  },
+  {
+   "resource": "Current Part 2 topic list",
+   "usedFor": "Extra cue cards for self-study",
+   "note": "Use when a named card has already been practised"
+  },
+  {
+   "resource": "A 5–10 minute clip of clear, natural speech",
+   "usedFor": "Daily shadowing",
+   "note": "Course speaking samples or BBC Learning English"
+  },
+  {
+   "resource": "The error log (below)",
+   "usedFor": "The daily Fix block and lesson warm-ups",
+   "note": "One row per error; mark rows fixed, never delete them"
+  }
+ ],
+ "phases": [
+  {
+   "week": 1,
+   "name": "Foundations",
+   "dates": "12–18 Oct",
+   "intro": "Get the speaking baseline, fix the structure of both writing tasks, and start the error log."
+  },
+  {
+   "week": 2,
+   "name": "Development",
+   "dates": "19–25 Oct",
+   "intro": "Longer, better-supported answers in speaking and writing, and the main reading question types under control. The week ends at the first checkpoint."
+  },
+  {
+   "week": 3,
+   "name": "Precision",
+   "dates": "26 Oct – 1 Nov",
+   "intro": "Cut the errors: articles, collocations and templates out of the writing, and accuracy into the speaking."
+  },
+  {
+   "week": 4,
+   "name": "Test conditions",
+   "dates": "2–8 Nov",
+   "intro": "Everything timed, everything consistent. The week ends with a full re-baseline that decides Month 2."
+  }
+ ],
+ "days": [
+  {
+   "date": "2026-10-12",
+   "dow": "Mon",
+   "week": 1,
+   "phase": "Foundations",
+   "title": "Lesson 1: Baseline",
+   "type": "lesson",
+   "lessonNo": 1,
+   "lessonTitle": "Baseline",
+   "checkpoint": false,
+   "agenda": [
+    {
+     "time": "0:00–0:15",
+     "title": "Speaking baseline mock",
+     "minutes": 15,
+     "text": "Recorded, exam conditions, questions below."
+    },
+    {
+     "time": "0:15–0:30",
+     "title": "Speaking debrief",
+     "minutes": 15,
+     "text": "Score yourself on the four criteria first, then compare with the teacher's score. Agree on the three biggest problems."
+    },
+    {
+     "time": "0:30–1:00",
+     "title": "Writing debrief",
+     "minutes": 30,
+     "text": "Go through the mock Task 1 and Task 2 against the error log. Rebuild the overview and the missing conclusion together."
+    },
+    {
+     "time": "1:00–1:20",
+     "title": "Reading debrief",
+     "minutes": 20,
+     "text": "Label each of the seven wrong answers by question type and cause: missed paraphrase, False vs Not Given, time, or careless."
+    },
+    {
+     "time": "1:20–1:30",
+     "title": "The plan",
+     "minutes": 10,
+     "text": "Targets, the math, the rules."
+    }
+   ],
+   "tasks": [],
+   "homework": [
+    {
+     "block": "homework",
+     "minutes": 45,
+     "text": "Rewrite the mock Task 2 with no time limit: add a conclusion, refocus body paragraph 1 on long holidays, add one concrete example",
+     "key": "2026-10-12|hw|1"
+    },
+    {
+     "block": "homework",
+     "minutes": 10,
+     "text": "Rewrite the Beechwood Farm overview so it names the two or three biggest changes",
+     "key": "2026-10-12|hw|2"
+    },
+    {
+     "block": "homework",
+     "minutes": 25,
+     "text": "Transcribe two minutes of your Part 2 recording and mark every error and filler",
+     "key": "2026-10-12|hw|3"
+    },
+    {
+     "block": "homework",
+     "minutes": 10,
+     "text": "Error log",
+     "key": "2026-10-12|hw|4"
+    }
+   ],
+   "questions": {
+    "part1": "Work: What do you do? What do you enjoy most about it? Is there anything you'd change about your job? · Mornings: Are you a morning person? What do you do first thing in the morning? Has your morning routine changed over the years? · Weather: What kind of weather do you like most? Does the weather affect your mood?",
+    "part2": "Describe a skill that took you a long time to learn. You should say: what the skill is, when and how you learned it, what made it difficult, and explain how you feel about it now.",
+    "part3": "Which skills matter most for young people today? Is it better to learn a skill from a teacher or online on your own? Why do some adults stop learning new things? How might the skills people need change in the next 20 years? Should schools teach more practical skills and fewer academic subjects?"
+   },
+   "lessonKey": "2026-10-12|lesson|1"
+  },
+  {
+   "date": "2026-10-13",
+   "dow": "Tue",
+   "week": 1,
+   "phase": "Foundations",
+   "title": "Self-study",
+   "type": "self",
+   "checkpoint": false,
+   "agenda": [],
+   "tasks": [
+    {
+     "block": "speak",
+     "minutes": 50,
+     "text": "shadowing; Part 2: a person you admire, an object you use every day; record ten Part 1 answers of two or three sentences each",
+     "label": "Speak",
+     "key": "2026-10-13|speak|1"
+    },
+    {
+     "block": "write",
+     "minutes": 70,
+     "text": "Task 2 P1 in 40 min, after a written 5-minute plan; then overviews only for three Task 1 visuals (20 min)",
+     "label": "Write",
+     "key": "2026-10-13|write|1",
+     "prompt": "P1"
+    },
+    {
+     "block": "read",
+     "minutes": 45,
+     "text": "one True/False/Not Given passage in 20 min, then analysis",
+     "label": "Read",
+     "key": "2026-10-13|read|1"
+    },
+    {
+     "block": "fix",
+     "minutes": 15,
+     "text": "articles — rewrite 15 of your own sentences correctly",
+     "label": "Fix",
+     "key": "2026-10-13|fix|1"
+    }
+   ],
+   "homework": [],
+   "questions": null
+  },
+  {
+   "date": "2026-10-14",
+   "dow": "Wed",
+   "week": 1,
+   "phase": "Foundations",
+   "title": "Lesson 2: Part 2 and essay structure",
+   "type": "lesson",
+   "lessonNo": 2,
+   "lessonTitle": "Part 2 and essay structure",
+   "checkpoint": false,
+   "agenda": [
+    {
+     "time": null,
+     "title": "Warm-up",
+     "minutes": 10,
+     "text": "Part 1: hometown, free time."
+    },
+    {
+     "time": null,
+     "title": "Speaking core",
+     "minutes": 35,
+     "text": "The Part 2 notes method: five keywords in one minute, then a simple arc — setting, what happened, one vivid detail, how it changed you. Cards: a person who influenced your career; a time you were extremely busy. Feedback, then redo the weaker one."
+    },
+    {
+     "time": null,
+     "title": "Writing",
+     "minutes": 35,
+     "text": "Feedback on P1. Technique: answer the exact question — underline the key words, plan in five minutes, state the position in the introduction, restate it in the conclusion. Drill: plan three new questions in five minutes each."
+    },
+    {
+     "time": null,
+     "title": "Reading clinic",
+     "minutes": 10,
+     "text": "False vs Not Given: the decision rule."
+    }
+   ],
+   "tasks": [],
+   "homework": [
+    {
+     "block": "homework",
+     "minutes": 30,
+     "text": "Rewrite P1 using the plan method",
+     "key": "2026-10-14|hw|1",
+     "prompt": "P1"
+    },
+    {
+     "block": "homework",
+     "minutes": 20,
+     "text": "Re-record today's two Part 2 cards",
+     "key": "2026-10-14|hw|2"
+    },
+    {
+     "block": "homework",
+     "minutes": 30,
+     "text": "One True/False/Not Given passage with analysis",
+     "key": "2026-10-14|hw|3"
+    },
+    {
+     "block": "homework",
+     "minutes": 10,
+     "text": "Error log",
+     "key": "2026-10-14|hw|4"
+    }
+   ],
+   "questions": null,
+   "lessonKey": "2026-10-14|lesson|1"
+  },
+  {
+   "date": "2026-10-15",
+   "dow": "Thu",
+   "week": 1,
+   "phase": "Foundations",
+   "title": "Self-study",
+   "type": "self",
+   "checkpoint": false,
+   "agenda": [],
+   "tasks": [
+    {
+     "block": "speak",
+     "minutes": 50,
+     "text": "shadowing; Part 2: a place you go to relax, a celebration you enjoyed; record four Part 3 answers on work — your before sample for Friday",
+     "label": "Speak",
+     "key": "2026-10-15|speak|1"
+    },
+    {
+     "block": "write",
+     "minutes": 70,
+     "text": "Task 1 map in 20 min (a new map from the course or the Cambridge books); Task 2 P2 in 40 min",
+     "label": "Write",
+     "key": "2026-10-15|write|1",
+     "prompt": "P2"
+    },
+    {
+     "block": "read",
+     "minutes": 45,
+     "text": "one matching-headings passage in 20 min, then analysis",
+     "label": "Read",
+     "key": "2026-10-15|read|1"
+    },
+    {
+     "block": "fix",
+     "minutes": 15,
+     "text": "collocations from the error log",
+     "label": "Fix",
+     "key": "2026-10-15|fix|1"
+    }
+   ],
+   "homework": [],
+   "questions": null
+  },
+  {
+   "date": "2026-10-16",
+   "dow": "Fri",
+   "week": 1,
+   "phase": "Foundations",
+   "title": "Lesson 3: Part 3 and Task 1 maps",
+   "type": "lesson",
+   "lessonNo": 3,
+   "lessonTitle": "Part 3 and Task 1 maps",
+   "checkpoint": false,
+   "agenda": [
+    {
+     "time": null,
+     "title": "Warm-up",
+     "minutes": 10,
+     "text": "Part 1: reading, music."
+    },
+    {
+     "time": null,
+     "title": "Speaking core",
+     "minutes": 35,
+     "text": "The Part 3 answer shape: direct answer, reason, example, then a contrast or concession. Language for comparing past and present and for speculating. Six live questions on work and cities; redo the weakest two and compare with Thursday's recordings."
+    },
+    {
+     "time": null,
+     "title": "Writing",
+     "minutes": 35,
+     "text": "Task 1 maps: overview first, then what changed versus what stayed — not compass points. Map verbs: was replaced by, was converted into, was relocated to, made way for, remained unchanged. Review Thursday's map."
+    },
+    {
+     "time": null,
+     "title": "Reading clinic",
+     "minutes": 10,
+     "text": "Matching headings."
+    }
+   ],
+   "tasks": [],
+   "homework": [
+    {
+     "block": "homework",
+     "minutes": 20,
+     "text": "Rewrite Thursday's map with today's structure",
+     "key": "2026-10-16|hw|1"
+    },
+    {
+     "block": "homework",
+     "minutes": 20,
+     "text": "Rewrite the flagged paragraphs of P2",
+     "key": "2026-10-16|hw|2",
+     "prompt": "P2"
+    },
+    {
+     "block": "homework",
+     "minutes": 20,
+     "text": "Re-record the six Part 3 answers",
+     "key": "2026-10-16|hw|3"
+    },
+    {
+     "block": "homework",
+     "minutes": 20,
+     "text": "One reading passage (20 min) and the error log",
+     "key": "2026-10-16|hw|4"
+    }
+   ],
+   "questions": null,
+   "lessonKey": "2026-10-16|lesson|1"
+  },
+  {
+   "date": "2026-10-17",
+   "dow": "Sat",
+   "week": 1,
+   "phase": "Foundations",
+   "title": "Test day",
+   "type": "test",
+   "checkpoint": false,
+   "agenda": [],
+   "tasks": [
+    {
+     "block": "write",
+     "minutes": 60,
+     "text": "Writing test, 60 min: Task 1 bar chart + Task 2 P3",
+     "key": "2026-10-17|write|1",
+     "prompt": "P3"
+    },
+    {
+     "block": "read",
+     "minutes": 60,
+     "text": "Reading test, 60 min: one full Academic test",
+     "key": "2026-10-17|read|1"
+    },
+    {
+     "block": "speak",
+     "minutes": 30,
+     "text": "Speaking self-mock, recorded: Part 1, Part 2 (a time you learned something from a mistake), four Part 3 questions; then review (30 min)",
+     "key": "2026-10-17|speak|1"
+    },
+    {
+     "block": "fix",
+     "minutes": 15,
+     "text": "Error log (15 min)",
+     "key": "2026-10-17|fix|1"
+    }
+   ],
+   "homework": [],
+   "questions": null
+  },
+  {
+   "date": "2026-10-18",
+   "dow": "Sun",
+   "week": 1,
+   "phase": "Foundations",
+   "title": "Off",
+   "type": "off",
+   "checkpoint": false,
+   "agenda": [],
+   "tasks": [],
+   "homework": [],
+   "questions": null
+  },
+  {
+   "date": "2026-10-19",
+   "dow": "Mon",
+   "week": 2,
+   "phase": "Development",
+   "title": "Lesson 4: Abstract Part 3 and body paragraphs",
+   "type": "lesson",
+   "lessonNo": 4,
+   "lessonTitle": "Abstract Part 3 and body paragraphs",
+   "checkpoint": false,
+   "agenda": [
+    {
+     "time": null,
+     "title": "Warm-up",
+     "minutes": 10,
+     "text": "Part 1: transport, shopping."
+    },
+    {
+     "time": null,
+     "title": "Speaking core",
+     "minutes": 35,
+     "text": "Abstract Part 3: hypotheticals (What would happen if…), predictions, cause and effect. Card first: a piece of technology you couldn't live without; then Part 3 on technology and communication. Redo the weakest two."
+    },
+    {
+     "time": null,
+     "title": "Writing",
+     "minutes": 35,
+     "text": "Review Saturday's test. Technique: a body paragraph is point, explanation, concrete example, link back to the question. Rebuild body paragraph 1 of the mock essay together."
+    },
+    {
+     "time": null,
+     "title": "Reading clinic",
+     "minutes": 10,
+     "text": "Saturday's reading errors, sorted by type."
+    }
+   ],
+   "tasks": [],
+   "homework": [
+    {
+     "block": "homework",
+     "minutes": 30,
+     "text": "Rewrite Saturday's Task 2, P3",
+     "key": "2026-10-19|hw|1",
+     "prompt": "P3"
+    },
+    {
+     "block": "homework",
+     "minutes": 20,
+     "text": "Re-record today's Part 3 answers",
+     "key": "2026-10-19|hw|2"
+    },
+    {
+     "block": "homework",
+     "minutes": 30,
+     "text": "One reading passage with analysis",
+     "key": "2026-10-19|hw|3"
+    },
+    {
+     "block": "homework",
+     "minutes": 10,
+     "text": "Error log",
+     "key": "2026-10-19|hw|4"
+    }
+   ],
+   "questions": null,
+   "lessonKey": "2026-10-19|lesson|1"
+  },
+  {
+   "date": "2026-10-20",
+   "dow": "Tue",
+   "week": 2,
+   "phase": "Development",
+   "title": "Self-study",
+   "type": "self",
+   "checkpoint": false,
+   "agenda": [],
+   "tasks": [
+    {
+     "block": "speak",
+     "minutes": 50,
+     "text": "shadowing; Part 2: a website or app you use often, a time you helped someone; four Part 3 answers on technology",
+     "label": "Speak",
+     "key": "2026-10-20|speak|1"
+    },
+    {
+     "block": "write",
+     "minutes": 70,
+     "text": "Task 2 P4 in 40 min; Task 1 line graph in 20 min",
+     "label": "Write",
+     "key": "2026-10-20|write|1",
+     "prompt": "P4"
+    },
+    {
+     "block": "read",
+     "minutes": 45,
+     "text": "one summary-completion passage, then analysis",
+     "label": "Read",
+     "key": "2026-10-20|read|1"
+    },
+    {
+     "block": "fix",
+     "minutes": 15,
+     "text": "articles drill",
+     "label": "Fix",
+     "key": "2026-10-20|fix|1"
+    }
+   ],
+   "homework": [],
+   "questions": null
+  },
+  {
+   "date": "2026-10-21",
+   "dow": "Wed",
+   "week": 2,
+   "phase": "Development",
+   "title": "Lesson 5: Vocabulary that scores and Task 1 trends",
+   "type": "lesson",
+   "lessonNo": 5,
+   "lessonTitle": "Vocabulary that scores and Task 1 trends",
+   "checkpoint": false,
+   "agenda": [
+    {
+     "time": null,
+     "title": "Warm-up",
+     "minutes": 10,
+     "text": "Part 1: sport, neighbours."
+    },
+    {
+     "time": null,
+     "title": "Speaking core",
+     "minutes": 35,
+     "text": "Lexical resource: paraphrase the examiner's question in your first sentence; topic collocations for the environment and the media; replace good, bad, important and a lot with precise words; idioms only where they sound natural. Cards: a natural place you'd like to visit; a news story that caught your attention. Then Part 3 on the environment."
+    },
+    {
+     "time": null,
+     "title": "Writing",
+     "minutes": 35,
+     "text": "Task 1 trends in line graphs and bar charts: grouping data, comparison structures, choosing which numbers to quote. Review Tuesday's line graph."
+    },
+    {
+     "time": null,
+     "title": "Reading clinic",
+     "minutes": 10,
+     "text": "Summary and sentence completion: word limits and grammatical fit."
+    }
+   ],
+   "tasks": [],
+   "homework": [
+    {
+     "block": "homework",
+     "minutes": 30,
+     "text": "Rewrite the flagged paragraphs of P4",
+     "key": "2026-10-21|hw|1",
+     "prompt": "P4"
+    },
+    {
+     "block": "homework",
+     "minutes": 20,
+     "text": "Re-record today's cards with the new vocabulary",
+     "key": "2026-10-21|hw|2"
+    },
+    {
+     "block": "homework",
+     "minutes": 30,
+     "text": "One reading passage with analysis",
+     "key": "2026-10-21|hw|3"
+    },
+    {
+     "block": "homework",
+     "minutes": 10,
+     "text": "Add today's collocations to the error log",
+     "key": "2026-10-21|hw|4"
+    }
+   ],
+   "questions": null,
+   "lessonKey": "2026-10-21|lesson|1"
+  },
+  {
+   "date": "2026-10-22",
+   "dow": "Thu",
+   "week": 2,
+   "phase": "Development",
+   "title": "Self-study",
+   "type": "self",
+   "checkpoint": false,
+   "agenda": [],
+   "tasks": [
+    {
+     "block": "speak",
+     "minutes": 50,
+     "text": "shadowing; Part 2: a book or film that changed your mind, an environmental problem where you live; four Part 3 answers on the media",
+     "label": "Speak",
+     "key": "2026-10-22|speak|1"
+    },
+    {
+     "block": "write",
+     "minutes": 70,
+     "text": "Task 1 table in 20 min; Task 2 P5 in 40 min",
+     "label": "Write",
+     "key": "2026-10-22|write|1",
+     "prompt": "P5"
+    },
+    {
+     "block": "read",
+     "minutes": 45,
+     "text": "one matching-information passage, then analysis",
+     "label": "Read",
+     "key": "2026-10-22|read|1"
+    },
+    {
+     "block": "fix",
+     "minutes": 15,
+     "text": "collocations drill",
+     "label": "Fix",
+     "key": "2026-10-22|fix|1"
+    }
+   ],
+   "homework": [],
+   "questions": null
+  },
+  {
+   "date": "2026-10-23",
+   "dow": "Fri",
+   "week": 2,
+   "phase": "Development",
+   "title": "Lesson 6: Speaking mock 2 (checkpoint)",
+   "type": "lesson",
+   "lessonNo": 6,
+   "lessonTitle": "Speaking mock 2",
+   "checkpoint": true,
+   "agenda": [
+    {
+     "time": "0:00–0:15",
+     "title": "Full speaking mock, recorded",
+     "minutes": 15,
+     "text": "Part 1: work, home. Part 2: a time you had to make a difficult decision. Part 3: decisions and responsibility."
+    },
+    {
+     "time": "0:15–0:35",
+     "title": "Scoring",
+     "minutes": 20,
+     "text": "Compare with the baseline; name the two problems still costing the most."
+    },
+    {
+     "time": "0:35–1:20",
+     "title": "Writing",
+     "minutes": 45,
+     "text": "The five essay types side by side — opinion, discussion, advantages and disadvantages, problem and solution, two-part question — and what each demands of the introduction and conclusion. Review P5."
+    },
+    {
+     "time": "1:20–1:30",
+     "title": "Reading clinic",
+     "minutes": 10,
+     "text": "Matching features."
+    }
+   ],
+   "tasks": [],
+   "homework": [
+    {
+     "block": "homework",
+     "minutes": 30,
+     "text": "Rewrite P5",
+     "key": "2026-10-23|hw|1",
+     "prompt": "P5"
+    },
+    {
+     "block": "homework",
+     "minutes": 20,
+     "text": "Re-record mock 2's Part 3 answers",
+     "key": "2026-10-23|hw|2"
+    },
+    {
+     "block": "homework",
+     "minutes": 30,
+     "text": "One reading passage with analysis",
+     "key": "2026-10-23|hw|3"
+    },
+    {
+     "block": "homework",
+     "minutes": 10,
+     "text": "Error log",
+     "key": "2026-10-23|hw|4"
+    }
+   ],
+   "questions": null,
+   "lessonKey": "2026-10-23|lesson|1"
+  },
+  {
+   "date": "2026-10-24",
+   "dow": "Sat",
+   "week": 2,
+   "phase": "Development",
+   "title": "Full mock (checkpoint)",
+   "type": "fullmock",
+   "checkpoint": true,
+   "agenda": [],
+   "tasks": [
+    {
+     "block": "listen",
+     "minutes": 40,
+     "text": "Listening, 40 min: one full test",
+     "key": "2026-10-24|listen|1"
+    },
+    {
+     "block": "read",
+     "minutes": 60,
+     "text": "Reading, 60 min: one full Academic test",
+     "key": "2026-10-24|read|1"
+    },
+    {
+     "block": "write",
+     "minutes": 60,
+     "text": "Writing, 60 min: Task 1 pie chart + Task 2 P6",
+     "key": "2026-10-24|write|1",
+     "prompt": "P6"
+    },
+    {
+     "block": "speak",
+     "minutes": 30,
+     "text": "Speaking self-mock, recorded: Part 2 (a time you were proud of a family member) and four Part 3 questions; then review (30 min)",
+     "key": "2026-10-24|speak|1"
+    }
+   ],
+   "homework": [],
+   "questions": null
+  },
+  {
+   "date": "2026-10-25",
+   "dow": "Sun",
+   "week": 2,
+   "phase": "Development",
+   "title": "Off",
+   "type": "off",
+   "checkpoint": false,
+   "agenda": [],
+   "tasks": [],
+   "homework": [],
+   "questions": null
+  },
+  {
+   "date": "2026-10-26",
+   "dow": "Mon",
+   "week": 3,
+   "phase": "Precision",
+   "title": "Lesson 7: Accurate speech and the accuracy clinic",
+   "type": "lesson",
+   "lessonNo": 7,
+   "lessonTitle": "Accurate speech and the accuracy clinic",
+   "checkpoint": false,
+   "agenda": [
+    {
+     "time": null,
+     "title": "Warm-up",
+     "minutes": 10,
+     "text": "Part 1: holidays, cooking."
+    },
+    {
+     "time": null,
+     "title": "Speaking core",
+     "minutes": 35,
+     "text": "Grammar in speech: articles, tense control in Part 2 stories, complex structures used naturally (conditionals, relative clauses, the more… the more…). Card: a journey that didn't go as planned; then Part 3 on travel and tourism. Redo with every slip flagged."
+    },
+    {
+     "time": null,
+     "title": "Writing",
+     "minutes": 35,
+     "text": "Accuracy clinic: find and fix 20 of your own sentences from the error log, against the clock. Template purge: replace every memorised phrase with plain, precise English."
+    },
+    {
+     "time": null,
+     "title": "Reading clinic",
+     "minutes": 10,
+     "text": "Passage 3: questions first, a clock plan, when to move on."
+    }
+   ],
+   "tasks": [],
+   "homework": [
+    {
+     "block": "homework",
+     "minutes": 30,
+     "text": "Rewrite Saturday's Task 2, P6, with the template purge applied",
+     "key": "2026-10-26|hw|1",
+     "prompt": "P6"
+    },
+    {
+     "block": "homework",
+     "minutes": 20,
+     "text": "Re-record the journey card, watching tenses and articles",
+     "key": "2026-10-26|hw|2"
+    },
+    {
+     "block": "homework",
+     "minutes": 30,
+     "text": "One Passage 3 with analysis",
+     "key": "2026-10-26|hw|3"
+    },
+    {
+     "block": "homework",
+     "minutes": 10,
+     "text": "Error log",
+     "key": "2026-10-26|hw|4"
+    }
+   ],
+   "questions": null,
+   "lessonKey": "2026-10-26|lesson|1"
+  },
+  {
+   "date": "2026-10-27",
+   "dow": "Tue",
+   "week": 3,
+   "phase": "Precision",
+   "title": "Self-study",
+   "type": "self",
+   "checkpoint": false,
+   "agenda": [],
+   "tasks": [
+    {
+     "block": "speak",
+     "minutes": 50,
+     "text": "shadowing; Part 2: an expensive thing you bought, a family tradition; four Part 3 answers on shopping",
+     "label": "Speak",
+     "key": "2026-10-27|speak|1"
+    },
+    {
+     "block": "write",
+     "minutes": 70,
+     "text": "Task 2 P7 in 40 min; Task 1 process diagram in 20 min",
+     "label": "Write",
+     "key": "2026-10-27|write|1",
+     "prompt": "P7"
+    },
+    {
+     "block": "read",
+     "minutes": 45,
+     "text": "one Passage 3 in 20 min, then analysis",
+     "label": "Read",
+     "key": "2026-10-27|read|1"
+    },
+    {
+     "block": "fix",
+     "minutes": 15,
+     "text": "articles and templates from the log",
+     "label": "Fix",
+     "key": "2026-10-27|fix|1"
+    }
+   ],
+   "homework": [],
+   "questions": null
+  },
+  {
+   "date": "2026-10-28",
+   "dow": "Wed",
+   "week": 3,
+   "phase": "Precision",
+   "title": "Lesson 8: Pronunciation, fluency and processes",
+   "type": "lesson",
+   "lessonNo": 8,
+   "lessonTitle": "Pronunciation, fluency and processes",
+   "checkpoint": false,
+   "agenda": [
+    {
+     "time": null,
+     "title": "Warm-up",
+     "minutes": 10,
+     "text": "Part 1: clothes, the internet."
+    },
+    {
+     "time": null,
+     "title": "Speaking core",
+     "minutes": 35,
+     "text": "Pronunciation: chunking, sentence stress, intonation on lists and contrasts; a check of your shadowing; cutting fillers such as to be honest, actually, you know. Card: a gift you gave that someone loved; then Part 3 on consumerism."
+    },
+    {
+     "time": null,
+     "title": "Writing",
+     "minutes": 35,
+     "text": "Task 1 process diagrams: sequencing language and the passive; an overview that names the stages, not the details. Review Tuesday's process."
+    },
+    {
+     "time": null,
+     "title": "Reading clinic",
+     "minutes": 10,
+     "text": "Yes/No/Not Given and multiple choice."
+    }
+   ],
+   "tasks": [],
+   "homework": [
+    {
+     "block": "homework",
+     "minutes": 30,
+     "text": "Rewrite the flagged paragraphs of P7",
+     "key": "2026-10-28|hw|1",
+     "prompt": "P7"
+    },
+    {
+     "block": "homework",
+     "minutes": 10,
+     "text": "Shadow for 10 min, then re-record today's card",
+     "key": "2026-10-28|hw|2"
+    },
+    {
+     "block": "homework",
+     "minutes": 30,
+     "text": "One Yes/No/Not Given passage with analysis",
+     "key": "2026-10-28|hw|3"
+    },
+    {
+     "block": "homework",
+     "minutes": 10,
+     "text": "Error log",
+     "key": "2026-10-28|hw|4"
+    }
+   ],
+   "questions": null,
+   "lessonKey": "2026-10-28|lesson|1"
+  },
+  {
+   "date": "2026-10-29",
+   "dow": "Thu",
+   "week": 3,
+   "phase": "Precision",
+   "title": "Self-study",
+   "type": "self",
+   "checkpoint": false,
+   "agenda": [],
+   "tasks": [
+    {
+     "block": "speak",
+     "minutes": 50,
+     "text": "shadowing; Part 2: a teacher who influenced you, a public place that needs improving; four Part 3 answers on education",
+     "label": "Speak",
+     "key": "2026-10-29|speak|1"
+    },
+    {
+     "block": "write",
+     "minutes": 70,
+     "text": "Task 1 with two charts in 20 min; Task 2 P8 in 40 min",
+     "label": "Write",
+     "key": "2026-10-29|write|1",
+     "prompt": "P8"
+    },
+    {
+     "block": "read",
+     "minutes": 45,
+     "text": "one multiple-choice passage in 20 min, then analysis",
+     "label": "Read",
+     "key": "2026-10-29|read|1"
+    },
+    {
+     "block": "fix",
+     "minutes": 15,
+     "text": "collocations drill",
+     "label": "Fix",
+     "key": "2026-10-29|fix|1"
+    }
+   ],
+   "homework": [],
+   "questions": null
+  },
+  {
+   "date": "2026-10-30",
+   "dow": "Fri",
+   "week": 3,
+   "phase": "Precision",
+   "title": "Lesson 9: Part 3 under pressure and higher-band moves",
+   "type": "lesson",
+   "lessonNo": 9,
+   "lessonTitle": "Part 3 under pressure and higher-band moves",
+   "checkpoint": false,
+   "agenda": [
+    {
+     "time": null,
+     "title": "Warm-up",
+     "minutes": 10,
+     "text": "Part 1: friends, photographs."
+    },
+    {
+     "time": null,
+     "title": "Speaking core",
+     "minutes": 35,
+     "text": "Part 3 under pressure: follow-up questions, the examiner's why, questions you have no opinion on, buying thinking time naturally. Themes: education, government and society."
+    },
+    {
+     "time": null,
+     "title": "Writing",
+     "minutes": 35,
+     "text": "Higher-band moves in Task 2: concession, qualifying a claim, precise examples instead of generic ones. Review P8."
+    },
+    {
+     "time": null,
+     "title": "Reading clinic",
+     "minutes": 10,
+     "text": "Your two most frequent error causes from the log."
+    }
+   ],
+   "tasks": [],
+   "homework": [
+    {
+     "block": "homework",
+     "minutes": 30,
+     "text": "Rewrite P8",
+     "key": "2026-10-30|hw|1",
+     "prompt": "P8"
+    },
+    {
+     "block": "homework",
+     "minutes": 20,
+     "text": "Re-record today's Part 3 answers",
+     "key": "2026-10-30|hw|2"
+    },
+    {
+     "block": "homework",
+     "minutes": 30,
+     "text": "One reading passage with analysis",
+     "key": "2026-10-30|hw|3"
+    },
+    {
+     "block": "homework",
+     "minutes": 10,
+     "text": "Error log",
+     "key": "2026-10-30|hw|4"
+    }
+   ],
+   "questions": null,
+   "lessonKey": "2026-10-30|lesson|1"
+  },
+  {
+   "date": "2026-10-31",
+   "dow": "Sat",
+   "week": 3,
+   "phase": "Precision",
+   "title": "Test day",
+   "type": "test",
+   "checkpoint": false,
+   "agenda": [],
+   "tasks": [
+    {
+     "block": "write",
+     "minutes": 60,
+     "text": "Writing test, 60 min: Task 1 map or process + Task 2 P9",
+     "key": "2026-10-31|write|1",
+     "prompt": "P9"
+    },
+    {
+     "block": "read",
+     "minutes": 60,
+     "text": "Reading test, 60 min: one full Academic test",
+     "key": "2026-10-31|read|1"
+    },
+    {
+     "block": "speak",
+     "minutes": 30,
+     "text": "Speaking self-mock, recorded: Part 2 (a time you had to wait for something) and four Part 3 questions; then review (30 min)",
+     "key": "2026-10-31|speak|1"
+    },
+    {
+     "block": "fix",
+     "minutes": 15,
+     "text": "Error log (15 min)",
+     "key": "2026-10-31|fix|1"
+    }
+   ],
+   "homework": [],
+   "questions": null
+  },
+  {
+   "date": "2026-11-01",
+   "dow": "Sun",
+   "week": 3,
+   "phase": "Precision",
+   "title": "Off",
+   "type": "off",
+   "checkpoint": false,
+   "agenda": [],
+   "tasks": [],
+   "homework": [],
+   "questions": null
+  },
+  {
+   "date": "2026-11-02",
+   "dow": "Mon",
+   "week": 4,
+   "phase": "Test conditions",
+   "title": "Lesson 10: Speaking mock 3 and timing",
+   "type": "lesson",
+   "lessonNo": 10,
+   "lessonTitle": "Speaking mock 3 and timing",
+   "checkpoint": false,
+   "agenda": [
+    {
+     "time": "0:00–0:15",
+     "title": "Full speaking mock, recorded",
+     "minutes": 15,
+     "text": "Part 2: a piece of advice you received. Part 3: advice, family, generations."
+    },
+    {
+     "time": "0:15–0:45",
+     "title": "Targeted fix",
+     "minutes": 30,
+     "text": "The biggest problem from mock 3, drilled and redone."
+    },
+    {
+     "time": "0:45–1:20",
+     "title": "Writing",
+     "minutes": 35,
+     "text": "The timing system: 20 minutes for Task 1, 40 for Task 2, a five-minute plan, a three-minute final check for articles and agreement. Review Saturday's test."
+    },
+    {
+     "time": "1:20–1:30",
+     "title": "Reading clinic",
+     "minutes": 10,
+     "text": "Skimming and scanning speed drill."
+    }
+   ],
+   "tasks": [],
+   "homework": [
+    {
+     "block": "homework",
+     "minutes": 30,
+     "text": "Rewrite Saturday's Task 2, P9",
+     "key": "2026-11-02|hw|1",
+     "prompt": "P9"
+    },
+    {
+     "block": "homework",
+     "minutes": 20,
+     "text": "Re-record mock 3's weakest answers",
+     "key": "2026-11-02|hw|2"
+    },
+    {
+     "block": "homework",
+     "minutes": 30,
+     "text": "One reading passage with analysis",
+     "key": "2026-11-02|hw|3"
+    },
+    {
+     "block": "homework",
+     "minutes": 10,
+     "text": "Error log",
+     "key": "2026-11-02|hw|4"
+    }
+   ],
+   "questions": null,
+   "lessonKey": "2026-11-02|lesson|1"
+  },
+  {
+   "date": "2026-11-03",
+   "dow": "Tue",
+   "week": 4,
+   "phase": "Test conditions",
+   "title": "Self-study",
+   "type": "self",
+   "checkpoint": false,
+   "agenda": [],
+   "tasks": [
+    {
+     "block": "speak",
+     "minutes": 50,
+     "text": "shadowing; Part 2: a goal you achieved, a time you changed your opinion; four Part 3 answers on health and lifestyle",
+     "label": "Speak",
+     "key": "2026-11-03|speak|1"
+    },
+    {
+     "block": "write",
+     "minutes": 70,
+     "text": "full writing test, 60 min: Task 1 (any type) + Task 2 P10",
+     "label": "Write",
+     "key": "2026-11-03|write|1",
+     "prompt": "P10"
+    },
+    {
+     "block": "read",
+     "minutes": 45,
+     "text": "one full Academic test, 60 min",
+     "label": "Read",
+     "key": "2026-11-03|read|1"
+    },
+    {
+     "block": "fix",
+     "minutes": 15,
+     "text": "the ten errors that recur most in the log",
+     "label": "Fix",
+     "key": "2026-11-03|fix|1"
+    }
+   ],
+   "homework": [],
+   "questions": null
+  },
+  {
+   "date": "2026-11-04",
+   "dow": "Wed",
+   "week": 4,
+   "phase": "Test conditions",
+   "title": "Lesson 11: The last weak spots",
+   "type": "lesson",
+   "lessonNo": 11,
+   "lessonTitle": "The last weak spots",
+   "checkpoint": false,
+   "agenda": [
+    {
+     "time": null,
+     "title": "Warm-up",
+     "minutes": 10,
+     "text": "Part 1: sleep, weekends."
+    },
+    {
+     "time": null,
+     "title": "Speaking core",
+     "minutes": 35,
+     "text": "Whatever mock 3 showed as weakest, with themes chosen to match."
+    },
+    {
+     "time": null,
+     "title": "Writing",
+     "minutes": 35,
+     "text": "Review Tuesday's test. Finish your personal phrase bank: natural phrases you own, not templates."
+    },
+    {
+     "time": null,
+     "title": "Reading clinic",
+     "minutes": 10,
+     "text": "The question type that still costs the most."
+    }
+   ],
+   "tasks": [],
+   "homework": [
+    {
+     "block": "homework",
+     "minutes": 30,
+     "text": "Rewrite the flagged paragraphs of P10",
+     "key": "2026-11-04|hw|1",
+     "prompt": "P10"
+    },
+    {
+     "block": "homework",
+     "minutes": 20,
+     "text": "Re-record today's speaking work",
+     "key": "2026-11-04|hw|2"
+    },
+    {
+     "block": "homework",
+     "minutes": 30,
+     "text": "One reading passage with analysis",
+     "key": "2026-11-04|hw|3"
+    },
+    {
+     "block": "homework",
+     "minutes": 10,
+     "text": "Error log",
+     "key": "2026-11-04|hw|4"
+    }
+   ],
+   "questions": null,
+   "lessonKey": "2026-11-04|lesson|1"
+  },
+  {
+   "date": "2026-11-05",
+   "dow": "Thu",
+   "week": 4,
+   "phase": "Test conditions",
+   "title": "Full mock (checkpoint)",
+   "type": "fullmock",
+   "checkpoint": true,
+   "agenda": [],
+   "tasks": [
+    {
+     "block": "listen",
+     "minutes": 40,
+     "text": "Listening, 40 min",
+     "key": "2026-11-05|listen|1"
+    },
+    {
+     "block": "read",
+     "minutes": 60,
+     "text": "Reading, 60 min",
+     "key": "2026-11-05|read|1"
+    },
+    {
+     "block": "write",
+     "minutes": 60,
+     "text": "Writing, 60 min: Task 1 (any type) + Task 2 P11",
+     "key": "2026-11-05|write|1",
+     "prompt": "P11"
+    },
+    {
+     "block": "speak",
+     "minutes": 5,
+     "text": "One Part 2 recording: a person who is very good at their job (5 min)",
+     "key": "2026-11-05|speak|1"
+    }
+   ],
+   "homework": [],
+   "questions": null
+  },
+  {
+   "date": "2026-11-06",
+   "dow": "Fri",
+   "week": 4,
+   "phase": "Test conditions",
+   "title": "Lesson 12: Final speaking mock and Month 1 review (checkpoint)",
+   "type": "lesson",
+   "lessonNo": 12,
+   "lessonTitle": "Final speaking mock and Month 1 review",
+   "checkpoint": true,
+   "agenda": [
+    {
+     "time": "0:00–0:15",
+     "title": "Final speaking mock, recorded",
+     "minutes": 15,
+     "text": "Part 2: a goal you are working towards. Part 3: ambition, success, work–life balance. If possible, a second IELTS teacher scores the same recording."
+    },
+    {
+     "time": "0:15–0:35",
+     "title": "Speaking comparison",
+     "minutes": 20,
+     "text": "Against the Lesson 1 baseline, criterion by criterion."
+    },
+    {
+     "time": "0:35–1:05",
+     "title": "Results",
+     "minutes": 30,
+     "text": "All four skills against the checkpoints, using Thursday's mock."
+    },
+    {
+     "time": "1:05–1:30",
+     "title": "Month 2",
+     "minutes": 25,
+     "text": "What stays, what changes, the new targets."
+    }
+   ],
+   "tasks": [],
+   "homework": [],
+   "questions": null,
+   "lessonKey": "2026-11-06|lesson|1"
+  },
+  {
+   "date": "2026-11-07",
+   "dow": "Sat",
+   "week": 4,
+   "phase": "Test conditions",
+   "title": "Light day",
+   "type": "light",
+   "checkpoint": false,
+   "agenda": [],
+   "tasks": [
+    {
+     "block": "write",
+     "minutes": 60,
+     "text": "Rewrite Thursday's Task 1 and Task 2 (60 min)",
+     "key": "2026-11-07|write|1"
+    },
+    {
+     "block": "fix",
+     "minutes": 30,
+     "text": "Consolidate the error log: the 20 errors that still recur (30 min)",
+     "key": "2026-11-07|fix|1"
+    }
+   ],
+   "homework": [],
+   "questions": null
+  },
+  {
+   "date": "2026-11-08",
+   "dow": "Sun",
+   "week": 4,
+   "phase": "Test conditions",
+   "title": "Off",
+   "type": "off",
+   "checkpoint": false,
+   "agenda": [],
+   "tasks": [],
+   "homework": [],
+   "questions": null
+  }
+ ],
+ "prompts": [
+  {
+   "id": "P1",
+   "type": "Two-part question",
+   "text": "Many young people change jobs several times in their first ten years of work. Why is this happening? Is it a positive or negative development?",
+   "used": "Tue 13 Oct"
+  },
+  {
+   "id": "P2",
+   "type": "Opinion",
+   "text": "Universities should only offer courses that lead directly to a job. To what extent do you agree or disagree?",
+   "used": "Thu 15 Oct"
+  },
+  {
+   "id": "P3",
+   "type": "Discussion",
+   "text": "Some people think schools should teach children how to manage money, while others believe this is the family's job. Discuss both views and give your opinion.",
+   "used": "Sat 17 Oct"
+  },
+  {
+   "id": "P4",
+   "type": "Advantages and disadvantages",
+   "text": "Many employees now work from home for part of the week. Do the advantages of this outweigh the disadvantages?",
+   "used": "Tue 20 Oct"
+  },
+  {
+   "id": "P5",
+   "type": "Problem and solution",
+   "text": "In many countries, fewer young people want to become teachers. Why is this, and what can be done about it?",
+   "used": "Thu 22 Oct"
+  },
+  {
+   "id": "P6",
+   "type": "Opinion",
+   "text": "Governments should spend more on public transport than on building new roads. To what extent do you agree or disagree?",
+   "used": "Sat 24 Oct"
+  },
+  {
+   "id": "P7",
+   "type": "Discussion",
+   "text": "Some people say museums and galleries should be free to enter; others believe visitors should pay. Discuss both views and give your opinion.",
+   "used": "Tue 27 Oct"
+  },
+  {
+   "id": "P8",
+   "type": "Two-part question",
+   "text": "More people now read online reviews before buying anything. Why is this? Is it a positive development?",
+   "used": "Thu 29 Oct"
+  },
+  {
+   "id": "P9",
+   "type": "Advantages and disadvantages",
+   "text": "More and more people choose to live alone. Do the advantages outweigh the disadvantages?",
+   "used": "Sat 31 Oct"
+  },
+  {
+   "id": "P10",
+   "type": "Opinion",
+   "text": "Top athletes are paid far more than their work is worth. To what extent do you agree or disagree?",
+   "used": "Tue 3 Nov"
+  },
+  {
+   "id": "P11",
+   "type": "Problem and solution",
+   "text": "Many working adults struggle to balance work and personal life. What causes this, and what can be done about it?",
+   "used": "Thu 5 Nov"
+  },
+  {
+   "id": "P12",
+   "type": "Discussion",
+   "text": "Some believe technology has brought people closer together; others think it has made them more isolated. Discuss both views and give your opinion.",
+   "used": "Spare"
+  }
+ ],
+ "errors": [
+  {
+   "id": "e01",
+   "source": "Mock T2",
+   "wrote": "No conclusion",
+   "correct": "Four paragraphs every time: introduction, two body paragraphs, a conclusion that restates your position",
+   "pattern": "Task",
+   "status": "Open"
+  },
+  {
+   "id": "e02",
+   "source": "Mock T2",
+   "wrote": "Body paragraph 1 argues for having holidays at all",
+   "correct": "Test every paragraph against the key word of the question: long holidays",
+   "pattern": "Task",
+   "status": "Open"
+  },
+  {
+   "id": "e03",
+   "source": "Mock T2",
+   "wrote": "No concrete example",
+   "correct": "One specific example per body paragraph, as the question asks",
+   "pattern": "Task",
+   "status": "Open"
+  },
+  {
+   "id": "e04",
+   "source": "Mock T1",
+   "wrote": "Overview names no changes",
+   "correct": "Name the two or three biggest changes, with no numbers",
+   "pattern": "Task",
+   "status": "Open"
+  },
+  {
+   "id": "e05",
+   "source": "Mock T1",
+   "wrote": "holiday cottages and farmhouse have been constructed",
+   "correct": "holiday cottages have been built beside the farmhouse, which is unchanged",
+   "pattern": "Task",
+   "status": "Open"
+  },
+  {
+   "id": "e06",
+   "source": "Mock T1",
+   "wrote": "Farm shop not mentioned",
+   "correct": "A farm shop has been added near the main road",
+   "pattern": "Task",
+   "status": "Open"
+  },
+  {
+   "id": "e07",
+   "source": "Mock T2",
+   "wrote": "make the education less effective",
+   "correct": "make education less effective",
+   "pattern": "Article",
+   "status": "Open"
+  },
+  {
+   "id": "e08",
+   "source": "Mock T2",
+   "wrote": "through a constant practice",
+   "correct": "through constant practice",
+   "pattern": "Article",
+   "status": "Open"
+  },
+  {
+   "id": "e09",
+   "source": "Mock T2",
+   "wrote": "allocating certain part of the curriculum",
+   "correct": "a certain part of the curriculum; better: part of the next term",
+   "pattern": "Article",
+   "status": "Open"
+  },
+  {
+   "id": "e10",
+   "source": "Mock T2",
+   "wrote": "earn the knowledge",
+   "correct": "gain knowledge",
+   "pattern": "Collocation",
+   "status": "Open"
+  },
+  {
+   "id": "e11",
+   "source": "Mock T2",
+   "wrote": "It is widely common",
+   "correct": "It is very common",
+   "pattern": "Collocation",
+   "status": "Open"
+  },
+  {
+   "id": "e12",
+   "source": "Mock T2",
+   "wrote": "seasonal exams",
+   "correct": "end-of-term exams",
+   "pattern": "Collocation",
+   "status": "Open"
+  },
+  {
+   "id": "e13",
+   "source": "Mock T2",
+   "wrote": "widen their mindset",
+   "correct": "broaden their horizons",
+   "pattern": "Collocation",
+   "status": "Open"
+  },
+  {
+   "id": "e14",
+   "source": "Mock T2",
+   "wrote": "can be recorded as another reason",
+   "correct": "is another reason",
+   "pattern": "Collocation",
+   "status": "Open"
+  },
+  {
+   "id": "e15",
+   "source": "Mock T1",
+   "wrote": "in the purpose of modernizing it",
+   "correct": "to modernise it",
+   "pattern": "Collocation",
+   "status": "Open"
+  },
+  {
+   "id": "e16",
+   "source": "Mock T1",
+   "wrote": "Regarding with",
+   "correct": "Regarding, or As for",
+   "pattern": "Collocation",
+   "status": "Open"
+  },
+  {
+   "id": "e17",
+   "source": "Mock T1",
+   "wrote": "adjusted to roads",
+   "correct": "converted into roads",
+   "pattern": "Collocation",
+   "status": "Open"
+  },
+  {
+   "id": "e18",
+   "source": "Mock T1",
+   "wrote": "contemporary solar panels",
+   "correct": "solar panels",
+   "pattern": "Collocation",
+   "status": "Open"
+  },
+  {
+   "id": "e19",
+   "source": "Mock T1",
+   "wrote": "a parking",
+   "correct": "two parking areas",
+   "pattern": "Collocation",
+   "status": "Open"
+  },
+  {
+   "id": "e20",
+   "source": "Mock T2",
+   "wrote": "can children relax",
+   "correct": "can help children relax",
+   "pattern": "Grammar",
+   "status": "Open"
+  },
+  {
+   "id": "e21",
+   "source": "Mock T2",
+   "wrote": "life skills engaging in various activities",
+   "correct": "life skills by engaging in various activities",
+   "pattern": "Grammar",
+   "status": "Open"
+  },
+  {
+   "id": "e22",
+   "source": "Mock T2",
+   "wrote": "relearning them",
+   "correct": "relearning it",
+   "pattern": "Grammar",
+   "status": "Open"
+  },
+  {
+   "id": "e23",
+   "source": "Mock T1",
+   "wrote": "there has not seen any alterations",
+   "correct": "there have been no alterations",
+   "pattern": "Grammar",
+   "status": "Open"
+  },
+  {
+   "id": "e24",
+   "source": "Mock T1",
+   "wrote": "solar panels with a parking has been established",
+   "correct": "solar panels and two parking areas have been installed",
+   "pattern": "Grammar",
+   "status": "Open"
+  },
+  {
+   "id": "e25",
+   "source": "Mock T1",
+   "wrote": "the far greatest changes",
+   "correct": "by far the greatest changes",
+   "pattern": "Grammar",
+   "status": "Open"
+  },
+  {
+   "id": "e26",
+   "source": "Mock T1",
+   "wrote": "Given is a map depicting",
+   "correct": "The plans show how the farm changed between 1950 and today",
+   "pattern": "Template",
+   "status": "Open"
+  },
+  {
+   "id": "e27",
+   "source": "Mock T1",
+   "wrote": "Looking from an overall perspective, it is readily apparent that",
+   "correct": "Overall,",
+   "pattern": "Template",
+   "status": "Open"
+  },
+  {
+   "id": "e28",
+   "source": "Mock T1",
+   "wrote": "Commencing with",
+   "correct": "Cut it; start with the content",
+   "pattern": "Template",
+   "status": "Open"
+  },
+  {
+   "id": "e29",
+   "source": "Mock T2",
+   "wrote": "To explain this, / To make it clear,",
+   "correct": "Cut, or For example,",
+   "pattern": "Template",
+   "status": "Open"
+  }
+ ],
+ "blockMinutes": {
+  "Speak": 50,
+  "Write": 70,
+  "Read": 45,
+  "Fix": 15
+ }
+}
