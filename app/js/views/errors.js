@@ -1,7 +1,7 @@
 // Error log: every mistake, corrected and tagged. Rows are marked fixed, never deleted.
 import { h, icon, fmtShort, patternMark } from "../util.js";
 import * as store from "../store.js";
-import { head, toast } from "../ui.js";
+import { head, toast, segLinks } from "../ui.js";
 import { errorForm } from "./write.js";
 
 export const live = true;
@@ -13,9 +13,7 @@ export default async function (ctx) {
   const setF = (k, v) => { F[k] = v; render(); };
   const root = h("div");
   root.append(head("Error log", { sub: `${S.errors.filter((e) => e.status === "Open").length} open, ${S.errors.filter((e) => e.status === "Fixed").length} fixed`, back: q.task ? "#/today" : null }));
-  root.append(h("div", { class: "seg", role: "tablist", style: { marginBottom: "16px" } },
-    h("a", { class: "btn quiet", href: "#/review", style: { minHeight: "40px", color: "var(--text-2)" } }, "Cards"),
-    h("a", { class: "btn quiet", href: "#/errors", style: { minHeight: "40px", background: "var(--surface)", boxShadow: "var(--shadow)", borderRadius: "9px", color: "var(--text)" } }, "Error log")));
+  root.append(segLinks("Review sections", [["cards", "Cards", "#/review"], ["errors", "Error log", "#/errors"]], "errors"));
 
   if (q.task) {
     root.append(h("div", { class: "notice" }, "Add every new mistake from today, then mark this task done.",

@@ -2,7 +2,7 @@
 import { h, icon, mmss, todayISO, uid } from "../util.js";
 import * as store from "../store.js";
 import * as srs from "../srs.js";
-import { head, toast, makeTimer, sheet } from "../ui.js";
+import { head, toast, makeTimer, sheet, segLinks } from "../ui.js";
 import { patternMark } from "../util.js";
 
 export const live = false;
@@ -22,9 +22,7 @@ function hub(ctx) {
   const learned = S.cards.filter((c) => c.fsrs).length, leeches = S.cards.filter(srs.isLeech);
   const root = h("div");
   root.append(head("Review", { sub: "Words, phrases and fixes" }));
-  root.append(h("div", { class: "seg", role: "tablist", style: { marginBottom: "16px" } },
-    h("a", { class: "btn quiet", href: "#/review", "aria-selected": "true", style: { minHeight: "40px", background: "var(--surface)", boxShadow: "var(--shadow)", borderRadius: "9px", color: "var(--text)" } }, "Cards"),
-    h("a", { class: "btn quiet", href: "#/errors", "aria-selected": "false", style: { minHeight: "40px", color: "var(--text-2)" } }, "Error log")));
+  root.append(segLinks("Review sections", [["cards", "Cards", "#/review"], ["errors", "Error log", "#/errors"]], "cards"));
 
   root.append(h("section", { class: "section", style: { marginTop: 0 } },
     h("div", { class: "band" }, h("div", { class: "big num", "aria-label": `${due.length} cards ready` }, String(due.length)), h("div", { class: "side" }, h("div", { class: "kicker" }, "cards ready"), h("div", { class: "kicker" }, `${srs.newRemaining()} new allowed today`))),
@@ -70,7 +68,7 @@ function inbox(ctx) {
   if (!cards.length) { root.append(h("div", { class: "empty" }, "The inbox is empty.")); return root; }
   root.append(h("div", { class: "row-actions" }, h("button", { class: "btn primary", onclick: async () => { for (const c of cards.slice(0, 50)) await srs.approve(c); toast("Added 50 cards."); ctx.rerender(); } }, `Approve the first ${Math.min(50, cards.length)}`)));
   root.append(h("ul", { class: "rows", style: { marginTop: "12px" } }, cards.slice(0, 60).map((c) => h("li", null, h("div", { class: "row", style: { flexWrap: "wrap" } },
-    h("div", { class: "grow" }, h("div", { class: "title" }, c.front), h("div", { class: "sub" }, c.back), c.source ? h("div", { class: "tiny faint" }, c.source) : null),
+    h("div", { class: "grow" }, h("div", { class: "title" }, c.front), h("div", { class: "sub", style: { whiteSpace: "pre-line" } }, c.back), c.source ? h("div", { class: "tiny faint" }, c.source) : null),
     h("button", { class: "btn small", onclick: async () => { await srs.approve(c); ctx.rerender(); } }, "Approve"),
     h("button", { class: "btn small quiet", onclick: async () => { await store.setSetting("rej-" + c.id, true); ctx.rerender(); } }, "Reject"))))));
   return root;
@@ -124,7 +122,7 @@ async function session(ctx) {
     body.replaceChildren(flash, answerArea, reveal);
     function doReveal() {
       if (revealed) return; revealed = true;
-      flash.classList.add("flip"); flash.append(h("div", { class: "a" }, current.back), current.source ? h("div", { class: "tiny faint" }, current.source) : null);
+      flash.classList.add("flip"); flash.append(h("div", { class: "a", style: { whiteSpace: "pre-line" } }, current.back), current.source ? h("div", { class: "tiny faint" }, current.source) : null);
       reveal.remove();
       const pv = srs.preview(current), R = srs.Rating;
       const btn = (rating, label, cls) => h("button", { class: cls, onclick: () => rate(rating), "aria-label": `${label}, next in ${srs.humanInterval(pv[rating])}` }, h("span", null, label), h("small", null, srs.humanInterval(pv[rating])), h("span", { class: "kbd", "aria-hidden": "true", style: { justifySelf: "center" } }, String(rating)));
