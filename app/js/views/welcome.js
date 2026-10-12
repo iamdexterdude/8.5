@@ -6,7 +6,7 @@ import * as store from "../store.js";
 export function ikat({ opacity = 1 } = {}) {
   const NS = "http://www.w3.org/2000/svg";
   const el = (n, a = {}) => { const e = document.createElementNS(NS, n); for (const [k, v] of Object.entries(a)) e.setAttribute(k, v); return e; };
-  const svg = el("svg", { viewBox: "0 0 160 160", preserveAspectRatio: "xMidYMid slice", class: "ikat", "aria-hidden": "true" });
+  const svg = el("svg", { viewBox: "0 0 280 280", preserveAspectRatio: "xMidYMid slice", class: "ikat", "aria-hidden": "true" });
   svg.style.opacity = opacity;
   const defs = el("defs");
   const f = el("filter", { id: "feather" + Math.random().toString(36).slice(2, 6), x: "-5%", y: "-5%", width: "110%", height: "110%" });
@@ -17,7 +17,7 @@ export function ikat({ opacity = 1 } = {}) {
   const diamond = (cx, cy, n, fill, op) => { for (let i = -n; i <= n; i++) { const w = (n - Math.abs(i)) * 2 + 1; g.append(el("rect", { x: cx - w * 4, y: cy + i * 8 - 4, width: w * 8, height: 8, fill, opacity: op })); } };
   diamond(40, 40, 4, "#2B4FD0", .55); diamond(40, 40, 2, "#1FB5AD", .6); diamond(40, 40, 0, "#F4F1E8", .7);
   diamond(0, 0, 2, "#1FB5AD", .35); diamond(80, 0, 2, "#1FB5AD", .35); diamond(0, 80, 2, "#1FB5AD", .35); diamond(80, 80, 2, "#1FB5AD", .35);
-  pat.append(g); defs.append(f, pat); svg.append(defs, el("rect", { width: 160, height: 160, fill: `url(#p${id})` }));
+  pat.append(g); defs.append(f, pat); svg.append(defs, el("rect", { width: 280, height: 280, fill: `url(#p${id})` }));
   return svg;
 }
 
