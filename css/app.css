@@ -7,9 +7,9 @@
   --bg: #F5F3EE; --surface: #FFFFFF; --surface-2: #ECE9E1; --line: #D8D4C8;
   --text: #17202E; --text-2: #465063; --text-3: #5F6A7E;
   --accent: #1E3FA8; --accent-ink: #FFFFFF; --accent-soft: #E1E8FB;
-  --turq: #0B7F7B; --turq-soft: #D4EFEC;
+  --turq: #0A726E; --turq-soft: #D4EFEC;
   --danger: #B42318; --ok: #137A4B; --warn: #8F5A00;
-  --p-task: #2650C8; --p-article: #0B7F7B; --p-collocation: #8F5A00; --p-grammar: #A3336B; --p-template: #566074;
+  --p-task: #2650C8; --p-article: #0A726E; --p-collocation: #8F5A00; --p-grammar: #A3336B; --p-template: #566074;
   --sk-speak: #0B7F7B; --sk-write: #1E3FA8; --sk-read: #8F5A00; --sk-listen: #6B4FB0;
   --shadow: 0 1px 2px rgba(23, 32, 46, .06), 0 8px 24px rgba(23, 32, 46, .06);
   --f-display: "Bricolage", "Segoe UI", system-ui, sans-serif;
@@ -112,8 +112,13 @@ input[type="text"], input[type="time"], input[type="number"], input[type="url"],
 textarea { resize: vertical; line-height: 1.5; }
 input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--accent); }
 .seg { display: inline-flex; background: var(--surface-2); border-radius: 12px; padding: 3px; gap: 2px; flex-wrap: wrap; }
-.seg button { border: 0; background: transparent; min-height: 40px; padding: 0 14px; border-radius: 9px; font-weight: 600; color: var(--text-2); }
+.seg button { border: 0; background: transparent; min-height: 44px; padding: 0 14px; border-radius: 9px; font-weight: 600; color: var(--text-2); }
 .seg button[aria-pressed="true"], .seg button[aria-selected="true"] { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+.seg .seglink { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: 9px; font-weight: 600; color: var(--text-2); text-decoration: none; }
+.seg .seglink[aria-current="page"] { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+.roadmap a.ph { text-decoration: none; color: inherit; }
+.roadmap a.ph.now { color: var(--accent-ink); }
+.weekcols .col h2 { font-size: 14px; }
 .row-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 
 /* ---------- rows ---------- */

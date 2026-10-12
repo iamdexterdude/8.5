@@ -4,11 +4,12 @@ import * as store from "../store.js";
 
 export function watchRow(v, date) {
   const key = `${date}|watch|${v.id}`; const done = store.isDone(key);
-  return h("li", null, h("div", { class: "row video-row" + (done ? " done" : "") },
+  return h("li", null, h("div", { class: "row video-row" + (done ? " done" : ""), style: { flexWrap: "wrap", alignItems: "flex-start" } },
     h("div", { class: "vthumb" }, icon("video")),
-    h("div", { class: "grow" }, h("div", { class: "title" }, v.title), h("div", { class: "sub" }, `${v.minutes} min, ${v.course}`, v.why ? ` — ${v.why}` : "")),
-    h("a", { class: "btn small", href: v.url, target: "_blank", rel: "noopener" }, "Open in Telegram"),
-    h("button", { class: "btn small quiet", "aria-pressed": String(done), onclick: () => (done ? store.unmarkDone(key) : store.markDone(key)) }, done ? "Watched" : "Mark watched")));
+    h("div", { class: "grow" }, h("div", { class: "title" }, v.title), h("div", { class: "sub" }, `${v.minutes} min, ${v.course}`, v.why ? `. ${v.why}` : "")),
+    h("div", { class: "row-actions", style: { flexBasis: "100%", paddingLeft: "56px" } },
+      h("a", { class: "btn small", href: v.url, target: "_blank", rel: "noopener" }, "Open in Telegram"),
+      h("button", { class: "btn small quiet", "aria-pressed": String(done), onclick: () => (done ? store.unmarkDone(key) : store.markDone(key)) }, done ? "Watched" : "Mark watched"))));
 }
 
 export default async function () { return h("div"); }

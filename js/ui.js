@@ -107,3 +107,9 @@ export function taskRow(t, { onToggle, startHref, startLabel = "Start", sub, evi
         evidence && !done ? h("span", { style: { marginLeft: "12px" } }, "Completes when you submit it") : null])),
     startHref && !done ? h("a", { class: "btn small", href: startHref }, startLabel) : null));
 }
+
+// A row of links that look like a segmented control; the current one is marked for screen readers.
+export function segLinks(label, items, current) {
+  return h("nav", { class: "seg", "aria-label": label, style: { marginBottom: "16px" } },
+    items.map(([id, text, href]) => h("a", { class: "seglink", href, "aria-current": id === current ? "page" : null }, text)));
+}

@@ -1,7 +1,7 @@
 // Plan: the month, the week, any day.
 import { h, icon, fmtDate, fmtShort, todayISO, addDays, dowOf, hm } from "../util.js";
 import * as store from "../store.js";
-import { head, taskRow, skillName } from "../ui.js";
+import { head, taskRow, skillName, segLinks } from "../ui.js";
 import { toolFor, watchFor } from "../tasks.js";
 import { watchRow } from "./watch.js";
 
@@ -16,12 +16,8 @@ export default async function (ctx) {
 
 function tabs(active, weekNo) {
   const t = todayISO();
-  return h("div", { class: "seg", role: "tablist", style: { marginBottom: "16px" } },
-    h("a", { class: "btn quiet", href: "#/plan", role: "tab", "aria-selected": String(active === "month"), style: segStyle(active === "month") }, "Month"),
-    h("a", { class: "btn quiet", href: `#/plan/week/${weekNo}`, role: "tab", "aria-selected": String(active === "week"), style: segStyle(active === "week") }, "Week"),
-    h("a", { class: "btn quiet", href: `#/plan/day/${store.dayByDate(t) ? t : store.S.plan.start}`, role: "tab", "aria-selected": String(active === "day"), style: segStyle(active === "day") }, "Day"));
+  return segLinks("Plan views", [["month", "Month", "#/plan"], ["week", "Week", `#/plan/week/${weekNo}`], ["day", "Day", `#/plan/day/${store.dayByDate(t) ? t : store.S.plan.start}`]], active);
 }
-const segStyle = (on) => ({ minHeight: "40px", background: on ? "var(--surface)" : "transparent", color: on ? "var(--text)" : "var(--text-2)", boxShadow: on ? "var(--shadow)" : "none", borderRadius: "9px" });
 const weekOf = (iso) => store.dayByDate(iso)?.week || 1;
 
 // ---------- month ----------
@@ -31,7 +27,7 @@ function monthView(ctx) {
   root.append(head("Plan", { sub: "Month 1: 12 October to 8 November" }), tabs("month", weekOf(today)));
   const nowWeek = store.dayByDate(today)?.week;
   root.append(h("div", { class: "roadmap", role: "list" }, plan.roadmap.map((r) =>
-    h("a", { class: "ph" + (nowWeek === r.week ? " now" : ""), href: `#/plan/week/${r.week}`, role: "listitem", style: { textDecoration: "none", color: "inherit" } },
+    h("a", { class: "ph" + (nowWeek === r.week ? " now" : ""), href: `#/plan/week/${r.week}`, role: "listitem" },
       h("b", null, r.phase), `Week ${r.week}`, h("div", { class: "tiny", style: { opacity: .85 } }, r.dates)))));
   root.append(h("p", { class: "small muted" }, plan.roadmap.find((r) => r.week === nowWeek)?.focus ? "This week: " + plan.roadmap.find((r) => r.week === nowWeek).focus : "Weeks 1 and 2 build technique, weeks 3 and 4 build accuracy and stamina."));
 
@@ -67,7 +63,7 @@ function weekView(ctx, week) {
   root.append(h("div", { class: "weekcols" }, days.map((d) => {
     const items = store.dayItems(d);
     return h("div", { class: "col", style: d.date === today ? { outline: "2px solid var(--accent)" } : null },
-      h("h3", null, h("a", { href: `#/plan/day/${d.date}`, style: { color: "inherit", textDecoration: "none" } }, `${d.dow} ${Number(d.date.slice(8))}`)),
+      h("h2", null, h("a", { href: `#/plan/day/${d.date}`, style: { color: "inherit", textDecoration: "none" } }, `${d.dow} ${Number(d.date.slice(8))}`)),
       h("div", { class: "tiny muted", style: { marginBottom: "6px" } }, d.lessonNo ? `Lesson ${d.lessonNo}: ${d.lessonTitle}` : SHORT[d.type]),
       h("ul", { style: { listStyle: "none", margin: 0, padding: 0, display: "grid", gap: "4px" } }, items.map((t) =>
         h("li", { style: { display: "flex", gap: "6px", alignItems: "flex-start" } },
