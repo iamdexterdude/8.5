@@ -349,6 +349,14 @@ function review() {
   <div class="card"><h3 style="margin-top:0">How reviews went</h3>${tot ? [["Again", r.again, "var(--danger)"], ["Hard", r.hard, "var(--warn)"], ["Good", r.good, "var(--accent)"], ["Easy", r.easy, "var(--ok)"]].map(([l, v, c]) => hbar(l, v, tot, `${v} (${Math.round((100 * v) / tot)}%)`, c)).join("") + `<div class="tiny muted" style="margin-top:8px">Remembered ${recall}% of the time (Hard, Good or Easy).</div>` : '<div class="empty">No reviews yet.</div>'}
   ${D.cards.leeches.length ? `<h3>Cards she keeps missing</h3><ul style="margin:0;padding-left:18px">${D.cards.leeches.map((c) => `<li>${esc(c.front)} <span class="faint tiny">(failed ${c.lapses} times)</span></li>`).join("")}</ul>` : ""}</div></div></section>`;
 }
+function decksSection() {
+  if (!D.decks || !D.decks.length) return "";
+  const kinds = { speaking1: "Speaking Part 1", speaking2: "Speaking Part 2", speaking3: "Speaking Part 3", reading: "Reading", mistakes: "Mistakes", mine: "Her own" };
+  const rows = D.decks.slice().sort((a, b) => (b.date || "").localeCompare(a.date || "")).map((d) => `<tr><td>${esc(d.name)}</td><td class="muted">${kinds[d.kind] || ""}</td><td>${d.date ? fmtD(d.date) : ""}</td><td class="n">${d.total}</td>
+    <td style="min-width:120px"><div class="bar"><i style="width:${d.total ? (100 * d.started) / d.total : 0}%"></i></div></td><td class="n">${d.started}</td><td class="n">${d.due ? `<span class="pill warn">${d.due} due</span>` : '<span class="faint">0</span>'}</td></tr>`).join("");
+  const tot = sum(D.decks.map((d) => d.total)), st = sum(D.decks.map((d) => d.started));
+  return `<section><div class="sechead"><h2>Decks</h2><span class="tiny muted">${D.decks.length} decks, ${st} of ${tot} cards started. A deck opens on the day its homework is set.</span></div><div class="card"><table><thead><tr><th>Deck</th><th>Type</th><th>From</th><th class="n">Cards</th><th>Started</th><th class="n">Done</th><th class="n">Due now</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
+}
 function errors() {
   const pats = ["Task", "Article", "Collocation", "Grammar", "Template"];
   const by = pats.map((p) => ({ p, open: D.errors.filter((e) => e.pattern === p && e.status !== "Fixed").length, fixed: D.errors.filter((e) => e.pattern === p && e.status === "Fixed").length }));
@@ -363,7 +371,7 @@ function errors() {
 }
 
 function render() {
-  $("#root").innerHTML = masthead() + `<div class="wrap">` + hero() + kpis() + flagsSection() + calendar() + effort() + scoresSection() + checkpoints() + writing() + speaking() + reading() + review() + errors() +
+  $("#root").innerHTML = masthead() + `<div class="wrap">` + hero() + kpis() + flagsSection() + calendar() + effort() + scoresSection() + checkpoints() + writing() + speaking() + reading() + decksSection() + review() + errors() +
     `<div class="foot">Made on her device by 8.5 and shared by her. It contains her essays${D.recordings.some((r) => r.audio) ? ", recordings" : ""} and scores, so please keep it private. Open it in any browser; nothing is sent anywhere.</div></div>`;
   $("#theme").onclick = () => { const cur = document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"); document.documentElement.dataset.theme = cur === "dark" ? "light" : "dark"; };
 }

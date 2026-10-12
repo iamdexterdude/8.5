@@ -50,11 +50,12 @@ export async function collect({ includeAudio = false } = {}) {
   for (const l of log) { const d = tashkentDate(l.at); const o = (reviews[d] ||= { n: 0, again: 0, hard: 0, good: 0, easy: 0 }); o.n++; o[["", "again", "hard", "good", "easy"][l.rating]]++; }
   const cards = { total: S.cards.length, started: S.cards.filter((c) => c.fsrs).length, due: S.cards.filter((c) => c.fsrs && new Date(c.fsrs.due) <= now).length,
     leeches: S.cards.filter(srs.isLeech).map((c) => ({ front: c.front, lapses: c.fsrs.lapses })) };
+  const decks = store.activeDecks(today).map((d) => { const st = srs.deckStats(d.id); return { name: d.name, kind: d.kind, date: d.date > "0001" ? d.date : null, total: st.total, started: st.started, due: st.due, fresh: st.fresh }; }).filter((d) => d.total > 0);
   const errors = S.errors.map((e) => ({ pattern: e.pattern, wrote: e.wrote, correct: e.correct, seen: e.seen, status: e.status, source: e.source, firstSeen: e.firstSeen, lastSeen: e.lastSeen, fromPlan: !!e.fromPlan }));
 
   return { app: "8.5", generatedAt: now.toISOString(), name: store.setting("name") || "", today, planStart: plan.start, planEnd: plan.end, target: S.config.target, aims: S.config.skillTargets,
     est, baseline, scores: S.scores.map((s) => ({ skill: s.skill, date: s.date, band: s.band ?? (s.raw != null && S.config.rawToBand[s.skill] ? rawToBand(S.config.rawToBand[s.skill], s.raw) : null), raw: s.raw ?? null, note: s.note || "", baseline: !!s.baseline })), writingSeries, checkpoints,
-    days, study, minimumDays, streak: store.streak(today), essays, recordings, reading, reviews, reviewTotal: log.length, cards, errors };
+    days, study, minimumDays, streak: store.streak(today), essays, recordings, reading, reviews, reviewTotal: log.length, cards, decks, errors };
 }
 
 export async function buildReportHtml(opts = {}) {

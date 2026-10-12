@@ -9,8 +9,9 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const priv = process.argv.includes("--private");
 const out = join(root, priv ? "build-private" : "dist");
 
-rmSync(out, { recursive: true, force: true });
+// empty the folder instead of deleting it, so a local server running inside it does not block the build
 mkdirSync(out, { recursive: true });
+for (const f of readdirSync(out)) rmSync(join(out, f), { recursive: true, force: true });
 cpSync(join(root, "app"), out, { recursive: true, filter: (src) => !/course-pack\.json$/.test(src) });
 
 if (priv) {

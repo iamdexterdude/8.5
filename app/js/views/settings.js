@@ -43,7 +43,7 @@ export default async function (ctx) {
     h("p", { class: "small muted" }, "Once the date is set, a countdown appears on Today.")));
 
   // review
-  root.append(h("section", { class: "section" }, h("div", { class: "shead" }, h("h2", null, "Review")), num("newCardsPerDay", "New cards per day", 0, 60), num("quickReviewMinutes", "Quick review length, minutes", 1, 20),
+  root.append(h("section", { class: "section" }, h("div", { class: "shead" }, h("h2", null, "Review")), num("newCardsPerDay", "New cards per day (0 means no limit)", 0, 500), num("quickReviewMinutes", "Quick review length, minutes", 1, 20),
     h("p", { class: "small muted" }, "Cards are scheduled with FSRS for 90% retention.")));
 
   // install

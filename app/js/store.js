@@ -26,6 +26,7 @@ export async function load() {
   const packRows = await db.all("pack");
   S.pack = packRows.find((r) => r.key === "pack")?.value || await tryBundledPack();
   if (!S.kv.seeded) await seed();
+  await syncDecks();
 }
 
 // A local-only build may ship the pack next to the app; the public build never does.
@@ -54,7 +55,7 @@ async function seed() {
 export function errorCard(e) {
   const swap = e.pattern === "Template";
   return {
-    id: "c-" + e.id, type: swap ? "swap" : "fix", errorId: e.id, tag: e.pattern.toLowerCase(),
+    id: "c-" + e.id, type: swap ? "swap" : "fix", deck: "mistakes", errorId: e.id, tag: e.pattern.toLowerCase(),
     front: e.wrote, back: e.correct,
     prompt: swap ? "Say it plainly. What replaces this?" : e.pattern === "Task" ? "What should you do instead?" : "Correct it, from memory.",
     source: e.source, fsrs: null, introduced: null, suspended: false,
@@ -92,6 +93,7 @@ export function dayItems(d) {
   const items = [];
   if (d.lessonNo) items.push({ key: d.lessonKey, block: "lesson", text: `Lesson ${d.lessonNo}: ${d.lessonTitle}`, minutes: setting("lessonMinutes"), date: d.date, lesson: true });
   items.push(...dayTasks(d));
+  items.push(...courseTasks(d));
   return items;
 }
 export function dayProgress(d) {
@@ -219,7 +221,7 @@ export async function resetAll() {
   S.kv = {}; S.tasks = {}; S.errors = []; S.cards = []; S.scores = []; S.study = {};
   await seed(); changed();
 }
-export async function savePack(pack) { S.pack = pack; await db.put("pack", { key: "pack", value: pack }); changed(); }
+export async function savePack(pack) { S.pack = pack; await db.put("pack", { key: "pack", value: pack }); await syncDecks(); changed(); }
 export async function removePack() { S.pack = null; await db.del("pack", "pack"); changed(); }
 
 // ---------- lessons ----------
@@ -228,4 +230,50 @@ export function lessonStart(d) { return lessonMoment(d.date, setting("lessonTime
 export function nextLesson(now = new Date()) {
   const mins = Number(setting("lessonMinutes")) || 90;
   return lessonDays().find((d) => lessonStart(d).getTime() + mins * 60000 > now.getTime()) || null;
+}
+
+// ---------- decks ----------
+// Every card belongs to a deck. Her own decks always exist; the course's decks switch on, with all their cards, on the day they are assigned.
+export const BUILTIN_DECKS = [
+  { id: "mistakes", name: "My mistakes", kind: "mistakes", date: "0000-00-00", note: "From your error log" },
+  { id: "mine", name: "Cards I added", kind: "mine", date: "0000-00-01", note: "Added by you" },
+];
+export function activeDecks(today = todayISO()) {
+  const pack = (S.pack?.decks || []).filter((d) => d.date <= today);
+  return [...BUILTIN_DECKS, ...pack];
+}
+export function deckById(id) { return BUILTIN_DECKS.find((d) => d.id === id) || (S.pack?.decks || []).find((d) => d.id === id) || null; }
+export async function syncDecks() {
+  const today = todayISO(); let added = 0;
+  for (const c of S.cards) if (!c.deck) { c.deck = c.errorId ? "mistakes" : "mine"; await db.put("cards", c); }
+  const have = new Set(S.cards.map((c) => c.id));
+  const open = new Set((S.pack?.decks || []).filter((d) => d.date <= today).map((d) => d.id));
+  for (const c of S.pack?.cards || []) {
+    if (!open.has(c.deck) || have.has(c.id)) continue;
+    const card = { ...c, fsrs: null, introduced: null, suspended: false };
+    S.cards.push(card); await db.put("cards", card); added++;
+  }
+  return added;
+}
+
+// ---------- the course homework for a day (from the private pack) ----------
+export function courseDay(iso) { return S.pack?.days?.[iso] || null; }
+export function courseTasks(d) {
+  const cd = courseDay(d.date); if (!cd) return [];
+  return (cd.tasks || []).map((t) => ({ key: `${d.date}|course|${t.id}`, block: "course", text: t.text, minutes: t.minutes, date: d.date, course: true, route: t.route, unit: t.unit || null }));
+}
+export function unitById(id) {
+  for (const [date, cd] of Object.entries(S.pack?.days || {})) for (const k of ["part1", "part2", "part3"]) { const u = (cd.speaking?.[k] || []).find((x) => x.id === id); if (u) return { ...u, date }; }
+  return null;
+}
+// finishing a deck session or a day's word session ticks the matching course tasks
+export async function markCourseTasks({ deck = null, day = null, unit = null }) {
+  const today = todayISO();
+  for (const d of S.plan.days) {
+    if (d.date > today) break;
+    for (const t of courseTasks(d)) {
+      const hit = (deck && t.route?.includes(`deck=${deck}`)) || (day && t.route?.includes(`day=${day}`)) || (unit && t.unit === unit);
+      if (hit && !isDone(t.key)) await markDone(t.key);
+    }
+  }
 }

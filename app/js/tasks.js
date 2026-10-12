@@ -7,6 +7,7 @@ const enc = encodeURIComponent;
 export function toolFor(t, { session = false } = {}) {
   const text = t.text || "";
   const q = `task=${enc(t.key)}${session ? "&session=1" : ""}`;
+  if (t.course) return { kind: "course", href: t.route, evidence: false, label: /\/model\//.test(t.route || "") ? "Open" : "Learn" };
   if (t.lesson) return { kind: "lesson", href: `#/lesson/${t.key.split("|")[0]}`, evidence: false, label: "Open lesson" };
   const block = t.block;
   if (block === "homework") {

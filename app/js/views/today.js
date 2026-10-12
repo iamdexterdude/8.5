@@ -7,6 +7,7 @@ import { toolFor, needsEvidence, minimumTasks, minimumTool, watchFor } from "../
 import { bandBlock } from "./bandblock.js";
 import { watchRow } from "./watch.js";
 import { reportCard } from "../report.js";
+import { courseWork, todaysDecks } from "./coursework.js";
 
 const TYPE_LABEL = { lesson: "Lesson day", self: "Self-study", test: "Test day", fullmock: "Full mock", light: "Light day", off: "Rest day", other: "" };
 
@@ -42,6 +43,9 @@ export default async function (ctx) {
 
   main.append(missedBlock(today));
   main.append(taskStack(ctx, day, today, before));
+
+  main.append(...courseWork(day.date));
+  const dk = todaysDecks(day.date); if (dk) main.append(dk);
 
   // course videos for tonight (private pack only)
   const vids = watchFor(day.date);
