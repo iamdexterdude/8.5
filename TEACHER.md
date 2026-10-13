@@ -2,7 +2,7 @@
 
 **Her link: https://iamdexterdude.github.io/8.5/** That is all she needs. Nothing to type, no code, no setup. She opens it, sees her name, and the homework appears on Today as soon as you publish it. (Her name comes from Class settings; the welcome plays once.)
 
-**Your password: `lantern-copper-willow-62`** (set on 14 Oct). Change it in Teacher mode, Class, Password. Keep it long: its hash is public.
+**Your password: `bom04`** (set on 14 Oct). Change it in Teacher mode, Class, Password (4 characters or more). The hash in the feed repo is mixed with a secret kept on Vercel, so it cannot be cracked offline; online guesses are limited to 8 per 15 minutes.
 
 ## Each day
 

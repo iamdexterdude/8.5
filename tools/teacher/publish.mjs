@@ -1,7 +1,7 @@
 // The teacher's command-line tool (used by Claude when Dexter sends homework in chat, or by hand). Needs a logged-in `gh`.
 //   node tools/teacher/publish.mjs homework file.json     validate, scramble and publish one day's homework
 //   node tools/teacher/publish.mjs config file.json       publish class settings: { student, teacher, lessonTime, lessonLink, music: [{title, artist, url, note}] }
-//   node tools/teacher/publish.mjs password [new]         set or change the teacher password (prints it)
+//   node tools/teacher/publish.mjs password [new]         set or change the teacher password
 //   node tools/teacher/publish.mjs show 2026-10-15        print what is published for a day
 //   node tools/teacher/publish.mjs requests               print the notes the teacher saved in "Tell Claude", then clear them
 //   node tools/teacher/publish.mjs remove 2026-10-15      unpublish a day
@@ -32,7 +32,14 @@ async function fetchDec(path) {
   const r = await fetch(`${RAW}/${path}?t=${Date.now()}`); if (!r.ok) return null;
   return decryptJson(await r.json(), FEED_KEY);
 }
-const hashPassword = (password) => { const salt = randomBytes(16).toString("base64"), iter = 600000; return { alg: "pbkdf2-sha256", iter, salt, hash: pbkdf2Sync(password, Buffer.from(salt, "base64"), iter, 32, "sha256").toString("base64") }; };
+// the relay mixes a secret ("pepper") into the password hash; it is in backend/.env.local (vercel env pull) or TEACHER_PEPPER
+function pepper() {
+  if (process.env.TEACHER_PEPPER) return process.env.TEACHER_PEPPER;
+  const f = join(here, "..", "..", "backend", ".env.local");
+  if (existsSync(f)) { for (const line of readFileSync(f, "utf8").split(/[\r\n]+/)) { const m = line.match(/^TEACHER_PEPPER=(.*)$/); if (m) return m[1].trim().replace(/^"|"$/g, ""); } }
+  throw new Error("No TEACHER_PEPPER: run  cd backend && vercel env pull .env.local");
+}
+const hashPassword = (password) => { const salt = randomBytes(16).toString("base64"), iter = 600000; return { alg: "pbkdf2-sha256", iter, salt, hash: pbkdf2Sync(pepper() + ":" + password, Buffer.from(salt, "base64"), iter, 32, "sha256").toString("base64") }; };
 
 const [cmd, arg] = process.argv.slice(2);
 if (cmd === "homework") {
@@ -45,7 +52,7 @@ if (cmd === "homework") {
   const cfg = JSON.parse(readFileSync(arg, "utf8")); writeFileSync(join(here, "config.json"), JSON.stringify(cfg, null, 2));
   await put("config.json", { ...cfg, updatedAt: new Date().toISOString() }, "Class settings"); console.log("published class settings (" + (cfg.music?.length || 0) + " tracks)");
 } else if (cmd === "password") {
-  const pw = arg || process.env.TEACHER_PASSWORD; if (!pw || pw.length < 10) { console.error("Give a password of at least 10 characters."); process.exit(1); }
+  const pw = arg || process.env.TEACHER_PASSWORD; if (!pw || pw.length < 4) { console.error("Give a password of at least 4 characters."); process.exit(1); }
   putRaw("teacher.json", JSON.stringify(hashPassword(pw)), "Teacher password"); console.log("teacher password set");
 } else if (cmd === "show") {
   const v = await fetchDec(`hw/${arg}.json`); console.log(v ? JSON.stringify(v, null, 2) : "nothing published for " + arg);

@@ -1,1 +1,1 @@
-{ "name": "eight", "private": true, "type": "module", "scripts": { "test": "node --test tests/" } }
+{ "name": "eight-publish", "private": true, "type": "module" }

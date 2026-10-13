@@ -5,11 +5,14 @@ import { pbkdf2Sync, timingSafeEqual, randomBytes } from "node:crypto";
 
 const REPO = process.env.FEED_REPO || "iamdexterdude/8.5-feed", BRANCH = process.env.FEED_BRANCH || "main";
 const GH = process.env.GITHUB_TOKEN || "", TG = process.env.TG_BOT_TOKEN || "", CHAT = process.env.TG_CHAT_ID || "";
+// a secret mixed into the password hash, so the public teacher.json cannot be attacked offline; set once in the Vercel env
+const PEPPER = process.env.TEACHER_PEPPER || "";
+const MIN_PW = 4;
 const ORIGINS = [/^https:\/\/iamdexterdude\.github\.io$/, /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/];
 const PATH_OK = /^(hw\/\d{4}-\d{2}-\d{2}\.json|config\.json|requests\/[a-z0-9-]{1,40}\.json)$/;
 const MAX_FILE = 3.5 * 1024 * 1024;
 
-// ---- password: salted PBKDF2. The hash is public (feed repo), so the password must be long.
+// ---- password: salted PBKDF2 with a server-side pepper. The hash file is public (feed repo); without the pepper it is useless.
 let teacherCache = { at: 0, v: undefined };
 async function teacherRecord() {
   if (Date.now() - teacherCache.at < 30000 && teacherCache.v !== undefined) return teacherCache.v;
@@ -18,7 +21,7 @@ async function teacherRecord() {
   teacherCache = { at: Date.now(), v }; return v;
 }
 export function hashPassword(password, salt = randomBytes(16).toString("base64"), iter = 600000) {
-  return { alg: "pbkdf2-sha256", iter, salt, hash: pbkdf2Sync(password, Buffer.from(salt, "base64"), iter, 32, "sha256").toString("base64") };
+  return { alg: "pbkdf2-sha256", iter, salt, hash: pbkdf2Sync(PEPPER + ":" + password, Buffer.from(salt, "base64"), iter, 32, "sha256").toString("base64") };
 }
 function checkPassword(password, rec) {
   if (!rec || typeof password !== "string" || !password) return false;
@@ -94,7 +97,7 @@ export default async function handler(req, res) {
     tries.delete(ip);
     if (op === "login") return send(res, 200, { ok: true });
     if (op === "password") {
-      if (typeof b.newPassword !== "string" || b.newPassword.length < 10) return send(res, 400, { ok: false, error: "Use at least 10 characters." });
+      if (typeof b.newPassword !== "string" || b.newPassword.length < MIN_PW) return send(res, 400, { ok: false, error: `Use at least ${MIN_PW} characters.` });
       await putFile("teacher.json", JSON.stringify(hashPassword(b.newPassword)), "Teacher password"); teacherCache = { at: 0, v: undefined }; return send(res, 200, { ok: true });
     }
     if (op === "publish") {
