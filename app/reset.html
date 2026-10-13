@@ -35,7 +35,7 @@ $("refresh").onclick = async () => { say("Refreshing…"); try { await clearCach
 $("erase").onclick = async () => {
   if (!confirm("Delete all saved data for 8.5 on this device?")) return;
   say("Erasing…"); try { await clearCaches(); } catch {}
-  await new Promise((res) => { const r = indexedDB.deleteDatabase("eight"); r.onsuccess = r.onerror = r.onblocked = () => res(); setTimeout(res, 3000); });
+  for (const name of ["eight", "eight-hw"]) await new Promise((res) => { const r = indexedDB.deleteDatabase(name); r.onsuccess = r.onerror = r.onblocked = () => res(); setTimeout(res, 3000); });
   try { localStorage.clear(); sessionStorage.clear(); } catch {}
   location.replace("./?r=" + Date.now() + "#/today");
 };

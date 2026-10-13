@@ -2,6 +2,7 @@
 import * as store from "./store.js";
 import { h, icon, clear } from "./util.js";
 import * as hwm from "./homework.js";
+import * as dbm from "./db.js";
 
 const TABS = [
   { id: "today", label: "Today", href: "#/today", icon: "today" },
@@ -84,6 +85,7 @@ async function boot() {
   buildNav();
   await store.load();
   await hwm.init();
+  if (!dbm.persistent) document.body.append(h("div", { class: "nosave", role: "alert" }, h("span", null, "Your work is not being saved on this device. Close any other 8.5 tab or window, then reload."), h("button", { class: "btn small", onclick: () => location.reload() }, "Reload")));
   applyTheme();
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     const hadController = !!navigator.serviceWorker.controller;

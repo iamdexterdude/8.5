@@ -354,6 +354,9 @@ ol.stepedit { list-style: none; margin: 12px 0; padding: 0; display: grid; gap: 
 .stepedit-in { border-left: 3px solid var(--turq); padding: 4px 0 4px 12px; background: var(--bg); }
 .afterlesson { margin: 14px 0 0; display: grid; gap: 6px; }
 .afterlesson textarea { font-size: 16px; }
+.nosave { position: fixed; z-index: 120; top: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; padding: 10px 16px; background: var(--danger); color: #fff; font-weight: 600; }
+:root[data-theme="dark"] .nosave { color: #0B1120; }
+.nosave .btn { background: #fff; color: #17202E; border-color: transparent; }
 .footer-note { margin-top: 40px; font-size: 13px; color: var(--text-3); }
 
 /* view transition: crossfade, no layout shift */
