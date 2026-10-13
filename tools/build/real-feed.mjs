@@ -1,0 +1,10 @@
+import { chromium } from "playwright";
+const code = process.argv[2];
+const b = await chromium.launch({ channel: "msedge", headless: true });
+const ctx = await b.newContext({ viewport: { width: 390, height: 844 } }); const p = await ctx.newPage();
+await p.goto("http://127.0.0.1:8123/?date=2026-12-31&nowelcome#/join/" + code);
+await p.waitForSelector("text=Round-trip test", { timeout: 15000 });
+const t = await p.innerText("main#view"); console.log("REAL feed loaded in the app:", /Round-trip test/.test(t) && /Test task/.test(t) && /checking the feed/.test(t));
+await p.goto("http://127.0.0.1:8123/?date=2026-12-31&nowelcome#/join/wrong-code-here"); await p.waitForTimeout(3500);
+console.log("wrong code is refused:", /did not open the homework|Enter your access code/.test(await p.innerText("main#view")));
+await b.close();

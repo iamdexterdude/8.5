@@ -1,0 +1,16 @@
+import { chromium } from "playwright";
+const browser = await chromium.launch({ channel: "msedge", headless: true });
+const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, colorScheme: "light", deviceScaleFactor: 2 });
+const page = await ctx.newPage();
+const errors = [];
+page.on("console", (m) => { if (m.type() === "error") errors.push(m.text()); });
+page.on("pageerror", (e) => errors.push("PAGEERROR " + e.message));
+const date = process.argv[2] || "2026-10-13";
+await page.goto(`http://127.0.0.1:8123/?date=${date}&nowelcome`);
+await page.waitForSelector("main#view > *");
+await page.waitForTimeout(500);
+await page.screenshot({ path: "shots/today-phone-light.png", fullPage: true });
+console.log("TITLE", await page.title());
+console.log("TEXT", (await page.innerText("main#view")).slice(0, 600));
+console.log("ERRORS", errors);
+await browser.close();

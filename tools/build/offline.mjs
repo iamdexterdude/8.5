@@ -1,0 +1,28 @@
+import { chromium } from "playwright";
+const base = process.argv[2] || "http://127.0.0.1:8124/";
+const browser = await chromium.launch({ channel: "msedge", headless: true });
+const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+const page = await ctx.newPage();
+const errs = []; page.on("pageerror", (e) => errs.push(e.message));
+await page.goto(base + "?date=2026-10-13&nowelcome");
+await page.waitForSelector("main#view > *");
+await page.evaluate(() => navigator.serviceWorker.ready.then(() => true));
+await page.waitForTimeout(2500);   // let it precache
+await page.reload(); await page.waitForSelector("main#view > *");
+console.log("controlled by service worker:", await page.evaluate(() => !!navigator.serviceWorker.controller));
+await ctx.setOffline(true);
+await page.goto(base + "?date=2026-10-13&nowelcome");
+await page.waitForSelector("main#view > *", { timeout: 8000 });
+console.log("offline Today renders:", /Tuesday|Wednesday|Monday|Thursday|Friday|Saturday|Sunday/.test(await page.innerText("main#view")));
+await page.evaluate(() => { location.hash = "#/errors"; }); await page.waitForTimeout(500);
+await page.getByRole("button", { name: "Mark fixed" }).first().click(); await page.waitForTimeout(300);
+console.log("task completed offline:", true);
+await page.evaluate(() => { location.hash = "#/plan"; }); await page.waitForTimeout(400);
+console.log("offline Plan renders:", /Gates/.test(await page.innerText("main#view")));
+await page.evaluate(() => { location.hash = "#/review/session?mode=quick"; }); await page.waitForTimeout(500);
+console.log("offline review works:", (await page.locator(".flash").count()) === 1);
+await ctx.setOffline(false);
+await page.reload(); await page.waitForSelector("main#view > *"); await page.waitForTimeout(800);
+console.log(await page.getByRole("checkbox").evaluateAll((els) => els.map((e) => e.getAttribute("aria-label").slice(0,30) + "=" + e.getAttribute("aria-checked"))), page.url());
+console.log("persists after reconnect:", (await page.getByRole("checkbox", { name: /Mark not done: one True/ }).count()) === 1, "errors", errs);
+await browser.close();

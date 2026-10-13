@@ -1,0 +1,12 @@
+import { chromium } from "playwright";
+const browser = await chromium.launch({ channel: "msedge", headless: true });
+const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+const page = await ctx.newPage();
+await page.goto("http://127.0.0.1:8124/?date=2026-10-13&nowelcome");
+await page.waitForSelector("main#view > *");
+await page.getByRole("checkbox", { name: /Mark done: one True\/False/ }).click();
+await page.waitForTimeout(500);
+console.log(await page.evaluate(async () => { const r = indexedDB.open("eight"); return await new Promise((res) => { r.onsuccess = () => { const tx = r.result.transaction("tasks"); tx.objectStore("tasks").getAll().onsuccess = (e) => res(JSON.stringify(e.target.result)); }; }); }));
+await page.reload(); await page.waitForSelector("main#view > *"); await page.waitForTimeout(600);
+console.log((await page.getByRole("checkbox").allInnerTexts()).length, await page.getByRole("checkbox").evaluateAll((els) => els.map((e) => e.getAttribute("aria-label") + "=" + e.getAttribute("aria-checked"))));
+await browser.close();

@@ -1,63 +1,55 @@
-# Teacher guide: setting her homework
+# Teacher guide
 
-Everything here is free. Homework is published as **encrypted** files in a small public GitHub repo, `iamdexterdude/8.5-feed`. Anyone can open that repo, but only scrambled text is in it. Her app unlocks it with a **class code** that travels inside her join link, so she never types it.
+**Her link: https://iamdexterdude.github.io/8.5/** That is all she needs. Nothing to type, no code, no setup. She opens it, sees her name, and the homework appears on Today as soon as you publish it. (Her name comes from Class settings; the welcome plays once.)
 
-## What she does
+**Your password: `lantern-copper-willow-62`** (set on 14 Oct). Change it in Teacher mode, Class, Password. Keep it long: its hash is public.
 
-Nothing to type. She opens **her link** once, on her phone or computer, and her homework appears on Today from then on. Without the link, Today says "Open the link from your teacher".
+## Each day
 
-Her link: `https://iamdexterdude.github.io/8.5/#/join/<class code>`. Send it to her privately, once. It contains the class code, so don't post it anywhere public. Teacher mode shows it (Class settings, "The student's link"); `node tools/teacher/publish.mjs link` prints it too.
+Open the app, Settings, the small **Teacher** link at the bottom (or go to `#/admin`), type the password.
 
-## What you do, one time (about two minutes)
+**A. Tell Claude** (the easiest). Write the homework in your own words: the date, each task (speaking, writing, reading), the topics and questions, what she must read, watch, write, photograph or record, links. Then:
+- **Send to Claude on Telegram**: Telegram opens with the text; choose the chat with **@claudeofmine_bot** and send it (attach the sample-answer PDF to the same chat). Claude builds the homework and publishes it when Claude Code is running on the PC.
+- or **Copy for Claude Code** and paste it into the chat on the PC.
+- or **Save for Claude**, then in Claude Code say "publish the homework I saved in teacher mode" (Claude runs `node tools/teacher/publish.mjs requests`).
 
-1. **Make the feed key.** GitHub, Settings, Developer settings, Fine-grained tokens, Generate new token.
-   - Repository access: **Only select repositories**, choose `iamdexterdude/8.5-feed`.
-   - Permissions: **Contents: Read and write** (nothing else).
-   - Expiration: pick the longest you are comfortable with. Copy the token (it starts with `github_pat_`).
-   This token can touch only the feed files. It cannot change the app, and it cannot see any other repository.
-2. **Open her link in your own browser first** (once), so this browser has the class code.
-3. Open the app, **Settings, Teacher mode**. The first time it says "Set up teacher mode, once.": choose a **password** (10+ characters) and paste the token. The token is locked with your password and saved as `vault.json` in the feed repo.
+**B. Build it yourself** (Homework tab). Pick the day, fill the lesson title and "What we cover", add tasks from the templates (Speaking Part 1, Writing notes, Reading video, blank), fill each step, **Preview as the student**, **Publish to the student**. "Copy the day before" starts from yesterday's draft; the chips show which days are published; **Unpublish** removes a day.
 
-From then on, on any device, **teacher mode asks for the password and nothing else.** Tap **Lock** when you are done. The password is never stored or sent anywhere. If it is forgotten there is no recovery: delete `vault.json` from the feed repo and set up again.
+She sees it the next time she opens Today (she can also pull it with the **Ask for the homework** button, which messages you).
 
-Why a password and not a plain "teacher code"? Publishing from a web page needs a write key to GitHub. The password is what guards that key, so it is a real lock, not just a hidden screen. Make it a strong one: `vault.json` is public, so a short password could be guessed offline.
+## What she sends you
 
-## Her work reaches you on Telegram (optional, recommended)
-
-A bot of yours delivers her photos (as one PDF) and recordings. Without it her files wait on her phone until sent by hand.
-
-1. In Telegram open **@BotFather**, send `/newbot`, choose a name, copy the **bot token**.
-2. Open your new bot and send it any message.
-3. In the app: **Teacher mode, Class settings**. Paste the bot token, tap **Find my chat id**, tap **Send a test message** (you should get it in Telegram).
-4. Tap **Publish class settings**. Her app picks them up the next time it opens.
-
-**Music:** Teacher mode, **Music**: add your tracks (title, artist, a YouTube/Spotify link, an optional line from you), then **Publish class settings** again. She gets the next track in your list each time she finishes a day. Only links are stored, never the songs.
-
-## Each day: two ways
-
-**A. In the app (Teacher mode, Homework tab).** Pick the day, fill the lesson, add tasks from a template (Speaking Part 1, Writing notes, Reading video, or blank), fill each step, **Preview as the student**, then **Publish to the student**. She sees it the next time she opens or reloads Today (allow up to 5 minutes).
-
-**B. Send it to Claude in the chat.** Paste the day's content (questions, sample answer, words, the reading video link, what she must upload) and the date; Claude builds the homework file and runs `node tools/teacher/publish.mjs homework <file>`.
+Her photos (made into one PDF on her phone) and her recordings arrive in your Telegram, in the chat with **@claudeofmine_bot**, named like `2026-10-14_speaking-written-answers.pdf` and `2026-10-14_speaking-recordings_Q1.webm`. If she is offline, they wait on her phone and go when she is back.
 
 ## Step types
 
 | Step | What she does | What reaches you |
 | --- | --- | --- |
-| `questions` | reads the topics and questions to prepare | nothing |
-| `read` | reads a sample answer, with your highlighted phrases | nothing |
+| `questions` | reads the topics and questions (optional link to a file) | nothing |
+| `read` | reads a sample answer with your highlighted phrases (optional link) | nothing |
 | `words` | adds the words as a named deck in Review | nothing |
-| `watch` | opens your video link, ticks "I watched it" | nothing |
-| `photos` | photographs her handwritten pages; the app makes **one PDF** | the PDF, on Telegram |
-| `record` | records one audio answer per question | one audio file per question, on Telegram |
+| `watch` | opens the video link, ticks "I watched it" | nothing |
+| `photos` | photographs her pages; the app makes **one PDF** | the PDF, on Telegram |
+| `record` | records one audio answer per question | one audio file per question |
 | `check` | confirms she did something | nothing |
 | `text` | a note or link | nothing |
 
-Until you publish a day, she sees "No homework yet" and an **Ask for the homework** button that sends you a Telegram message.
+Until you publish a day she sees "No homework yet". When every step is done she gets the finish screen: the time, one line, and the next track from your **Music** list (Teacher mode, Music; publish the list; 30 tracks fit fine).
 
-## When she finishes everything
+## How it works (free, no server of yours)
 
-The finish screen shows the time she finished (with a quieter line if it is late at night) and one track from your list. Everything she did is also in the progress report she sends you from Progress.
+- The homework is a scrambled JSON file per day in the public repo `iamdexterdude/8.5-feed`; the app reads it directly.
+- Publishing and her uploads go through one small function on Vercel (`backend/`, free plan, `https://eight-five-publish.vercel.app/api`). It holds the GitHub token and the Telegram bot token; the app never does. It checks your password against `teacher.json` in the feed repo.
+- The GitHub token in Vercel is the `gh` login from this PC. If `gh auth logout` is ever run, publishing from the app stops: make a fine-grained token (Contents: read and write on `8.5-feed` only) and `cd backend && vercel env add GITHUB_TOKEN production`, then `vercel --prod`.
+- The Telegram bot is the Claude Code bot (`@claudeofmine_bot`); her files land in that chat. To use a bot of your own: `vercel env add TG_BOT_TOKEN production` and `TG_CHAT_ID`, then `vercel --prod`.
 
-## Files
+## Command line (what Claude uses)
 
-`tools/teacher/publish.mjs`: `setup`, `homework <file>`, `config <file>`, `link`, `show <date>` (uses your logged-in `gh`). The class code is in `tools/teacher/.classcode` (never committed).
+```
+node tools/teacher/publish.mjs homework file.json     publish one day
+node tools/teacher/publish.mjs config file.json       class settings (name, Telegram username, lesson time and link, music)
+node tools/teacher/publish.mjs password <new>         set or change the password
+node tools/teacher/publish.mjs list | show <date> | remove <date> | requests
+```
+
+A homework file: `{ "date": "2026-10-15", "lesson": { "no": "3", "title": "…", "focus": "…", "time": "19:00" }, "tasks": [ { "title": "Speaking", "summary": "…", "minutes": 120, "steps": [ { "type": "questions", "title": "Part 1 questions", "groups": [ { "name": "Topic", "questions": ["…"] } ] }, { "type": "read", "title": "Sample answer", "paragraphs": ["…"], "highlights": ["…"] }, { "type": "words", "title": "New words", "cards": [ { "front": "…", "back": "…" } ] }, { "type": "photos", "title": "Your written answers", "prompt": "…" }, { "type": "record", "title": "Record your answers", "questions": ["…"], "max": 90 } ] } ] }`

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>8.5</title>
-  <meta name="description" content="A private IELTS training companion: today's tasks, writing, speaking, review and progress toward band 8.5.">
+  <meta name="description" content="A private IELTS training companion: today's lesson and homework, writing, speaking, review and progress toward band 8.5.">
   <meta name="theme-color" content="#F5F3EE" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#0B1120" media="(prefers-color-scheme: dark)">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -32,18 +32,21 @@
   <noscript>8.5 needs JavaScript to run.</noscript>
   <script type="module" src="js/main.js"></script>
   <script>
-    // watchdog: if nothing has appeared after 8 seconds, say what went wrong and offer the repair page
+    // If nothing has appeared after 12 seconds, offer a refresh (clears the saved copy of the app, keeps her data).
     (function () {
       var last = "";
       window.addEventListener("error", function (e) { last = (e.message || "") + (e.filename ? " (" + e.filename.split("/").slice(-2).join("/") + ":" + e.lineno + ")" : ""); });
       window.addEventListener("unhandledrejection", function (e) { last = String((e.reason && e.reason.message) || e.reason); });
       setTimeout(function () {
         var v = document.getElementById("view");
-        if (v && !v.children.length) {
-          v.innerHTML = '<div class="empty"><h1>8.5 is taking too long</h1><p>Open the repair page. It keeps your saved data.</p><p><a class="btn primary" href="reset.html">Repair the app</a></p><p class="tiny faint" id="wd"></p></div>';
-          document.getElementById("wd").textContent = last ? "Detail: " + last : "";
-        }
-      }, 8000);
+        if (!v || v.children.length) return;
+        v.innerHTML = '<div class="empty"><h1>8.5 is taking too long</h1><p>Refresh the app. Everything you saved stays on this device.</p><p><button class="btn primary" id="wd-refresh">Refresh the app</button></p><p class="tiny faint" id="wd"></p></div>';
+        document.getElementById("wd").textContent = last ? "Detail: " + last : "";
+        document.getElementById("wd-refresh").onclick = async function () {
+          try { var ks = await caches.keys(); for (var i = 0; i < ks.length; i++) await caches.delete(ks[i]); var rs = await navigator.serviceWorker.getRegistrations(); for (var j = 0; j < rs.length; j++) await rs[j].unregister(); } catch (e) {}
+          location.replace(location.pathname + "?r=" + Date.now() + "#/today");
+        };
+      }, 12000);
     })();
   </script>
 </body>

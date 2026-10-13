@@ -6,3 +6,4 @@ course/
 *.session
 tools/teacher/.classcode
 tools/teacher/config.json
+backend/.vercel

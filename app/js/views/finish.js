@@ -1,4 +1,5 @@
-// The finish screen: a strip of ikat medallions weaves itself in, the time she finished, and a track chosen by her teacher.
+// The finish screen: a strip of ikat medallions weaves itself in, the time she finished in large figures,
+// one plain line, and one track from her teacher's list. No confetti, no exclamation marks.
 import { h, icon, reducedMotion } from "../util.js";
 import * as store from "../store.js";
 import * as hw from "../homework.js";
@@ -28,25 +29,28 @@ const tashkentParts = (iso) => {
   return { h: Number(f.find((p) => p.type === "hour").value) % 24, m: f.find((p) => p.type === "minute").value };
 };
 
-function copyFor(t) {
+// one line, chosen by the hour. Late nights get a quieter one.
+function copyFor(t, name) {
   const time = `${String(t.h).padStart(2, "0")}:${t.m}`;
-  if (t.h >= 23 || t.h < 5) return { big: time, line: `Done at ${time}.`, sub: "It is late, and it is all in. Now sleep." };
+  if (t.h >= 23 || t.h < 5) return { big: time, line: "All of it, done.", sub: "It is late. Everything is in. Sleep well" + (name ? ", " + name : "") + "." };
+  if (t.h < 12) return { big: time, line: "Done before noon.", sub: "Everything is in. The day is yours." };
   if (t.h < 17) return { big: time, line: "Homework done.", sub: "Everything is in." };
   return { big: time, line: "Done for today.", sub: "Everything is in. The evening is yours." };
 }
 
 export function trackFor(date) {
-  const list = hw.F.config?.music || [];
+  const list = (hw.F.config?.music || []).filter((t) => t && (t.title || t.url));
   if (!list.length) return null;
   const finished = Object.values(store.S.hw).filter((r) => r.completedAt).map((r) => r.date).sort();
-  const idx = Math.max(0, finished.indexOf(date)); return list[idx % list.length];
+  const idx = Math.max(0, finished.indexOf(date)); return { ...list[idx % list.length], no: (idx % list.length) + 1, of: list.length };
 }
 
 export function openFinish(date, homework) {
-  const row = hw.stateOf(date), when = row.completedAt || new Date().toISOString(), c = copyFor(tashkentParts(when)), p = hw.dayProgress(date, homework), track = trackFor(date);
+  if (document.querySelector(".finish")) return;
+  const row = hw.stateOf(date), when = row.completedAt || new Date().toISOString(), c = copyFor(tashkentParts(when), hw.studentName()), p = hw.dayProgress(date, homework), track = trackFor(date);
   const prev = document.activeElement;
   const root = h("div", { class: "finish", role: "dialog", "aria-modal": "true", "aria-label": "Homework finished" });
-  const close = () => { root.remove(); document.removeEventListener("keydown", esc); prev?.focus?.(); };
+  const close = () => { root.classList.add("out"); setTimeout(() => root.remove(), 260); document.removeEventListener("keydown", esc); prev?.focus?.(); };
   const esc = (e) => { if (e.key === "Escape") close(); };
   root.append(
     h("div", { class: "finish-in" },
@@ -54,14 +58,14 @@ export function openFinish(date, homework) {
       h("div", { class: "finish-time num" }, c.big),
       h("h1", null, c.line),
       h("p", { class: "finish-sub" }, c.sub),
-      h("p", { class: "finish-count num" }, `${p.tasks} ${p.tasks === 1 ? "task" : "tasks"}, ${p.steps} steps`),
+      h("p", { class: "finish-count num" }, `${p.tasks} ${p.tasks === 1 ? "task" : "tasks"}, ${p.steps} steps, every one sent`),
       track ? h("div", { class: "treat" },
-        h("div", { class: "treat-k" }, "From your teacher"),
-        h("div", { class: "treat-title" }, track.title),
+        h("div", { class: "treat-k" }, `From your teacher${track.of > 1 ? `, track ${track.no} of ${track.of}` : ""}`),
+        h("div", { class: "treat-title" }, track.title || "A track"),
         track.artist ? h("div", { class: "treat-artist" }, track.artist) : null,
         track.note ? h("div", { class: "treat-note" }, track.note) : null,
         track.url ? h("a", { class: "btn primary", href: track.url, target: "_blank", rel: "noopener" }, icon("headphones", 18), "Listen") : null) : null,
       h("button", { class: "btn finish-close", onclick: close }, "Back to Today")));
   document.body.append(root); document.addEventListener("keydown", esc);
-  root.querySelector(".finish-close").focus();
+  root.querySelector(".finish-close").focus({ preventScroll: true });
 }

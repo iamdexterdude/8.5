@@ -1,0 +1,12 @@
+import { chromium } from "playwright";
+const base = "https://iamdexterdude.github.io/8.5/";
+const b = await chromium.launch({ channel: "msedge", headless: true });
+const ctx = await b.newContext(); const p = await ctx.newPage();
+const pending = new Set(); p.on("request", (r) => pending.add(r.url())); p.on("requestfinished", (r) => pending.delete(r.url())); p.on("requestfailed", (r) => { pending.delete(r.url()); console.log("FAILED", r.url().slice(-60), r.failure()?.errorText); });
+p.on("console", (m) => m.type() === "error" && console.log("console error:", m.text().slice(0, 150)));
+const t0 = Date.now();
+await p.goto(base, { waitUntil: "domcontentloaded", timeout: 30000 }); console.log("domcontentloaded", Date.now() - t0, "ms");
+await p.waitForTimeout(8000);
+console.log("pending after 8s:", [...pending].map((u) => u.slice(-50)));
+console.log("page shows:", JSON.stringify((await p.innerText("body")).slice(0, 100)));
+await b.close();

@@ -1,0 +1,14 @@
+import { chromium } from "playwright";
+const b = await chromium.launch({ channel: "msedge", headless: true });
+const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, colorScheme: "dark" });
+const p = await ctx.newPage(); const errs = []; p.on("pageerror", (e) => errs.push(e.message)); p.on("console", (m) => m.type() === "error" && errs.push(m.text()));
+await p.goto("http://127.0.0.1:8125/?date=2026-10-14&nowelcome"); await p.waitForSelector("main#view > *"); await p.waitForTimeout(600);
+console.log("Watch tonight present:", /Watch tonight/.test(await p.innerText("main#view")));
+await p.evaluate(() => { document.querySelectorAll("details").forEach((d) => d.open = false); window.scrollTo(0, 650); }); await p.waitForTimeout(300);
+await p.screenshot({ path: "shots/pack-today.png" });
+await p.evaluate(() => { location.hash = "#/plan/day/2026-10-14"; }); await p.waitForTimeout(500);
+await p.evaluate(() => window.scrollTo(0, 1100)); await p.screenshot({ path: "shots/pack-day.png" });
+await p.evaluate(() => { location.hash = "#/review/inbox"; }); await p.waitForTimeout(500); await p.screenshot({ path: "shots/pack-inbox.png" });
+await p.evaluate(() => { location.hash = "#/speak"; }); await p.waitForTimeout(500); console.log("course cue cards listed:", /Cue cards from the course/.test(await p.innerText("main#view")));
+await p.evaluate(() => { location.hash = "#/speak?mode=part1&from=2026-10-20"; }); await p.waitForTimeout(500); console.log((await p.innerText("main#view")).slice(0, 300).replace(/\n/g, " | "));
+console.log("errors", errs); await b.close();

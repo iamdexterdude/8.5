@@ -1,0 +1,14 @@
+import { chromium } from "playwright";
+const b = await chromium.launch({ channel: "msedge", headless: true });
+const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, colorScheme: "light" });
+const p = await ctx.newPage(); const errs = [];
+p.on("pageerror", (e) => errs.push("PAGEERROR " + e.message)); p.on("console", (m) => m.type() === "error" && errs.push(m.text()));
+await p.goto("http://127.0.0.1:8125/?date=2026-10-15&nowelcome"); await p.waitForSelector("main#view > *"); await p.waitForTimeout(1500);
+const t = await p.innerText("main#view");
+console.log("has Today's speaking:", /Today's speaking/.test(t), "| reading:", /Today's reading/.test(t), "| decks:", /Today's decks/.test(t), "| course homework:", /Course homework/.test(t));
+await p.evaluate(() => document.querySelectorAll("details").forEach((d) => d.open = false));
+await p.evaluate(() => window.scrollTo(0, 900)); await p.waitForTimeout(200); await p.screenshot({ path: "shots/dk-today1.png" });
+await p.evaluate(() => window.scrollTo(0, 1900)); await p.waitForTimeout(200); await p.screenshot({ path: "shots/dk-today2.png" });
+await p.evaluate(() => { location.hash = "#/review"; }); await p.waitForTimeout(800); await p.screenshot({ path: "shots/dk-review.png" });
+console.log((await p.innerText("main#view")).slice(0, 700).replace(/\n/g, " | "));
+console.log("errors", errs); await b.close();
