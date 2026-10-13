@@ -28,17 +28,20 @@ const mem = {}; // fallback
 export function open() {
   return new Promise((resolve) => {
     if (!("indexedDB" in window)) { persistent = false; return resolve(); }
-    let req;
-    try { req = indexedDB.open(DB_NAME, DB_VERSION); } catch { persistent = false; return resolve(); }
+    let req, settled = false;
+    const done = () => { if (!settled) { settled = true; resolve(); } };
+    // never hang the app: if the database does not open in 5 seconds (another tab holding an old version, a broken profile), start without it
+    const timer = setTimeout(() => { if (!settled) { persistent = false; done(); } }, 5000);
+    try { req = indexedDB.open(DB_NAME, DB_VERSION); } catch { clearTimeout(timer); persistent = false; return done(); }
     req.onupgradeneeded = () => {
       const d = req.result;
       for (const [name, keyPath] of Object.entries(STORES)) {
         if (!d.objectStoreNames.contains(name)) d.createObjectStore(name, keyPath ? { keyPath } : { autoIncrement: true });
       }
     };
-    req.onsuccess = () => { db = req.result; resolve(); };
-    req.onerror = () => { persistent = false; resolve(); };
-    req.onblocked = () => { persistent = false; resolve(); };
+    req.onsuccess = () => { clearTimeout(timer); if (settled) { req.result.close(); return; } db = req.result; db.onversionchange = () => db.close(); done(); };
+    req.onerror = () => { clearTimeout(timer); persistent = false; done(); };
+    req.onblocked = () => { /* an old tab still has the database open; wait for the timeout above */ };
   });
 }
 

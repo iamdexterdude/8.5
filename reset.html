@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>8.5: repair</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.5 system-ui, "Segoe UI", sans-serif; max-width: 640px; margin: 0 auto; padding: 24px 16px 64px; background: #F5F3EE; color: #17202E; }
+  @media (prefers-color-scheme: dark) { body { background: #0B1120; color: #E8ECF5; } .box { background: #131B2E; border-color: #27324E; } button { background: #131B2E; color: #E8ECF5; border-color: #3a4666; } button.primary { background: #8FAEFF; color: #0B1120; } }
+  h1 { font-size: 26px; margin: 0 0 4px; } h2 { font-size: 18px; margin: 28px 0 6px; }
+  .box { border: 1px solid #D8D4C8; background: #fff; border-radius: 12px; padding: 12px 14px; margin: 8px 0; font-size: 14px; overflow-wrap: anywhere; }
+  button { font: inherit; min-height: 48px; padding: 0 18px; border-radius: 12px; border: 1px solid #D8D4C8; background: #fff; font-weight: 600; cursor: pointer; margin: 4px 8px 4px 0; }
+  button.primary { background: #1E3FA8; color: #fff; border-color: transparent; }
+  .muted { color: #5F6A7E; } pre { white-space: pre-wrap; margin: 0; }
+</style>
+</head>
+<body>
+<h1>8.5: repair</h1>
+<p class="muted">If the app shows a blank page or an old version, use the first button. It keeps everything you saved.</p>
+<p><button class="primary" id="refresh">Refresh the app (keeps my data)</button></p>
+<div class="box" id="msg" aria-live="polite"></div>
+
+<h2>What this device has</h2>
+<div class="box"><pre id="diag">Looking…</pre></div>
+
+<h2>Last resort</h2>
+<p class="muted">This deletes your saved tasks, essays, recordings and cards on this device only. Export a backup first if you can (Settings, Export my data).</p>
+<p><button id="erase">Erase my data on this device</button></p>
+
+<script>
+const $ = (id) => document.getElementById(id), say = (t) => ($("msg").textContent = t);
+async function clearCaches() { for (const r of await navigator.serviceWorker.getRegistrations()) await r.unregister(); for (const k of await caches.keys()) await caches.delete(k); }
+$("refresh").onclick = async () => { say("Refreshing…"); try { await clearCaches(); } catch (e) { say("Could not clear: " + e.message); } location.replace("./?r=" + Date.now() + "#/today"); };
+$("erase").onclick = async () => {
+  if (!confirm("Delete all saved data for 8.5 on this device?")) return;
+  say("Erasing…"); try { await clearCaches(); } catch {}
+  await new Promise((res) => { const r = indexedDB.deleteDatabase("eight"); r.onsuccess = r.onerror = r.onblocked = () => res(); setTimeout(res, 3000); });
+  try { localStorage.clear(); sessionStorage.clear(); } catch {}
+  location.replace("./?r=" + Date.now() + "#/today");
+};
+(async () => {
+  const L = [];
+  try { const regs = await navigator.serviceWorker.getRegistrations(); L.push("Service workers: " + (regs.length ? regs.map((r) => (r.active ? "active" : "") + (r.waiting ? " + waiting" : "") + (r.installing ? " + installing" : "")).join("; ") : "none")); } catch (e) { L.push("Service workers: unavailable"); }
+  try { L.push("Saved copies: " + ((await caches.keys()).join(", ") || "none")); } catch { L.push("Saved copies: unavailable"); }
+  try { const dbs = indexedDB.databases ? await indexedDB.databases() : []; L.push("Database: " + (dbs.map((d) => d.name + " v" + d.version).join(", ") || "none")); } catch { L.push("Database: unavailable"); }
+  L.push("Page: " + location.href);
+  try { const s = await import("./js/store.js"); await Promise.race([s.load(), new Promise((_, rej) => setTimeout(() => rej(new Error("starting took more than 8 seconds")), 8000))]); L.push("Starting the app: works (" + s.S.errors.length + " mistakes, " + s.S.cards.length + " cards found)"); }
+  catch (e) { L.push("Starting the app FAILED: " + (e && e.message ? e.message : e)); }
+  $("diag").textContent = L.join("\n");
+})();
+</script>
+</body>
+</html>
