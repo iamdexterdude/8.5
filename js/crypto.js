@@ -1,5 +1,5 @@
-// AES-GCM encryption with a key made from the class code (PBKDF2). Used for the homework feed:
-// the public GitHub branch only ever holds scrambled text, and only people with the class code can read it.
+// AES-GCM with a key made from a pass phrase (PBKDF2). Used for the homework feed:
+// the public GitHub repository only ever holds scrambled text.
 // The same file is used by the teacher's command-line tool in Node.
 const te = new TextEncoder(), td = new TextDecoder();
 const ITER = 150000;
@@ -27,9 +27,4 @@ export async function decryptJson(file, code) {
   const key = await deriveKey(code, fromB64(file.salt), file.it || ITER);
   const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: fromB64(file.iv) }, key, fromB64(file.ct));
   return JSON.parse(td.decode(pt));
-}
-
-export function newClassCode() {
-  const a = crypto.getRandomValues(new Uint8Array(12)); const abc = "abcdefghjkmnpqrstuvwxyz23456789";
-  return Array.from(a, (x) => abc[x % abc.length]).join("").replace(/(.{4})(?=.)/g, "$1-");
 }

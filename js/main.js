@@ -16,7 +16,7 @@ const ROUTES = {
   today: ["today", "today"], plan: ["plan", "plan"], lesson: ["lesson", "plan"],
   practice: ["practice", "practice"], write: ["write", "practice"], speak: ["speak", "practice"], read: ["readlog", "practice"], timer: ["timer", "practice"], session: ["session", "today"],
   model: ["model", "today"], review: ["review", "review"], errors: ["errors", "review"],
-  progress: ["progress", "progress"], settings: ["settings", "today"], watch: ["watch", "today"], admin: ["admin", "today"], join: ["join", "today"],
+  progress: ["progress", "progress"], settings: ["settings", "today"], watch: ["watch", "today"], admin: ["admin", "today"],
 };
 
 const viewEl = document.getElementById("view");
@@ -81,32 +81,41 @@ store.onChange(applyTheme);
 
 window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); window.__installPrompt = e; });
 
+function serviceWorker() {
+  if (!("serviceWorker" in navigator) || location.protocol === "file:") return;
+  const hadController = !!navigator.serviceWorker.controller;
+  // when a new version takes over, reload once so the page and its scripts are all the same version
+  navigator.serviceWorker.addEventListener("controllerchange", () => { if (hadController && !sessionStorage.getItem("eight-updated")) { sessionStorage.setItem("eight-updated", "1"); location.reload(); } });
+  navigator.serviceWorker.register("sw.js", { updateViaCache: "none" }).then((r) => {
+    const check = () => r.update().catch(() => {});
+    check();
+    document.addEventListener("visibilitychange", () => { if (!document.hidden) check(); });   // a new deploy is picked up when she comes back to the app
+  }).catch(() => {});
+}
+
 async function boot() {
   buildNav();
   await store.load();
   await hwm.init();
-  // the database may open a moment late (it retries quietly and reloads itself); only warn if it still has not after 15 s
-  if (!dbm.persistent) setTimeout(() => { if (dbm.persistent || document.querySelector(".nosave")) return; document.body.append(h("div", { class: "nosave", role: "alert" }, h("span", null, "Your work is not being saved on this device. Close any other 8.5 tab or window, then reload." + (dbm.problem ? " (" + dbm.problem + ")" : "")), h("button", { class: "btn small", onclick: () => location.reload() }, "Reload"))); }, 15000);
+  // if a database opens late, read it again so nothing she did before is missing from the screen
+  dbm.onReady(async () => { try { await store.load(); store.changed(); } catch {} });
   applyTheme();
-  if ("serviceWorker" in navigator && location.protocol !== "file:") {
-    const hadController = !!navigator.serviceWorker.controller;
-    // when a new version takes over, reload once so the page and its scripts are all the same version
-    navigator.serviceWorker.addEventListener("controllerchange", () => { if (hadController && !sessionStorage.getItem("eight-updated")) { sessionStorage.setItem("eight-updated", "1"); location.reload(); } });
-    navigator.serviceWorker.register("sw.js", { updateViaCache: "none" }).then((r) => r.update().catch(() => {})).catch(() => {});
-  }
+  serviceWorker();
   window.addEventListener("hashchange", () => render());
   document.addEventListener("hw-rerender", () => render({ keepScroll: true }));
   document.addEventListener("visibilitychange", () => { if (!document.hidden && parseHash().name === "today") hwm.refresh(undefined, { force: true }); });
   if (!store.S.kv.welcomed && !new URLSearchParams(location.search).has("nowelcome")) {
+    // the first time only: learn her name from the class settings (quickly), so there is nothing to type
+    if (!store.setting("name") && navigator.onLine) await hwm.refresh(undefined, { force: true, timeout: 4000 }).catch(() => {});
     const { runWelcome } = await import("./views/welcome.js");
     await render();
-    await runWelcome();
+    await runWelcome({ name: hwm.studentName() });
     return;
   }
   render();
 }
 boot().catch((e) => {
   console.error(e);
-  clear(viewEl).append(h("div", { class: "empty" }, h("h1", null, "8.5 could not start"), h("p", null, "Close every 8.5 tab and open it again. If it still does not start, clear this site's data in your browser settings. Your homework and cards are not lost on your teacher's side."),
-    h("button", { class: "btn primary", onclick: async () => { try { for (const k of await caches.keys()) await caches.delete(k); for (const r of await navigator.serviceWorker.getRegistrations()) await r.unregister(); } catch {} location.reload(); } }, "Refresh the app")));
+  clear(viewEl).append(h("div", { class: "empty" }, h("h1", null, "8.5 could not start"), h("p", null, "Refresh the app. Everything you saved stays on this device."), h("pre", { class: "tiny faint" }, String(e && e.message)),
+    h("button", { class: "btn primary", onclick: async () => { try { for (const k of await caches.keys()) await caches.delete(k); for (const r of await navigator.serviceWorker.getRegistrations()) await r.unregister(); } catch {} location.replace(location.pathname + "?r=" + Date.now() + "#/today"); } }, "Refresh the app")));
 });

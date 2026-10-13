@@ -1,4 +1,5 @@
-// First-launch welcome: asks her name, then about ten seconds, skippable, plays once.
+// First-launch welcome: about ten seconds, skippable, plays once. Her name comes from the class settings;
+// only if it is not known yet does it ask.
 import { h, reducedMotion } from "../util.js";
 import * as store from "../store.js";
 
@@ -21,36 +22,40 @@ export function ikat({ opacity = 1 } = {}) {
   return svg;
 }
 
-export function runWelcome() {
+export function runWelcome({ name: known = "" } = {}) {
   return new Promise((resolve) => {
     const root = h("div", { class: "welcome", role: "dialog", "aria-label": "Welcome" });
     const pattern = ikat({ opacity: 0 }); pattern.classList.add("ikat");
     const stage = h("div", { class: "stage" });
-    let chosen = ""; // the name she typed, kept so Skip never loses it
+    let chosen = known; // the name, kept so Skip never loses it
     const skip = h("button", { class: "skip", onclick: () => finish(chosen || input.value.trim()) }, "Skip");
     root.append(pattern, skip, stage);
     document.body.append(root);
     let finished = false; const timers = [];
     const later = (ms, fn) => timers.push(setTimeout(fn, ms));
+    // mark it seen as soon as it starts: an interrupted welcome must not play again
+    store.setSetting("welcomed", new Date().toISOString());
 
     const finish = async (name) => {
       if (finished) return; finished = true; timers.forEach(clearTimeout);
-      if (name) await store.setSetting("name", name);
-      await store.setSetting("welcomed", new Date().toISOString());
+      if (name && name !== store.setting("name")) await store.setSetting("name", name);
       root.style.transition = "opacity .5s"; root.style.opacity = 0;
       setTimeout(() => { root.remove(); resolve(); location.hash = "#/today"; }, 500);
     };
 
-    // step 1: name
+    // step 1: the name, only when it is not known
     const input = h("input", { type: "text", placeholder: "Your name", autocomplete: "given-name", "aria-label": "Your name", maxLength: 40 });
     const begin = () => play(input.value.trim());
-    input.addEventListener("keydown", (e) => { if (e.key === "Enter") begin(); });
-    stage.append(
-      h("div", { class: "line show hold" }, "This was made for you."),
-      h("div", { class: "sub show" }, "What should I call you?"),
-      input,
-      h("div", { class: "row-actions", style: { justifyContent: "center" } }, h("button", { class: "btn primary", onclick: begin }, "Continue")));
-    setTimeout(() => input.focus(), 50);
+    if (known) play(known);
+    else {
+      input.addEventListener("keydown", (e) => { if (e.key === "Enter") begin(); });
+      stage.append(
+        h("div", { class: "line show hold" }, "This was made for you."),
+        h("div", { class: "sub show" }, "What should I call you?"),
+        input,
+        h("div", { class: "row-actions", style: { justifyContent: "center" } }, h("button", { class: "btn primary", onclick: begin }, "Continue")));
+      setTimeout(() => input.focus(), 50);
+    }
 
     // step 2: the month, about ten seconds
     function play(name) {
@@ -64,7 +69,7 @@ export function runWelcome() {
         line.classList.add("show"); if (subtext) sub.classList.add("show");
       };
       const seq = [
-        [0, name ? `${name}.` : "Welcome.", "Your month starts today."],
+        [0, name ? `${name}.` : "Welcome.", "This was made for you."],
         [2400, "28 days.", "Monday 12 October to Sunday 8 November."],
         [4600, "12 lessons.", "Three a week, with the rest at your own pace."],
         [6800, "One target.", ""],

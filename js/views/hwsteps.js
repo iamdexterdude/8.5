@@ -1,7 +1,7 @@
 // The kinds of homework step a teacher can set, and how each one is done on screen.
 //   questions  read  words  watch  photos  record  check  text
 // Each step ends with a button that marks it done and moves her to the next one.
-import { h, icon, mmss, uid } from "../util.js";
+import { h, icon, mmss } from "../util.js";
 import * as store from "../store.js";
 import * as hw from "../homework.js";
 import { imagesToPdf } from "../pdf.js";
@@ -28,6 +28,7 @@ async function finishStep(c, data) {
   c.advance?.();
 }
 const doneBtn = (c, label = "Done", data) => h("button", { class: "btn primary", onclick: (e) => { e.currentTarget.disabled = true; finishStep(c, data); } }, icon("check", 18), label);
+const linkBtn = (url, label, ic = "link") => h("a", { class: "btn", href: url, target: "_blank", rel: "noopener" }, icon(ic, 18), label);
 
 // ---------------------------------------------------------------- step bodies
 function questions(c) {
@@ -35,7 +36,8 @@ function questions(c) {
   return h("div", null,
     s.intro ? h("p", { class: "muted" }, s.intro) : null,
     (s.groups || []).map((g) => h("div", { class: "qgroup" }, g.name ? h("h3", null, g.name) : null, h("ol", null, (g.questions || []).map((q) => h("li", null, q))))),
-    h("div", { class: "row-actions" }, doneBtn(c, "I have read the questions")));
+    s.url ? h("div", { class: "row-actions", style: { marginTop: "8px" } }, linkBtn(s.url, s.linkText || "Open the file")) : null,
+    h("div", { class: "row-actions" }, doneBtn(c, s.button || "I have read the questions")));
 }
 
 function read(c) {
@@ -44,7 +46,8 @@ function read(c) {
     s.intro ? h("p", { class: "muted" }, s.intro) : null,
     h("div", { class: "model-text hwtext" }, (s.paragraphs || []).map((p) => h("p", null, ...withHighlights(p, s.highlights)))),
     s.highlights?.length ? h("p", { class: "tiny faint" }, "The highlighted phrases are the ones to take into your own answer.") : null,
-    h("div", { class: "row-actions" }, doneBtn(c, "I have read it")));
+    s.url ? h("div", { class: "row-actions", style: { marginBottom: "8px" } }, linkBtn(s.url, s.linkText || "Open the file")) : null,
+    h("div", { class: "row-actions" }, doneBtn(c, s.button || "I have read it")));
 }
 
 function words(c) {
@@ -64,8 +67,8 @@ function watch(c) {
   return h("div", null,
     s.text ? h("p", null, s.text) : null,
     h("div", { class: "row-actions" },
-      s.url ? h("a", { class: "btn", href: s.url, target: "_blank", rel: "noopener" }, icon("video", 18), `Open the video${s.minutes ? ` (${s.minutes} min)` : ""}`) : null,
-      doneBtn(c, "I watched it")));
+      s.url ? linkBtn(s.url, `Open the video${s.minutes ? ` (${s.minutes} min)` : ""}`, "video") : null,
+      doneBtn(c, s.button || "I watched it")));
 }
 
 function check(c) {
@@ -73,7 +76,7 @@ function check(c) {
 }
 
 function text(c) {
-  return h("div", null, c.step.text ? h("p", null, c.step.text) : null, c.step.url ? h("a", { class: "btn", href: c.step.url, target: "_blank", rel: "noopener" }, icon("link", 18), c.step.linkText || "Open") : null, h("div", { class: "row-actions", style: { marginTop: "8px" } }, doneBtn(c, "Got it")));
+  return h("div", null, c.step.text ? h("p", null, c.step.text) : null, c.step.url ? linkBtn(c.step.url, c.step.linkText || "Open") : null, h("div", { class: "row-actions", style: { marginTop: "8px" } }, doneBtn(c, c.step.button || "Got it")));
 }
 
 function photos(c) {
@@ -88,9 +91,9 @@ function photos(c) {
   async function build() {
     send.disabled = true; msg.textContent = "Making the PDF…";
     try {
-      const pdf = await imagesToPdf(files.map((f) => f.file)), name = `${c.date}_${slug(s.label || s.title)}.pdf`;
+      const parts = await imagesToPdf(files.map((f) => f.file)), base = `${c.date}_${slug(s.label || s.title)}`;
       msg.textContent = "Sending…";
-      const r = await hw.sendFiles({ date: c.date, label: s.label || s.title, files: [{ blob: pdf, name }] });
+      const r = await hw.sendFiles({ date: c.date, label: s.label || s.title, files: parts.map((blob, i) => ({ blob, name: parts.length > 1 ? `${base}_part${i + 1}.pdf` : `${base}.pdf` })) });
       MEM.delete(key + ":files");
       await finishStep(c, { pages: files.length, sent: r });
     } catch (e) { console.error(e); msg.textContent = "That did not work. Check the photos and try again."; send.disabled = false; }
@@ -118,7 +121,7 @@ function record(c) {
     try { stream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } }); }
     catch { toast("The microphone is blocked. Allow it in your browser settings."); return; }
     const mime = pickMime(); let parts = [];
-    try { rec = new MediaRecorder(stream, mime ? { mimeType: mime, audioBitsPerSecond: 48000 } : { audioBitsPerSecond: 48000 }); } catch { rec = new MediaRecorder(stream); }
+    try { rec = new MediaRecorder(stream, mime ? { mimeType: mime, audioBitsPerSecond: 40000 } : { audioBitsPerSecond: 40000 }); } catch { rec = new MediaRecorder(stream); }
     rec.ondataavailable = (e) => e.data.size && parts.push(e.data);
     rec.onstop = () => { stream.getTracks().forEach((t) => t.stop()); clearInterval(timer); takes[i] = new Blob(parts, { type: rec.mimeType || mime || "audio/webm" }); current = -1; store.S.busy = Math.max(0, (store.S.busy || 1) - 1); draw(); };
     current = i; store.S.busy = (store.S.busy || 0) + 1; rec.start(1000);
