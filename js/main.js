@@ -1,6 +1,7 @@
 // Boot, routing and the navigation shell.
 import * as store from "./store.js";
 import { h, icon, clear } from "./util.js";
+import * as hwm from "./homework.js";
 
 const TABS = [
   { id: "today", label: "Today", href: "#/today", icon: "today" },
@@ -14,7 +15,7 @@ const ROUTES = {
   today: ["today", "today"], plan: ["plan", "plan"], lesson: ["lesson", "plan"],
   practice: ["practice", "practice"], write: ["write", "practice"], speak: ["speak", "practice"], read: ["readlog", "practice"], timer: ["timer", "practice"], session: ["session", "today"],
   model: ["model", "today"], review: ["review", "review"], errors: ["errors", "review"],
-  progress: ["progress", "progress"], settings: ["settings", "today"], watch: ["watch", "today"],
+  progress: ["progress", "progress"], settings: ["settings", "today"], watch: ["watch", "today"], admin: ["admin", "today"], join: ["join", "today"],
 };
 
 const viewEl = document.getElementById("view");
@@ -64,6 +65,7 @@ let rerenderTimer;
 store.onChange(() => {
   if (!current.live) return;
   // don't rebuild a view while she is typing or recording inside it
+  if (store.S.busy > 0) return;                    // she is recording: leave the screen alone
   const a = document.activeElement;
   if (a && (a.tagName === "TEXTAREA" || (a.tagName === "INPUT" && a.type === "text"))) return;
   clearTimeout(rerenderTimer); rerenderTimer = setTimeout(() => render({ keepScroll: true }), 30);
@@ -81,9 +83,12 @@ window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); wind
 async function boot() {
   buildNav();
   await store.load();
+  await hwm.init();
   applyTheme();
   if ("serviceWorker" in navigator && location.protocol !== "file:") navigator.serviceWorker.register("sw.js").catch(() => {});
   window.addEventListener("hashchange", () => render());
+  document.addEventListener("hw-rerender", () => render({ keepScroll: true }));
+  document.addEventListener("visibilitychange", () => { if (!document.hidden && parseHash().name === "today") hwm.refresh(undefined, { force: true }); });
   if (!store.S.kv.welcomed && !new URLSearchParams(location.search).has("nowelcome")) {
     const { runWelcome } = await import("./views/welcome.js");
     await render();
