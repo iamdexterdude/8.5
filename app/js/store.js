@@ -5,7 +5,7 @@ import { overall, writingBand, rawToBand, speakingBand } from "./bands.js";
 
 export const S = {
   plan: null, config: null, bank: null,
-  kv: {}, tasks: {}, errors: [], cards: [], scores: [], study: {}, pack: null,
+  kv: {}, tasks: {}, errors: [], cards: [], scores: [], study: {}, pack: null, hw: {},
 };
 
 const listeners = new Set();
@@ -23,6 +23,7 @@ export async function load() {
   S.cards = await db.all("cards");
   S.scores = await db.all("scores");
   S.study = Object.fromEntries((await db.all("study")).map((r) => [r.date, r]));
+  S.hw = Object.fromEntries((await db.all("hw")).map((r) => [r.date, r]));
   const packRows = await db.all("pack");
   S.pack = packRows.find((r) => r.key === "pack")?.value || await tryBundledPack();
   if (!S.kv.seeded) await seed();
@@ -131,6 +132,7 @@ export async function addStudy(minutes, kind = "") {
 // streak: days that weren't zero; Sundays do not break it; minimum days count
 export function streak(today) {
   const doneDates = new Set(Object.values(S.tasks).filter((t) => t.done).map((t) => t.key.slice(0, 10)));
+  for (const r of Object.values(S.hw)) if (Object.values(r.steps || {}).some((x) => x.done)) doneDates.add(r.date);
   const active = (iso) => (S.study[iso]?.minutes || 0) > 0 || doneDates.has(iso);
   let n = 0, d = today;
   if (!active(d)) d = addDays(d, -1); // today may not have started yet
@@ -195,7 +197,7 @@ const b64ToBlob = async (url) => (await fetch(url)).blob();
 export async function exportAll() {
   const out = { app: "eight", version: 1, exportedAt: new Date().toISOString(), data: {} };
   for (const name of db.storeNames) {
-    if (name === "pack") continue; // the course pack is not her data and stays separate
+    if (name === "pack" || name === "feed" || name === "outbox") continue; // not her data: the course pack, the cached feed, the send queue
     const rows = await db.all(name);
     if (name === "recordings") for (const r of rows) if (r.blob) { r.blobData = await blobToB64(r.blob); delete r.blob; }
     if (name === "essays") for (const r of rows) if (r.imageBlob) { r.imageData = await blobToB64(r.imageBlob); delete r.imageBlob; }
@@ -206,7 +208,7 @@ export async function exportAll() {
 export async function importAll(obj) {
   if (obj?.app !== "eight" || !obj.data) throw new Error("This file is not an 8.5 backup.");
   for (const [name, rows] of Object.entries(obj.data)) {
-    if (!db.storeNames.includes(name) || name === "pack") continue;
+    if (!db.storeNames.includes(name) || name === "pack" || name === "feed" || name === "outbox") continue;
     await db.clear(name);
     for (const r of rows) {
       if (name === "recordings" && r.blobData) { r.blob = await b64ToBlob(r.blobData); delete r.blobData; }
@@ -218,7 +220,7 @@ export async function importAll(obj) {
 }
 export async function resetAll() {
   for (const name of db.storeNames) if (name !== "pack") await db.clear(name);
-  S.kv = {}; S.tasks = {}; S.errors = []; S.cards = []; S.scores = []; S.study = {};
+  S.kv = {}; S.tasks = {}; S.errors = []; S.cards = []; S.scores = []; S.study = {}; S.hw = {};
   await seed(); changed();
 }
 export async function savePack(pack) { S.pack = pack; await db.put("pack", { key: "pack", value: pack }); await syncDecks(); changed(); }
@@ -240,9 +242,9 @@ export const BUILTIN_DECKS = [
 ];
 export function activeDecks(today = todayISO()) {
   const pack = (S.pack?.decks || []).filter((d) => d.date <= today);
-  return [...BUILTIN_DECKS, ...pack];
+  return [...BUILTIN_DECKS, ...(S.kv.hwDecks || []), ...pack];
 }
-export function deckById(id) { return BUILTIN_DECKS.find((d) => d.id === id) || (S.pack?.decks || []).find((d) => d.id === id) || null; }
+export function deckById(id) { return BUILTIN_DECKS.find((d) => d.id === id) || (S.kv.hwDecks || []).find((d) => d.id === id) || (S.pack?.decks || []).find((d) => d.id === id) || null; }
 export async function syncDecks() {
   const today = todayISO(); let added = 0;
   for (const c of S.cards) if (!c.deck) { c.deck = c.errorId ? "mistakes" : "mine"; await db.put("cards", c); }
@@ -276,4 +278,17 @@ export async function markCourseTasks({ deck = null, day = null, unit = null }) 
       if (hit && !isDone(t.key)) await markDone(t.key);
     }
   }
+}
+
+// a deck made from a homework step ("new words"): its cards join her deck at once
+export async function addHomeworkDeck({ id, name, date, cards }) {
+  const list = S.kv.hwDecks || [];
+  if (!list.some((d) => d.id === id)) await setSetting("hwDecks", [...list, { id, name, kind: "homework", date, note: "From your homework" }]);
+  const have = new Set(S.cards.map((c) => c.id));
+  for (const c of cards) {
+    if (have.has(c.id)) continue;
+    const card = { id: c.id, deck: id, type: "chunk", tag: "homework", front: c.front, back: c.back, prompt: c.prompt, source: "Homework " + date, fsrs: null, introduced: null, suspended: false };
+    S.cards.push(card); await db.put("cards", card);
+  }
+  changed();
 }

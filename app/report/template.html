@@ -349,6 +349,17 @@ function review() {
   <div class="card"><h3 style="margin-top:0">How reviews went</h3>${tot ? [["Again", r.again, "var(--danger)"], ["Hard", r.hard, "var(--warn)"], ["Good", r.good, "var(--accent)"], ["Easy", r.easy, "var(--ok)"]].map(([l, v, c]) => hbar(l, v, tot, `${v} (${Math.round((100 * v) / tot)}%)`, c)).join("") + `<div class="tiny muted" style="margin-top:8px">Remembered ${recall}% of the time (Hard, Good or Easy).</div>` : '<div class="empty">No reviews yet.</div>'}
   ${D.cards.leeches.length ? `<h3>Cards she keeps missing</h3><ul style="margin:0;padding-left:18px">${D.cards.leeches.map((c) => `<li>${esc(c.front)} <span class="faint tiny">(failed ${c.lapses} times)</span></li>`).join("")}</ul>` : ""}</div></div></section>`;
 }
+function homeworkSection() {
+  const H = D.homework || [];
+  if (!H.length) return `<section><div class="sechead"><h2>Homework</h2></div><div class="card empty">No homework has been started yet.</div></section>`;
+  const rows = H.slice().reverse().map((d) => {
+    const p = d.progress || { done: 0, total: 0 }, complete = d.completedAt;
+    const tasks = d.tasks.map((t) => { const dn = t.steps.filter((s) => s.done).length; return `<div style="margin:4px 0"><b>${esc(t.title)}</b> <span class="faint tiny num">${dn}/${t.steps.length}</span> ${t.steps.map((s) => `<span class="pill ${s.done ? (s.sent === "queued" ? "warn" : "ok") : ""}" title="${esc(s.title)}">${esc(s.title)}${s.sent === "queued" ? " (not sent yet)" : ""}</span>`).join(" ")}</div>`; }).join("");
+    return `<tr><td style="white-space:nowrap">${fmtD(d.date)}</td><td>${d.lesson ? `<div class="muted tiny">${esc(d.lesson)}</div>` : ""}${tasks || '<span class="faint">No detail saved</span>'}${d.afterLesson ? `<details class="essay"><summary class="small">What she learnt in the lesson</summary><div class="text">${esc(d.afterLesson)}</div></details>` : ""}</td>
+      <td class="n">${complete ? `<span class="pill ok">Done ${new Date(complete).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Tashkent" })}</span>` : `<span class="pill ${p.done ? "warn" : ""}">${p.done}/${p.total} steps</span>`}</td></tr>`;
+  }).join("");
+  return `<section><div class="sechead"><h2>Homework</h2><span class="tiny muted">${H.filter((d) => d.completedAt).length} of ${H.length} days finished.${D.outbox ? ` ${D.outbox} files are waiting to be sent from her phone.` : ""}</span></div><div class="card"><table><thead><tr><th>Date</th><th>What was set and what she did</th><th class="n">Status</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
+}
 function decksSection() {
   if (!D.decks || !D.decks.length) return "";
   const kinds = { speaking1: "Speaking Part 1", speaking2: "Speaking Part 2", speaking3: "Speaking Part 3", reading: "Reading", mistakes: "Mistakes", mine: "Her own" };
@@ -371,7 +382,7 @@ function errors() {
 }
 
 function render() {
-  $("#root").innerHTML = masthead() + `<div class="wrap">` + hero() + kpis() + flagsSection() + calendar() + effort() + scoresSection() + checkpoints() + writing() + speaking() + reading() + decksSection() + review() + errors() +
+  $("#root").innerHTML = masthead() + `<div class="wrap">` + hero() + kpis() + flagsSection() + calendar() + homeworkSection() + scoresSection() + checkpoints() + writing() + speaking() + reading() + decksSection() + review() + errors() +
     `<div class="foot">Made on her device by 8.5 and shared by her. It contains her essays${D.recordings.some((r) => r.audio) ? ", recordings" : ""} and scores, so please keep it private. Open it in any browser; nothing is sent anywhere.</div></div>`;
   $("#theme").onclick = () => { const cur = document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"); document.documentElement.dataset.theme = cur === "dark" ? "light" : "dark"; };
 }

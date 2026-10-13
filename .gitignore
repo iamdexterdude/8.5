@@ -4,3 +4,5 @@ build-private/
 course/
 .env
 *.session
+tools/teacher/.classcode
+tools/teacher/config.json

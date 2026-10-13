@@ -2,7 +2,7 @@
 // If IndexedDB is not available (some private windows) it falls back to memory and says so.
 
 const DB_NAME = "eight";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 // store name -> key path (null = auto-increment)
 const STORES = {
   kv: "key",            // settings and small flags
@@ -16,6 +16,9 @@ const STORES = {
   reading: "id",        // reading passage log
   study: "date",        // minutes studied per day
   pack: "key",          // the private course pack (items, materials, banks)
+  hw: "date",           // her progress through each day's homework, step by step
+  feed: "key",          // the last homework feed fetched (so Today works offline)
+  outbox: "id",         // work waiting to be sent to the teacher
 };
 
 let db = null;
