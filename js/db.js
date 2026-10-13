@@ -1,12 +1,12 @@
 // A tiny IndexedDB wrapper. Everything she does is stored on her device only.
-// If IndexedDB is not available (some private windows) it falls back to memory and says so.
+// Two databases, so an older copy of the app open in another tab can never block saving:
+//   "eight"     the original stores (unchanged since the first release, always version 1)
+//   "eight-hw"  homework progress, the cached feed and the send queue (added later, its own database)
+// If IndexedDB is not available at all (some private windows), it falls back to memory and says so.
 
-const DB_NAME = "eight";
-const DB_VERSION = 2;
-// store name -> key path (null = auto-increment)
-const STORES = {
+const MAIN = { name: "eight", stores: {
   kv: "key",            // settings and small flags
-  tasks: "key",         // task state by plan key: {key, done, doneAt, skipped, movedTo, ...}
+  tasks: "key",         // task state by plan key
   errors: "id",         // the error log
   cards: "id",          // review cards with FSRS state
   reviewlog: null,      // every review (append only)
@@ -15,60 +15,76 @@ const STORES = {
   scores: "id",         // band / raw-score results
   reading: "id",        // reading passage log
   study: "date",        // minutes studied per day
-  pack: "key",          // the private course pack (items, materials, banks)
+  pack: "key",          // the private course pack
+} };
+const HW = { name: "eight-hw", stores: {
   hw: "date",           // her progress through each day's homework, step by step
   feed: "key",          // the last homework feed fetched (so Today works offline)
   outbox: "id",         // work waiting to be sent to the teacher
-};
+} };
+const STORES = { ...MAIN.stores, ...HW.stores };
+const OF = (store) => (store in HW.stores ? "hw" : "main");
 
-let db = null;
+const conns = { main: null, hw: null };
 export let persistent = true;
 const mem = {}; // fallback
 
-export function open() {
+function openOne(def) {
   return new Promise((resolve) => {
-    if (!("indexedDB" in window)) { persistent = false; return resolve(); }
-    let req, settled = false;
-    const done = () => { if (!settled) { settled = true; resolve(); } };
-    // never hang the app: if the database does not open in 5 seconds (another tab holding an old version, a broken profile), start without it
-    const timer = setTimeout(() => { if (!settled) { persistent = false; done(); } }, 5000);
-    try { req = indexedDB.open(DB_NAME, DB_VERSION); } catch { clearTimeout(timer); persistent = false; return done(); }
-    req.onupgradeneeded = () => {
-      const d = req.result;
-      for (const [name, keyPath] of Object.entries(STORES)) {
-        if (!d.objectStoreNames.contains(name)) d.createObjectStore(name, keyPath ? { keyPath } : { autoIncrement: true });
-      }
+    let settled = false, req;
+    const done = (v) => { if (!settled) { settled = true; resolve(v); } };
+    // never hang the app: if it does not open in 5 seconds, start without it
+    const timer = setTimeout(() => done(null), 5000);
+    const upgrade = () => { const d = req.result; for (const [name, keyPath] of Object.entries(def.stores)) if (!d.objectStoreNames.contains(name)) d.createObjectStore(name, keyPath ? { keyPath } : { autoIncrement: true }); };
+    const attempt = (version) => {
+      try { req = version ? indexedDB.open(def.name, version) : indexedDB.open(def.name); } catch { clearTimeout(timer); return done(null); }
+      req.onupgradeneeded = upgrade;
+      req.onsuccess = () => { clearTimeout(timer); if (settled) { req.result.close(); return; } const d = req.result; d.onversionchange = () => d.close(); done(d); };
+      req.onerror = (ev) => {
+        // this database already exists at a higher version (an earlier release): open it as it is
+        if (req.error?.name === "VersionError" && version) { ev.preventDefault?.(); return attempt(0); }
+        clearTimeout(timer); done(null);
+      };
     };
-    req.onsuccess = () => { clearTimeout(timer); if (settled) { req.result.close(); return; } db = req.result; db.onversionchange = () => db.close(); done(); };
-    req.onerror = () => { clearTimeout(timer); persistent = false; done(); };
-    req.onblocked = () => { /* an old tab still has the database open; wait for the timeout above */ };
+    attempt(1);
   });
 }
 
+export async function open() {
+  if (!("indexedDB" in window)) { persistent = false; return; }
+  [conns.main, conns.hw] = await Promise.all([openOne(MAIN), openOne(HW)]);
+  if (!conns.main || !conns.main.objectStoreNames.contains("kv")) persistent = false;
+}
+
 const wrap = (r) => new Promise((res, rej) => { r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
-const tx = (store, mode = "readonly") => db.transaction(store, mode).objectStore(store);
+function tx(store, mode = "readonly") {
+  const d = conns[OF(store)];
+  if (!d || !d.objectStoreNames.contains(store)) return null;
+  return d.transaction(store, mode).objectStore(store);
+}
 
 export async function all(store) {
-  if (!db) return Object.values(mem[store] || {});
-  return wrap(tx(store).getAll());
+  const s = tx(store); if (!s) return Object.values(mem[store] || {});
+  return wrap(s.getAll());
 }
 export async function get(store, key) {
-  if (!db) return (mem[store] || {})[key];
-  return wrap(tx(store).get(key));
+  const s = tx(store); if (!s) return (mem[store] || {})[key];
+  return wrap(s.get(key));
 }
 export async function put(store, value) {
-  if (!db) {
+  const s = tx(store, "readwrite");
+  if (!s) {
     const k = STORES[store] ? value[STORES[store]] : (mem[store + "#n"] = (mem[store + "#n"] || 0) + 1);
     (mem[store] ||= {})[k] = value; return k;
   }
-  return wrap(tx(store, "readwrite").put(value));
+  return wrap(s.put(value));
 }
 export async function del(store, key) {
-  if (!db) { delete (mem[store] || {})[key]; return; }
-  return wrap(tx(store, "readwrite").delete(key));
+  const s = tx(store, "readwrite"); if (!s) { delete (mem[store] || {})[key]; return; }
+  return wrap(s.delete(key));
 }
 export async function clear(store) {
-  if (!db) { mem[store] = {}; return; }
-  return wrap(tx(store, "readwrite").clear());
+  const s = tx(store, "readwrite"); if (!s) { mem[store] = {}; return; }
+  return wrap(s.clear());
 }
 export const storeNames = Object.keys(STORES);
