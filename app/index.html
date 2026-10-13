@@ -31,5 +31,20 @@
   </div>
   <noscript>8.5 needs JavaScript to run.</noscript>
   <script type="module" src="js/main.js"></script>
+  <script>
+    // watchdog: if nothing has appeared after 8 seconds, say what went wrong and offer the repair page
+    (function () {
+      var last = "";
+      window.addEventListener("error", function (e) { last = (e.message || "") + (e.filename ? " (" + e.filename.split("/").slice(-2).join("/") + ":" + e.lineno + ")" : ""); });
+      window.addEventListener("unhandledrejection", function (e) { last = String((e.reason && e.reason.message) || e.reason); });
+      setTimeout(function () {
+        var v = document.getElementById("view");
+        if (v && !v.children.length) {
+          v.innerHTML = '<div class="empty"><h1>8.5 is taking too long</h1><p>Open the repair page. It keeps your saved data.</p><p><a class="btn primary" href="reset.html">Repair the app</a></p><p class="tiny faint" id="wd"></p></div>';
+          document.getElementById("wd").textContent = last ? "Detail: " + last : "";
+        }
+      }, 8000);
+    })();
+  </script>
 </body>
 </html>
