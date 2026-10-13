@@ -11,20 +11,20 @@ function toB64(buf) {
 }
 const fromB64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
 
-async function deriveKey(code, salt) {
+async function deriveKey(code, salt, iter = ITER) {
   const base = await crypto.subtle.importKey("raw", te.encode(code), "PBKDF2", false, ["deriveKey"]);
-  return crypto.subtle.deriveKey({ name: "PBKDF2", salt, iterations: ITER, hash: "SHA-256" }, base, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
+  return crypto.subtle.deriveKey({ name: "PBKDF2", salt, iterations: iter, hash: "SHA-256" }, base, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
 }
 
-export async function encryptJson(obj, code) {
+export async function encryptJson(obj, code, iter = ITER) {
   const salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
-  const key = await deriveKey(code, salt);
+  const key = await deriveKey(code, salt, iter);
   const ct = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, te.encode(JSON.stringify(obj)));
-  return { v: 1, salt: toB64(salt), iv: toB64(iv), ct: toB64(ct) };
+  return { v: 1, ...(iter !== ITER ? { it: iter } : {}), salt: toB64(salt), iv: toB64(iv), ct: toB64(ct) };
 }
 
 export async function decryptJson(file, code) {
-  const key = await deriveKey(code, fromB64(file.salt));
+  const key = await deriveKey(code, fromB64(file.salt), file.it || ITER);
   const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: fromB64(file.iv) }, key, fromB64(file.ct));
   return JSON.parse(td.decode(pt));
 }

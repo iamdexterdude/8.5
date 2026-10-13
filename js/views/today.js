@@ -27,7 +27,7 @@ export default async function (ctx) {
 
   // ---- the homework
   if (!hw.classCode()) main.append(codeCard());
-  else if (hw.F.status === "badcode") main.append(codeCard("That code did not open the homework. Check it with your teacher."));
+  else if (hw.F.status === "badcode") main.append(codeCard("This link is out of date. Ask your teacher to send you the newest one."));
   else if (!homework) main.append(noHomework(today, day));
   else {
     main.append(homeworkSection(today, homework));
@@ -99,9 +99,8 @@ function noHomework(today, day) {
 }
 
 function codeCard(problem) {
-  const inp = h("input", { type: "text", placeholder: "xxxx-xxxx-xxxx", "aria-label": "Access code", autocomplete: "off", autocapitalize: "none", spellcheck: false });
-  return h("section", { class: "empty-hw" }, h("h2", null, "Enter your access code"), h("p", { class: "muted" }, problem || "Your teacher sends a code or a link. It opens your homework."),
-    h("div", { class: "row-actions" }, inp, h("button", { class: "btn primary", onclick: async () => { if (!inp.value.trim()) return; await hw.setClassCode(inp.value); toast("Checking…"); } }, "Open my homework")));
+  return h("section", { class: "empty-hw" }, h("h2", null, "Open the link from your teacher"),
+    h("p", { class: "muted" }, problem || "Your teacher sends you one link. Open it once on this device and your homework appears here. There is nothing to type."));
 }
 
 function doneBanner(today, homework, row) {
