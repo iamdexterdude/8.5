@@ -4,7 +4,8 @@ import { h, icon, todayISO, addDays, uid } from "../util.js";
 import * as store from "../store.js";
 import * as hw from "../homework.js";
 import { decryptJson, newClassCode } from "../crypto.js";
-import { adminLoad, adminSave, putEncrypted, encryptOnly, botCall, validateHomework } from "../publish.js";
+import { adminLoad, adminSave, putEncrypted, encryptOnly, botCall, validateHomework, session, lock, unlock, createVault, vaultExists } from "../publish.js";
+import { decryptJson as dec } from "../crypto.js";
 import { head, toast, sheet } from "../ui.js";
 import { homeworkSection } from "./hwview.js";
 
@@ -55,33 +56,58 @@ const saveDraft = () => { try { localStorage.setItem(draftKey(draft.date), JSON.
 const loadDraft = (d) => { try { const v = localStorage.getItem(draftKey(d)); return v ? JSON.parse(v) : null; } catch { return null; } };
 const clean = (hwObj) => JSON.parse(JSON.stringify(hwObj, (k, v) => (k === "_raw" ? undefined : v)));
 
-async function sha(t) { const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(t)); return Array.from(new Uint8Array(b), (x) => x.toString(16).padStart(2, "0")).join(""); }
+
+const teacherCode = () => session()?.classCode || store.setting("classCode") || "";
 
 export default async function (ctx) {
-  const root = h("div"), a = adminLoad();
-  root.append(head("Teacher mode", { back: "#/today" }));
-  const unlocked = sessionStorage.getItem("eight-admin-open") === "1";
-  if (!a.pinHash) { root.append(lockSetup(ctx)); return root; }
-  if (!unlocked) { root.append(lockScreen(ctx, a)); return root; }
+  const root = h("div");
+  root.append(head("Teacher mode", { back: "#/today", actions: session() ? h("button", { class: "btn small quiet", onclick: () => { lock(); ctx.rerender(); } }, "Lock") : null }));
+  if (!session()) { root.append(await lockPanel(ctx)); return root; }
   if (!draft) draft = loadDraft(defaultDate()) || emptyDraft(defaultDate());
   root.append(h("nav", { class: "seg", "aria-label": "Teacher mode", style: { marginBottom: "16px" } }, [["homework", "Homework"], ["class", "Class settings"], ["music", "Music"]].map(([k, l]) => h("button", { class: "seglink", "aria-current": tab === k ? "page" : null, onclick: () => { tab = k; ctx.rerender(); } }, l))));
   root.append(tab === "homework" ? homeworkTab(ctx) : tab === "class" ? classTab(ctx) : musicTab(ctx));
   return root;
 }
 
-const defaultDate = () => { const t = todayISO(); const hour = Number(new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Tashkent", hour: "2-digit", hour12: false }).format(new Date())); return hour >= 17 ? addDays(t, 1) : t; };
+// ------------------------------------------------------------------ the password screen
+// First time ever: choose a password and paste the publishing key once. After that: the password only, on any device.
+async function lockPanel(ctx) {
+  let exists;
+  try { exists = await vaultExists(); } catch (e) { return h("div", null, h("p", { class: "muted" }, "Could not reach the homework feed. Check your connection."), h("button", { class: "btn", onclick: () => ctx.rerender() }, "Try again")); }
+  const msg = h("div", { class: "small", style: { color: "var(--danger)", minHeight: "20px" }, "aria-live": "polite" });
+  const after = async () => { const code = session()?.classCode; if (code) await hw.setClassCode(code); await syncFromPublished(); ctx.rerender(); };
+  if (exists) {
+    const p = h("input", { type: "password", placeholder: "Teacher password", "aria-label": "Teacher password", autocomplete: "current-password" });
+    const go = async (e) => { const b = e?.currentTarget; if (b) b.disabled = true; msg.textContent = "Opening…"; const r = await unlock(p.value); if (r.status === "ok") await after(); else { msg.textContent = "That is not the password."; if (b) b.disabled = false; } };
+    p.addEventListener("keydown", (e) => e.key === "Enter" && go());
+    return h("div", null, h("div", { class: "field", style: { maxWidth: "340px" } }, h("label", null, "Teacher password"), p), h("button", { class: "btn primary", onclick: go }, "Open teacher mode"), msg);
+  }
+  const p1 = h("input", { type: "password", "aria-label": "Choose a password", autocomplete: "new-password" }), p2 = h("input", { type: "password", "aria-label": "Repeat the password", autocomplete: "new-password" });
+  const tok = h("input", { type: "password", "aria-label": "GitHub token for the feed", autocomplete: "off", spellcheck: false });
+  return h("div", null,
+    h("p", { class: "lead" }, "Set up teacher mode, once."),
+    h("p", { class: "muted" }, "Choose a password. It is the only thing you will type from now on, on any device."),
+    h("div", { class: "field" }, h("label", null, "Teacher password (at least 10 characters)"), p1), h("div", { class: "field" }, h("label", null, "Repeat the password"), p2),
+    h("p", { class: "muted small" }, "To publish, this screen needs one key to the homework feed. Paste it now, one time. It is locked with your password and never asked for again."),
+    h("div", { class: "field" }, h("label", null, "GitHub token for the feed (see TEACHER.md, one minute)"), tok),
+    h("button", { class: "btn primary", onclick: async (e) => {
+      if (p1.value !== p2.value) { msg.textContent = "The two passwords are different."; return; }
+      e.currentTarget.disabled = true; msg.textContent = "Setting up…";
+      try { await createVault(p1.value, tok.value.trim(), store.setting("classCode") || ""); await after(); } catch (err) { msg.textContent = err.message; e.currentTarget.disabled = false; }
+    } }, "Set up teacher mode"), msg);
+}
 
-function lockSetup(ctx) {
-  const p1 = h("input", { type: "password", placeholder: "Choose a teacher code", "aria-label": "Teacher code", autocomplete: "new-password" });
-  return h("div", null, h("p", { class: "lead" }, "Teacher mode is for you only."), h("p", { class: "muted" }, "Choose a code. It stays on this device and keeps students out of this screen. Publishing also needs your GitHub token, which only you have."),
-    h("div", { class: "field" }, p1), h("button", { class: "btn primary", onclick: async () => { if (p1.value.length < 4) { toast("Use at least 4 characters."); return; } adminSave({ pinHash: await sha(p1.value) }); sessionStorage.setItem("eight-admin-open", "1"); ctx.rerender(); } }, "Save and open"));
+// bring the published class settings (Telegram, music) onto this device, so any device shows the same thing
+async function syncFromPublished() {
+  try {
+    const code = teacherCode(); if (!code) return;
+    const r = await fetch(`${hw.RAW}/config.json?t=${Date.now()}`, { cache: "no-store" }); if (!r.ok) return;
+    const c = await dec(await r.json(), code);
+    adminSave({ teacher: c.teacher || "", botToken: c.bot?.token || "", botChat: c.bot?.chat || "", music: c.music || [] });
+  } catch {}
 }
-function lockScreen(ctx, a) {
-  const p = h("input", { type: "password", placeholder: "Teacher code", "aria-label": "Teacher code", autocomplete: "current-password" });
-  const go = async () => { if ((await sha(p.value)) === a.pinHash) { sessionStorage.setItem("eight-admin-open", "1"); ctx.rerender(); } else toast("That is not the code."); };
-  p.addEventListener("keydown", (e) => e.key === "Enter" && go());
-  return h("div", null, h("div", { class: "field", style: { maxWidth: "320px" } }, h("label", null, "Teacher code"), p), h("button", { class: "btn primary", onclick: go }, "Open"));
-}
+
+const defaultDate = () => { const t = todayISO(); const hour = Number(new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Tashkent", hour: "2-digit", hour12: false }).format(new Date())); return hour >= 17 ? addDays(t, 1) : t; };
 
 // ------------------------------------------------------------------ homework tab
 function homeworkTab(ctx) {
@@ -89,7 +115,7 @@ function homeworkTab(ctx) {
   const dateIn = h("input", { type: "date", value: draft.date, "aria-label": "Homework for", onchange: (e) => { saveDraft(); draft = loadDraft(e.target.value) || emptyDraft(e.target.value); ctx.rerender(); } });
   box.append(h("section", { class: "section", style: { marginTop: 0 } },
     h("div", { class: "field" }, h("label", null, "Homework for the day"), dateIn),
-    h("div", { class: "row-actions" }, h("button", { class: "btn", onclick: async () => { try { const r = await fetch(`${hw.RAW}/hw/${draft.date}.json?t=${Date.now()}`, { cache: "no-store" }); if (r.status === 404) { toast("Nothing is published for that day yet."); return; } draft = await decryptJson(await r.json(), store.setting("classCode")); saveDraft(); toast("Loaded the published homework."); ctx.rerender(); } catch { toast("Could not load it. Check the class code in Class settings."); } } }, "Load what is published"))));
+    h("div", { class: "row-actions" }, h("button", { class: "btn", onclick: async () => { try { const r = await fetch(`${hw.RAW}/hw/${draft.date}.json?t=${Date.now()}`, { cache: "no-store" }); if (r.status === 404) { toast("Nothing is published for that day yet."); return; } draft = await decryptJson(await r.json(), teacherCode()); saveDraft(); toast("Loaded the published homework."); ctx.rerender(); } catch { toast("Could not load it. Check the class code in Class settings."); } } }, "Load what is published"))));
 
   const L = draft.lesson;
   const f = (label, key, ph) => h("div", { class: "field" }, h("label", null, label), h("input", { type: "text", value: L[key] || "", placeholder: ph || "", oninput: (e) => { L[key] = e.target.value; saveDraft(); } }));
@@ -152,38 +178,35 @@ function preview() {
 async function publish(out) {
   const v = finalHomework(), errs = validateHomework(v);
   if (errs.length) { out.textContent = errs[0]; return; }
-  const code = store.setting("classCode");
-  if (!code) { out.textContent = "Set the class code first (Class settings)."; return; }
+  const code = teacherCode();
+  if (!code) { out.textContent = "Lock and open teacher mode again."; return; }
   out.textContent = "Publishing…";
   try { await putEncrypted(`hw/${v.date}.json`, v, code, `Homework for ${v.date}`); out.textContent = `Published for ${v.date}. She sees it within a few minutes (when she opens or reloads Today).`; hw.F.hw[v.date] = v; }
   catch (e) { out.textContent = `Could not publish: ${e.message}`; }
 }
 async function download() {
-  const v = finalHomework(), code = store.setting("classCode");
+  const v = finalHomework(), code = teacherCode();
   const data = code ? await encryptOnly(v, code) : v;
   const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(new Blob([JSON.stringify(data)], { type: "application/json" })), download: `${v.date}.json` }); document.body.append(a); a.click(); a.remove();
 }
 
 // ------------------------------------------------------------------ class settings
 function classTab(ctx) {
-  const a = adminLoad(), code = store.setting("classCode");
-  const cfgOf = () => ({ teacher: a.teacher || "", bot: a.botToken && a.botChat ? { token: a.botToken, chat: a.botChat } : null, music: a.music || [], updatedAt: new Date().toISOString() });
+  const a = adminLoad(), code = teacherCode();
+  const cfgOf = () => { const x = adminLoad(); return { teacher: x.teacher || "", bot: x.botToken && x.botChat ? { token: x.botToken, chat: x.botChat } : null, music: x.music || [], updatedAt: new Date().toISOString() }; };
   const field = (label, key, type = "text", hint) => h("div", { class: "field" }, h("label", null, label), h("input", { type, value: a[key] || "", autocomplete: "off", oninput: (e) => adminSave({ [key]: e.target.value.trim() }) }), hint ? h("span", { class: "tiny faint" }, hint) : null);
   const link = code ? `${location.origin}${location.pathname}#/join/${code}` : "";
   const out = h("div", { class: "small muted", "aria-live": "polite" });
-  const codeIn = h("input", { type: "text", value: code, "aria-label": "Class code", autocomplete: "off", spellcheck: false });
   return h("div", null,
-    h("section", { class: "section", style: { marginTop: 0 } }, h("div", { class: "shead" }, h("h2", null, "Class code")), h("p", { class: "small muted" }, "It locks the homework so only your student can read it. Send her the link below once."),
-      h("div", { class: "field" }, codeIn), h("div", { class: "row-actions" }, h("button", { class: "btn small", onclick: () => { codeIn.value = newClassCode(); } }, "Make a new code"), h("button", { class: "btn small primary", onclick: async () => { await hw.setClassCode(codeIn.value); toast("Saved."); ctx.rerender(); } }, "Save the code")),
-      link ? h("div", { class: "field", style: { marginTop: "10px" } }, h("label", null, "Link for the student"), h("input", { type: "text", readOnly: true, value: link, onfocus: (e) => e.target.select() }), h("button", { class: "btn small", style: { justifySelf: "start" }, onclick: () => { navigator.clipboard?.writeText(link); toast("Copied."); } }, "Copy the link")) : null),
-    h("section", { class: "section" }, h("div", { class: "shead" }, h("h2", null, "Publishing")), h("p", { class: "small muted" }, "A GitHub token lets this screen publish. On GitHub: Settings, Developer settings, Fine-grained tokens, repository iamdexterdude/8.5, permission Contents: Read and write. It stays on this device only."),
-      field("GitHub token", "token", "password")),
-    h("section", { class: "section" }, h("div", { class: "shead" }, h("h2", null, "Telegram")), h("p", { class: "small muted" }, "A bot of yours delivers her work and her requests to you. Make one with @BotFather, send your bot a message, then use Find my chat id."),
+    h("section", { class: "section", style: { marginTop: 0 } }, h("div", { class: "shead" }, h("h2", null, "The student's link")),
+      h("p", { class: "small muted" }, "Send her this link once, privately. She opens it and her homework appears. She types nothing."),
+      link ? h("div", { class: "field" }, h("input", { type: "text", readOnly: true, value: link, "aria-label": "Student link", onfocus: (e) => e.target.select() }), h("button", { class: "btn small", style: { justifySelf: "start" }, onclick: () => { navigator.clipboard?.writeText(link); toast("Copied."); } }, "Copy the link")) : h("p", { class: "muted" }, "Lock and open teacher mode again.")),
+    h("section", { class: "section" }, h("div", { class: "shead" }, h("h2", null, "Telegram")), h("p", { class: "small muted" }, "A bot of yours delivers her photos and recordings to you. Make one with @BotFather, send your bot a message, then use Find my chat id."),
       field("Bot token", "botToken", "password"), field("Your chat id", "botChat"), field("Your Telegram username (so she can message you)", "teacher"),
       h("div", { class: "row-actions" },
         h("button", { class: "btn small", onclick: async () => { try { const r = await botCall(adminLoad().botToken, "getUpdates", { limit: 20 }); const m = [...r].reverse().find((u) => u.message)?.message; if (!m) { out.textContent = "Send your bot a message first, then try again."; return; } adminSave({ botChat: String(m.chat.id) }); out.textContent = `Found your chat id: ${m.chat.id}.`; ctx.rerender(); } catch (e) { out.textContent = e.message; } } }, "Find my chat id"),
         h("button", { class: "btn small", onclick: async () => { try { const b = adminLoad(); await botCall(b.botToken, "sendMessage", { chat_id: b.botChat, text: "8.5: test message. Her work will arrive here." }); out.textContent = "Test sent. Check Telegram."; } catch (e) { out.textContent = e.message; } } }, "Send a test message"))),
-    h("section", { class: "section" }, h("div", { class: "row-actions" }, h("button", { class: "btn primary", onclick: async () => { out.textContent = "Publishing the class settings…"; try { await putEncrypted("config.json", cfgOf(), store.setting("classCode"), "Class settings"); out.textContent = "Published. Her app picks up the Telegram link and the music."; } catch (e) { out.textContent = "Could not publish: " + e.message; } } }, icon("upload", 18), "Publish class settings")), out));
+    h("section", { class: "section" }, h("div", { class: "row-actions" }, h("button", { class: "btn primary", onclick: async () => { out.textContent = "Publishing the class settings…"; try { await putEncrypted("config.json", cfgOf(), teacherCode(), "Class settings"); out.textContent = "Published. Her app picks up the Telegram link and the music."; } catch (e) { out.textContent = "Could not publish: " + e.message; } } }, icon("upload", 18), "Publish class settings")), out));
 }
 
 // ------------------------------------------------------------------ music

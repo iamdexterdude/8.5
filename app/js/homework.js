@@ -5,7 +5,8 @@ import * as store from "./store.js";
 import { decryptJson } from "./crypto.js";
 import { todayISO, uid, addDays } from "./util.js";
 
-export const OWNER = "iamdexterdude", REPO = "8.5", BRANCH = "data";
+// the feed has its own repository, so the key that publishes to it can never touch the app itself
+export const OWNER = "iamdexterdude", REPO = "8.5-feed", BRANCH = "main";
 export const RAW = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}`;
 
 // in memory: { config, hw: { date: homework | null } }

@@ -4,7 +4,8 @@
 //   node tools/teacher/publish.mjs config file.json       publish class settings: { teacher, bot: {token, chat}, music: [{title, artist, url, note}] }
 //   node tools/teacher/publish.mjs link                   print the student's join link
 //   node tools/teacher/publish.mjs show 2026-10-15        decrypt and print what is published for a day
-// The class code is kept in tools/teacher/.classcode (never committed). Everything published is encrypted with it.
+// The feed lives in its own repository (iamdexterdude/8.5-feed). The class code is kept in tools/teacher/.classcode (never committed).
+// Everything published is encrypted with it.
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { dirname, join } from "node:path";
@@ -12,8 +13,8 @@ import { fileURLToPath } from "node:url";
 import { encryptJson, decryptJson, newClassCode } from "../../app/js/crypto.js";
 import { validateHomework } from "../../app/js/validate.js";
 
-const here = dirname(fileURLToPath(import.meta.url)), OWNER = "iamdexterdude", REPO = "8.5", BRANCH = "data";
-const CODE_FILE = join(here, ".classcode"), SITE = `https://${OWNER}.github.io/${REPO}/`;
+const here = dirname(fileURLToPath(import.meta.url)), OWNER = "iamdexterdude", REPO = "8.5-feed", BRANCH = "main";
+const CODE_FILE = join(here, ".classcode"), SITE = `https://${OWNER}.github.io/8.5/`;
 
 function gh(args, input) {
   const r = spawnSync("gh", ["api", ...args], { input, encoding: "utf8", maxBuffer: 50 * 1024 * 1024 });
@@ -22,16 +23,7 @@ function gh(args, input) {
 }
 const code = () => { if (process.env.CLASS_CODE) return process.env.CLASS_CODE; if (!existsSync(CODE_FILE)) throw new Error("No class code yet. Run: node tools/teacher/publish.mjs setup"); return readFileSync(CODE_FILE, "utf8").trim(); };
 
-function ensureBranch() {
-  try { gh([`repos/${OWNER}/${REPO}/branches/${BRANCH}`]); return; } catch (e) { if (!/404|Not Found/.test(e.message)) throw e; }
-  const blob = gh([`repos/${OWNER}/${REPO}/git/blobs`, "--input", "-"], JSON.stringify({ content: "Encrypted class feed for the 8.5 app. Nothing readable is stored here.\n", encoding: "utf-8" }));
-  const tree = gh([`repos/${OWNER}/${REPO}/git/trees`, "--input", "-"], JSON.stringify({ tree: [{ path: "README.txt", mode: "100644", type: "blob", sha: blob.sha }] }));
-  const commit = gh([`repos/${OWNER}/${REPO}/git/commits`, "--input", "-"], JSON.stringify({ message: "Start the class feed", tree: tree.sha, parents: [] }));
-  gh([`repos/${OWNER}/${REPO}/git/refs`, "--input", "-"], JSON.stringify({ ref: `refs/heads/${BRANCH}`, sha: commit.sha }));
-  console.log("created the data branch");
-}
 async function put(path, obj, message) {
-  ensureBranch();
   const enc = await encryptJson(obj, code());
   let sha; try { sha = gh([`repos/${OWNER}/${REPO}/contents/${path}?ref=${BRANCH}`]).sha; } catch (e) { if (!/404|Not Found/.test(e.message)) throw e; }
   gh([`repos/${OWNER}/${REPO}/contents/${path}`, "-X", "PUT", "--input", "-"], JSON.stringify({ message, content: Buffer.from(JSON.stringify(enc)).toString("base64"), branch: BRANCH, ...(sha ? { sha } : {}) }));
@@ -41,7 +33,6 @@ const link = () => `${SITE}#/join/${code()}`;
 const [cmd, arg] = process.argv.slice(2);
 if (cmd === "setup") {
   if (!existsSync(CODE_FILE)) { writeFileSync(CODE_FILE, newClassCode()); console.log("made a new class code"); }
-  ensureBranch();
   const cfgPath = join(here, "config.json");
   const cfg = existsSync(cfgPath) ? JSON.parse(readFileSync(cfgPath, "utf8")) : { teacher: "", bot: null, music: [] };
   await put("config.json", { ...cfg, updatedAt: new Date().toISOString() }, "Class settings");

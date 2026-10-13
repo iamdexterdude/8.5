@@ -1,19 +1,37 @@
 # Teacher guide: setting her homework
 
-Everything here is free. Homework is published as **encrypted** files on a `data` branch of the GitHub repo `iamdexterdude/8.5`. Anyone can see that branch, but only scrambled text is in it. Her app unlocks it with the **class code**.
+Everything here is free. Homework is published as **encrypted** files in a small public GitHub repo, `iamdexterdude/8.5-feed`. Anyone can open that repo, but only scrambled text is in it. Her app unlocks it with a **class code** that travels inside her join link, so she never types it.
 
-## One time
+## What she does
 
-1. **Send her the link** (private, once). It contains the class code, so don't post it anywhere public:
-   `node tools/teacher/publish.mjs link` prints it. She opens it, and the app remembers the code.
-2. **Her work reaches you on Telegram** through a bot of yours (optional but recommended, otherwise her files wait on her phone until sent by hand):
-   1. In Telegram, open **@BotFather**, send `/newbot`, choose a name, and copy the **bot token**.
-   2. Open your new bot and send it any message.
-   3. In the app, open **Settings, Teacher mode** (set a teacher code the first time), go to **Class settings**.
-   4. Paste the bot token, tap **Find my chat id**, tap **Send a test message** (you should get it in Telegram).
-   5. Also paste a GitHub token there (GitHub, Settings, Developer settings, Fine-grained tokens, repository `iamdexterdude/8.5`, **Contents: Read and write**) so the app can publish.
-   6. Tap **Publish class settings**.
-3. **Music:** Teacher mode, **Music**: add your tracks (title, artist, a YouTube/Spotify link, an optional line from you), then **Publish class settings** again. She gets the next track in your list each time she finishes a day. Only links are stored, never the songs.
+Nothing to type. She opens **her link** once, on her phone or computer, and her homework appears on Today from then on. Without the link, Today says "Open the link from your teacher".
+
+Her link: `https://iamdexterdude.github.io/8.5/#/join/<class code>`. Send it to her privately, once. It contains the class code, so don't post it anywhere public. Teacher mode shows it (Class settings, "The student's link"); `node tools/teacher/publish.mjs link` prints it too.
+
+## What you do, one time (about two minutes)
+
+1. **Make the feed key.** GitHub, Settings, Developer settings, Fine-grained tokens, Generate new token.
+   - Repository access: **Only select repositories**, choose `iamdexterdude/8.5-feed`.
+   - Permissions: **Contents: Read and write** (nothing else).
+   - Expiration: pick the longest you are comfortable with. Copy the token (it starts with `github_pat_`).
+   This token can touch only the feed files. It cannot change the app, and it cannot see any other repository.
+2. **Open her link in your own browser first** (once), so this browser has the class code.
+3. Open the app, **Settings, Teacher mode**. The first time it says "Set up teacher mode, once.": choose a **password** (10+ characters) and paste the token. The token is locked with your password and saved as `vault.json` in the feed repo.
+
+From then on, on any device, **teacher mode asks for the password and nothing else.** Tap **Lock** when you are done. The password is never stored or sent anywhere. If it is forgotten there is no recovery: delete `vault.json` from the feed repo and set up again.
+
+Why a password and not a plain "teacher code"? Publishing from a web page needs a write key to GitHub. The password is what guards that key, so it is a real lock, not just a hidden screen. Make it a strong one: `vault.json` is public, so a short password could be guessed offline.
+
+## Her work reaches you on Telegram (optional, recommended)
+
+A bot of yours delivers her photos (as one PDF) and recordings. Without it her files wait on her phone until sent by hand.
+
+1. In Telegram open **@BotFather**, send `/newbot`, choose a name, copy the **bot token**.
+2. Open your new bot and send it any message.
+3. In the app: **Teacher mode, Class settings**. Paste the bot token, tap **Find my chat id**, tap **Send a test message** (you should get it in Telegram).
+4. Tap **Publish class settings**. Her app picks them up the next time it opens.
+
+**Music:** Teacher mode, **Music**: add your tracks (title, artist, a YouTube/Spotify link, an optional line from you), then **Publish class settings** again. She gets the next track in your list each time she finishes a day. Only links are stored, never the songs.
 
 ## Each day: two ways
 
@@ -42,4 +60,4 @@ The finish screen shows the time she finished (with a quieter line if it is late
 
 ## Files
 
-`tools/teacher/publish.mjs`: `setup`, `homework <file>`, `config <file>`, `link`, `show <date>`. The class code is in `tools/teacher/.classcode` (never committed).
+`tools/teacher/publish.mjs`: `setup`, `homework <file>`, `config <file>`, `link`, `show <date>` (uses your logged-in `gh`). The class code is in `tools/teacher/.classcode` (never committed).

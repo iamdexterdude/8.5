@@ -29,9 +29,9 @@ export default async function (ctx) {
     h("div", { class: "field" }, h("div", { class: "lbl" }, "Theme"), h("div", { class: "seg", role: "group", "aria-label": "Theme" }, [["system", "System"], ["light", "Light"], ["dark", "Dark"]].map(([k, l]) => h("button", { "aria-pressed": String(store.setting("theme") === k), onclick: async (e) => { const me = e.currentTarget, group = me.parentElement; await store.setSetting("theme", k); group.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b === me))); } }, l))))));
 
   // homework access
-  const code = h("input", { type: "text", value: store.setting("classCode") || "", placeholder: "xxxx-xxxx-xxxx", "aria-label": "Access code", autocomplete: "off", autocapitalize: "none", spellcheck: false });
-  root.append(h("section", { class: "section" }, h("div", { class: "shead" }, h("h2", null, "Homework")), h("div", { class: "field" }, h("label", null, "Access code from your teacher"), code),
-    h("div", { class: "row-actions" }, h("button", { class: "btn small primary", onclick: async () => { await hw.setClassCode(code.value); toast("Saved. Checking for homework…"); } }, "Save the code"), h("a", { class: "btn small quiet", href: "#/admin" }, "Teacher mode"))));
+  root.append(h("section", { class: "section" }, h("div", { class: "shead" }, h("h2", null, "Homework")),
+    h("p", { class: "muted" }, hw.classCode() ? "This device is connected to your teacher's homework." : "Open the link your teacher sent you to connect this device."),
+    h("div", { class: "row-actions" }, h("a", { class: "btn small quiet", href: "#/admin" }, "Teacher mode"))));
 
   // lessons
   const time = h("input", { type: "time", value: store.setting("lessonTime"), "aria-label": "Lesson start time" }); time.addEventListener("change", () => store.setSetting("lessonTime", time.value || "19:00"));
