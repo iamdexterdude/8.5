@@ -85,7 +85,8 @@ async function boot() {
   buildNav();
   await store.load();
   await hwm.init();
-  if (!dbm.persistent) document.body.append(h("div", { class: "nosave", role: "alert" }, h("span", null, "Your work is not being saved on this device. Close any other 8.5 tab or window, then reload."), h("button", { class: "btn small", onclick: () => location.reload() }, "Reload")));
+  // the database may open a moment late (it retries quietly and reloads itself); only warn if it still has not after 15 s
+  if (!dbm.persistent) setTimeout(() => { if (dbm.persistent || document.querySelector(".nosave")) return; document.body.append(h("div", { class: "nosave", role: "alert" }, h("span", null, "Your work is not being saved on this device. Close any other 8.5 tab or window, then reload." + (dbm.problem ? " (" + dbm.problem + ")" : "")), h("button", { class: "btn small", onclick: () => location.reload() }, "Reload"))); }, 15000);
   applyTheme();
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     const hadController = !!navigator.serviceWorker.controller;
