@@ -85,7 +85,12 @@ async function boot() {
   await store.load();
   await hwm.init();
   applyTheme();
-  if ("serviceWorker" in navigator && location.protocol !== "file:") navigator.serviceWorker.register("sw.js").catch(() => {});
+  if ("serviceWorker" in navigator && location.protocol !== "file:") {
+    const hadController = !!navigator.serviceWorker.controller;
+    // when a new version takes over, reload once so the page and its scripts are all the same version
+    navigator.serviceWorker.addEventListener("controllerchange", () => { if (hadController && !sessionStorage.getItem("eight-updated")) { sessionStorage.setItem("eight-updated", "1"); location.reload(); } });
+    navigator.serviceWorker.register("sw.js", { updateViaCache: "none" }).then((r) => r.update().catch(() => {})).catch(() => {});
+  }
   window.addEventListener("hashchange", () => render());
   document.addEventListener("hw-rerender", () => render({ keepScroll: true }));
   document.addEventListener("visibilitychange", () => { if (!document.hidden && parseHash().name === "today") hwm.refresh(undefined, { force: true }); });
@@ -97,4 +102,8 @@ async function boot() {
   }
   render();
 }
-boot();
+boot().catch((e) => {
+  console.error(e);
+  clear(viewEl).append(h("div", { class: "empty" }, h("h1", null, "8.5 could not start"), h("p", null, "Close every 8.5 tab and open it again. If it still does not start, clear this site's data in your browser settings. Your homework and cards are not lost on your teacher's side."),
+    h("button", { class: "btn primary", onclick: async () => { try { for (const k of await caches.keys()) await caches.delete(k); for (const r of await navigator.serviceWorker.getRegistrations()) await r.unregister(); } catch {} location.reload(); } }, "Refresh the app")));
+});
