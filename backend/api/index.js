@@ -68,7 +68,7 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS"); res.setHeader("Access-Control-Allow-Headers", "Content-Type"); res.setHeader("Access-Control-Max-Age", "86400");
   res.setHeader("Cache-Control", "no-store");
   if (req.method === "OPTIONS") { res.statusCode = 204; return res.end(); }
-  if (req.method === "GET") return send(res, 200, { ok: true, relay: "8.5", github: !!GH, telegram: !!(TG && CHAT) });
+  if (req.method === "GET") return send(res, 200, { ok: true, relay: "8.5", github: !!GH, telegram: !!(TG && CHAT), pepper: !!PEPPER, password: !!(await teacherRecord().catch(() => null)) });
   if (req.method !== "POST") return send(res, 405, { ok: false, error: "POST only" });
   if (!allowed) return send(res, 403, { ok: false, error: "origin" });
   const ip = String(req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "").split(",")[0].trim();
