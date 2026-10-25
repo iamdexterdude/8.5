@@ -1,9 +1,11 @@
-// Today: a greeting for the moment, the lesson, one small question, and a word from the teacher when there is one.
+// Today: a greeting for the moment, the lesson, the next small thing, one observation about her days, one small
+// question, and a word from the teacher when there is one. The ikat from the welcome lives in the sky.
 import { h, icon, fmtDate, todayISO, countdownText } from "../util.js";
 import * as store from "../store.js";
 import * as hw from "../homework.js";
 import * as ci from "../checkin.js";
-import { toast } from "../ui.js";
+import * as pulse from "../pulse.js";
+import { ikat } from "./welcome.js";
 
 export default async function (ctx) {
   const today = todayISO(), name = hw.studentName();
@@ -13,9 +15,9 @@ export default async function (ctx) {
   const streak = store.streak(today);
   const root = h("div", { class: "todayv" });
 
-  // ---- the sky: a header that changes with the hour
+  // ---- the sky: a header that changes with the hour, with the ikat behind it
   const g = ci.greeting({ name, lesson, streak, hwDone });
-  const sky = h("section", { class: "sky", dataset: { slot: ci.slotOf() } },
+  const sky = h("section", { class: "sky", dataset: { slot: ci.slotOf() } }, ikat(),
     h("div", { class: "sky-top" }, h("div", { class: "sky-date" }, fmtDate(today, { weekday: "long", day: "numeric", month: "long" })), h("a", { class: "iconbtn ghost", href: "#/settings", "aria-label": "Settings" }, icon("settings"))),
     h("h1", { class: "sky-line" }, g.line),
     h("p", { class: "sky-sub" }, g.sub));
@@ -29,19 +31,29 @@ export default async function (ctx) {
   if (note?.text && note.at !== store.S.kv["note-seen"]) root.append(h("section", { class: "tnote" }, h("div", { class: "tnote-k" }, "From your teacher"), h("p", null, note.text),
     h("button", { class: "btn small quiet", onclick: () => { store.setSetting("note-seen", note.at); } }, "Got it")));
 
+  // ---- the next small thing: what is waiting, or something small when nothing is
+  const step = await pulse.nextStep();
+  if (step) root.append(h("a", { class: "step " + step.kind, href: step.href }, ikat(), h("div", { class: "step-body" }, h("div", { class: "step-k" }, step.k), h("h2", null, step.title), h("p", null, step.why)), h("span", { class: "btn primary small" }, step.btn)));
+
+  // ---- one observation about her days
+  const obs = await pulse.noticed({ lesson, step });
+  if (obs) root.append(observation(obs, ctx));
+
   // ---- one small question
   const prompt = ci.promptFor({ lesson });
   if (prompt) root.append(question(prompt, ctx));
   else {
-    const last = store.S.checkins.filter((c) => c.date === today).at(-1);
+    const last = store.S.checkins.filter((c) => c.date === today && c.answer !== "(skipped)").at(-1);
     if (last) root.append(h("section", { class: "ask done" }, h("div", { class: "ask-k" }, "Today you said"), h("p", { class: "ask-echo" }, h("span", { class: "muted" }, last.prompt + " "), h("b", null, last.answer))));
   }
 
-  // ---- a quiet line about the week
-  const act = store.activeDates();
-  const days = Array.from({ length: 7 }, (_, i) => { const d = new Date(Date.now() - (6 - i) * 86400000); const iso = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Tashkent" }).format(d); return { iso, on: act.has(iso), today: iso === today }; });
-  root.append(h("section", { class: "week" }, h("div", { class: "week-dots", "aria-label": "The last seven days" }, days.map((d) => h("i", { class: (d.on ? "on" : "") + (d.today ? " now" : ""), title: d.iso }))),
-    h("span", { class: "week-k" }, streak ? `${streak} ${streak === 1 ? "day" : "days"} in a row` : "A quiet week so far")));
+  // ---- the week in dots and numbers
+  const w = await pulse.weekStats();
+  const nums = [w.reviews ? `${w.reviews} ${w.reviews === 1 ? "review" : "reviews"}` : null, w.homework ? `${w.homework} homework` : null, w.mocks ? `${w.mocks} mock ${w.mocks === 1 ? "part" : "parts"}` : null].filter(Boolean);
+  root.append(h("section", { class: "week" },
+    h("div", { class: "week-dots", "aria-label": "The last seven days" }, w.days.map((d) => h("i", { class: (d.on ? "on" : "") + (d.today ? " now" : ""), title: d.iso }))),
+    h("span", { class: "week-k" }, streak ? `${streak} ${streak === 1 ? "day" : "days"} in a row` : w.active ? `${w.active} of 7 days` : "A quiet week so far"),
+    nums.length ? h("span", { class: "week-n num" }, nums.join(" · ")) : null));
   return root;
 }
 
@@ -61,6 +73,22 @@ function lessonCard(ctx, today, lesson, homework) {
   };
   upd(); const id = setInterval(upd, 1000); ctx.onLeave(() => clearInterval(id));
   return box;
+}
+
+// something true about her days; she can answer it in one tap, or let it go
+function observation(obs, ctx) {
+  const sec = h("section", { class: "pulse" }, h("div", { class: "pulse-k" }, "Noticed"), h("p", { class: "pulse-t" }, obs.text));
+  const done = async (text) => {
+    const row = await pulse.answerNoticed(obs, text);
+    if (row) { hw.sendText(`${hw.studentName() || "Student"}, on "${obs.text}"\n${text}`); hw.report(); sec.replaceChildren(h("div", { class: "pulse-k" }, "Noted"), h("p", { class: "ask-echo" }, h("b", null, text))); }
+    else ctx.rerender();
+  };
+  const row = h("div", { class: "row-actions" });
+  if (obs.href) row.append(h("a", { class: "btn primary small", href: obs.href }, obs.btn));
+  if (obs.reply) row.append(h("div", { class: "chips" }, obs.reply.map((o) => h("button", { class: "chip", onclick: () => done(o) }, o))));
+  row.append(h("button", { class: "btn small quiet", onclick: () => done("") }, obs.reply ? "Let it go" : "Noted"));
+  sec.append(row);
+  return sec;
 }
 
 function question(prompt, ctx) {

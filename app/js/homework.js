@@ -156,11 +156,13 @@ export function report() {
   clearTimeout(reportTimer);
   reportTimer = setTimeout(async () => {
     try {
-      const srs = await import("./srs.js");
+      const srs = await import("./srs.js"), pulse = await import("./pulse.js");
       const now = new Date(), cards = store.S.cards;
       const byDay = await srs.reviewsByDay(14);
+      const hb = await pulse.habits(14);
       const snapshot = {
         student: nameOf(), at: now.toISOString(),
+        habits: { usualHour: hb.usualHour, activeDays7: hb.activeDays7, lateDays7: hb.lateDays7, lateDays14: hb.lateDays14, hwDone14: hb.hwDone, hwLate14: hb.hwLate.length, hwNight14: hb.hwNight, lastActive: hb.lastActive },
         anki: { decks: store.S.decks.map((d) => ({ name: d.name, kind: d.kind, ...srs.deckStats(d.id) })), cards: cards.length, due: cards.filter((c) => c.fsrs && new Date(c.fsrs.due) <= now && !c.suspended).length, reviews14: Object.values(byDay).reduce((a, b) => a + b, 0), days14: Object.keys(byDay).length, lastReview: Object.keys(byDay).sort().pop() || null },
         mocks: store.S.mocks.filter((m) => m.finishedAt).map((m) => ({ mock: m.mock, section: m.section, finishedAt: m.finishedAt, raw: m.raw ?? null, band: m.band ?? null, words: m.words ?? null, leaves: m.leaves ?? 0 })),
         homework: Object.values(store.S.hw).filter((r) => r.progress).map((r) => ({ date: r.date, done: r.progress.done, total: r.progress.total, completedAt: r.completedAt || null })).sort((a, b) => a.date.localeCompare(b.date)).slice(-14),
