@@ -1,126 +1,1423 @@
 {
   "songs": [
-    { "title": "Let It Be", "artist": "The Beatles", "year": 1970, "why": "Slow, clear, every word audible. Paul McCartney wrote it after a dream about his mother.", "focus": { "p": "let it be", "m": "accept a situation and stop fighting it" }, "ask": "Who gives the advice in this song, and when does she come?" },
-    { "title": "Here Comes the Sun", "artist": "The Beatles", "year": 1969, "why": "Written in a garden on the first warm day after a long winter. Listen for the relief.", "focus": { "p": "here comes the sun", "m": "here comes + noun: announcing an arrival (here comes the bus)" }, "ask": "What season is ending, and what is happening to the ice?" },
-    { "title": "Imagine", "artist": "John Lennon", "year": 1971, "why": "One idea per line in the simplest English possible. That simplicity is a skill.", "focus": { "p": "imagine", "m": "imagine + -ing / imagine there is…: picture a situation in your mind" }, "ask": "Count the things he asks you to imagine the world without." },
-    { "title": "Every Breath You Take", "artist": "The Police", "year": 1983, "why": "Played at weddings for forty years. Listen twice and decide whether it is a love song at all.", "focus": { "p": "every breath you take", "m": "take a breath, make a move, take a step: verb + noun pairs" }, "ask": "Is the singer loving or watching? Which words told you?" },
-    { "title": "Don't Speak", "artist": "No Doubt", "year": 1996, "why": "A break-up song sung by the person being left. The voice does half the grammar for you.", "focus": { "p": "don't speak", "m": "a negative imperative; compare 'say nothing' and 'be quiet'" }, "ask": "Why does she not want to hear the explanation?" },
-    { "title": "Wish You Were Here", "artist": "Pink Floyd", "year": 1975, "why": "About a friend who disappeared into himself. The guitar at the start sounds like a radio in another room.", "focus": { "p": "wish you were here", "m": "wish + past simple for a wish about the present" }, "ask": "The song asks you to tell two opposite things apart. Which pairs?" },
-    { "title": "Time", "artist": "Pink Floyd", "year": 1973, "why": "The clocks at the start were recorded one by one in a shop. The lyric is about a wasted decade.", "focus": { "p": "time", "m": "kill time, run out of time, in no time, time flies: four phrases to collect" }, "ask": "What was the singer doing while the years went by?" },
-    { "title": "Under Pressure", "artist": "Queen & David Bowie", "year": 1981, "why": "Two singers who did not plan to meet, one famous bass line, a lyric that turns from fear to love.", "focus": { "p": "under pressure", "m": "be / come / put someone under pressure" }, "ask": "What does the song say pressure does to ordinary people?" },
-    { "title": "Blowin' in the Wind", "artist": "Bob Dylan", "year": 1963, "why": "A song made almost entirely of questions, and one refusal to answer them.", "focus": { "p": "how many", "m": "how many + plural noun; how much + uncountable" }, "ask": "How many questions does he ask before the first answer?" },
-    { "title": "The Sound of Silence", "artist": "Simon & Garfunkel", "year": 1964, "why": "Two voices so close they sound like one. It is about people who talk and never say anything.", "focus": { "p": "the sound of silence", "m": "a paradox: two opposite ideas joined on purpose" }, "ask": "What are the people in the crowd doing wrong?" },
-    { "title": "Bridge Over Troubled Water", "artist": "Simon & Garfunkel", "year": 1970, "why": "A promise to a friend, sung by Art Garfunkel alone. Gospel pace, dictionary-clear diction.", "focus": { "p": "troubled water", "m": "troubled = full of problems; also 'troubled times', 'a troubled look'" }, "ask": "List the situations in which the singer promises to help." },
-    { "title": "What a Wonderful World", "artist": "Louis Armstrong", "year": 1967, "why": "A list of ordinary things, sung by a man who had seen plenty of the other kind.", "focus": { "p": "what a wonderful world", "m": "what + a + adjective + noun: an exclamation (what a day)" }, "ask": "Which colours does he name, and what has each one?" },
-    { "title": "Can't Help Falling in Love", "artist": "Elvis Presley", "year": 1961, "why": "Based on an eighteenth-century French melody. Three minutes of soft consonants.", "focus": { "p": "can't help -ing", "m": "cannot stop yourself doing something" }, "ask": "Who rushes in, according to the opening line?" },
-    { "title": "My Way", "artist": "Frank Sinatra", "year": 1969, "why": "A man looking back at his whole life in the past simple and present perfect. Listen for both tenses.", "focus": { "p": "my way", "m": "do it my way = in the way I choose; also 'have it your way'" }, "ask": "Which things does he say he has had 'a few' of?" },
-    { "title": "Hotel California", "artist": "Eagles", "year": 1977, "why": "A story song: a traveller, a hotel, a door that will not open. Follow it like a short film.", "focus": { "p": "check out", "m": "check out of a hotel; check something out = look at it" }, "ask": "What can the guest do, and what can he never do?" },
-    { "title": "Dreams", "artist": "Fleetwood Mac", "year": 1977, "why": "Written in ten minutes during a band break-up, about the band break-up.", "focus": { "p": "dreams", "m": "have a dream, follow a dream, a dream come true" }, "ask": "What does the singer say happens only when it rains?" },
-    { "title": "Three Little Birds", "artist": "Bob Marley & The Wailers", "year": 1977, "why": "The easiest reggae song to understand, and the most repeated advice in pop music.", "focus": { "p": "don't worry", "m": "worry about + noun / -ing; 'no worries' in casual speech" }, "ask": "Where are the birds, and what is their message?" },
-    { "title": "Redemption Song", "artist": "Bob Marley & The Wailers", "year": 1980, "why": "Just a voice and an acoustic guitar. Written when he was already ill, about freeing the mind.", "focus": { "p": "redemption", "m": "being saved from a bad past; redeem yourself" }, "ask": "What kind of slavery does he ask people to free themselves from?" },
-    { "title": "Wonderwall", "artist": "Oasis", "year": 1995, "why": "The song every guitarist learns first. Mancunian vowels: good practice for real British accents.", "focus": { "p": "by now", "m": "by now = at this point in time (you should have realised by now)" }, "ask": "What does the singer hope the other person will be for him?" },
-    { "title": "Don't Look Back in Anger", "artist": "Oasis", "year": 1996, "why": "A stadium sing-along with a gentle piece of advice in the title.", "focus": { "p": "look back in anger", "m": "look back = think about the past; in anger = angrily" }, "ask": "Who is Sally, and what should she not do?" },
-    { "title": "Creep", "artist": "Radiohead", "year": 1993, "why": "A song about not fitting in, sung quietly then very loudly. The verses are almost spoken.", "focus": { "p": "belong", "m": "belong here / belong to someone / a sense of belonging" }, "ask": "Which two words does he use to describe himself in the chorus?" },
-    { "title": "Fix You", "artist": "Coldplay", "year": 2005, "why": "Written for a grieving friend. The first half is a hymn, the second half is a march.", "focus": { "p": "fix", "m": "fix a problem, fix a time, fix someone (repair, in a kind sense)" }, "ask": "Make a list of the 'when you…' situations in the first verse." },
-    { "title": "The Scientist", "artist": "Coldplay", "year": 2002, "why": "The video runs backwards; the singer had to learn the words in reverse. Listen for apologies.", "focus": { "p": "go back to the start", "m": "start again from the beginning" }, "ask": "What does he say nobody told him?" },
-    { "title": "Someone Like You", "artist": "Adele", "year": 2011, "why": "One voice, one piano, and a conversation with an ex. Every second line is a complete sentence.", "focus": { "p": "never mind", "m": "it does not matter; forget it" }, "ask": "What has the other person done since they parted?" },
-    { "title": "Shape of My Heart", "artist": "Sting", "year": 1993, "why": "A gambler who plays not for money but to understand something. Card vocabulary throughout.", "focus": { "p": "deal", "m": "deal the cards; a deal; deal with a problem" }, "ask": "Why does the gambler play, if not for the money?" },
-    { "title": "Englishman in New York", "artist": "Sting", "year": 1987, "why": "About being foreign and staying yourself. The line about manners is worth memorising.", "focus": { "p": "legal alien", "m": "alien = a foreigner (formal, in law); also a being from space" }, "ask": "List the small habits that mark the singer as English." },
-    { "title": "Brothers in Arms", "artist": "Dire Straits", "year": 1985, "why": "A soldier's last words to his comrades. Slow, every consonant clear, a guitar instead of a chorus.", "focus": { "p": "brothers in arms", "m": "fellow soldiers; people who fought together" }, "ask": "Where does the soldier say he was born, and where will he die?" },
-    { "title": "Losing My Religion", "artist": "R.E.M.", "year": 1991, "why": "The title is a Southern American idiom, not about religion at all. A mandolin carries the whole song.", "focus": { "p": "lose my religion", "m": "US South idiom: lose your patience or temper" }, "ask": "Where is the singer standing, and what does he say he has done too much of?" },
-    { "title": "With or Without You", "artist": "U2", "year": 1987, "why": "Four chords for five minutes and it never gets boring. A lesson in building tension.", "focus": { "p": "with or without", "m": "a fixed pair; also 'sooner or later', 'more or less'" }, "ask": "Which things does he say he cannot do?" },
-    { "title": "Come As You Are", "artist": "Nirvana", "year": 1991, "why": "Three words of welcome in the title, then a verse full of contradictions on purpose.", "focus": { "p": "come as you are", "m": "come without changing or dressing up" }, "ask": "Find two instructions in the lyric that cancel each other out." },
-    { "title": "Fast Car", "artist": "Tracy Chapman", "year": 1988, "why": "A whole life in four minutes: leaving, working, hoping, repeating. Story told in plain past tense.", "focus": { "p": "make a deal", "m": "agree an arrangement; also 'a big deal', 'no big deal'" }, "ask": "What is the deal the singer suggests at the start?" },
-    { "title": "Hallelujah", "artist": "Leonard Cohen", "year": 1984, "why": "Eighty verses were written; four survive. Even the sad lines keep a straight face.", "focus": { "p": "hallelujah", "m": "a Hebrew word of praise; in English speech, relief ('finally, hallelujah')" }, "ask": "What two kinds of hallelujah does the song describe?" },
-    { "title": "Dreams", "artist": "The Cranberries", "year": 1993, "why": "An Irish voice that slides between notes. The lyric is about change arriving from every direction.", "focus": { "p": "in every possible way", "m": "in every way; possible adds emphasis" }, "ask": "What is changing, and how often?" },
-    { "title": "Father and Son", "artist": "Cat Stevens", "year": 1970, "why": "Two voices in one singer: the father low and slow, the son higher and quicker.", "focus": { "p": "settle down", "m": "start a calm, stable life; also 'calm down'" }, "ask": "What does the father advise, and what does the son answer?" },
-    { "title": "Stand by Me", "artist": "Ben E. King", "year": 1961, "why": "A bass line you will recognise in two seconds and a promise in three words.", "focus": { "p": "stand by someone", "m": "support someone in a hard time" }, "ask": "Which frightening things does he say he will not fear?" },
-    { "title": "Piano Man", "artist": "Billy Joel", "year": 1973, "why": "A bar on a Saturday night, one character per verse. A gallery of small portraits.", "focus": { "p": "in the mood for", "m": "feel like having or doing something" }, "ask": "Name three people in the bar and what each one does." },
-    { "title": "Yesterday", "artist": "The Beatles", "year": 1965, "why": "The most covered song ever written. Past tense all the way through, until one 'now'.", "focus": { "p": "yesterday", "m": "yesterday, the day before, the other day: three ways to point backwards" }, "ask": "What has changed between yesterday and today for the singer?" },
-    { "title": "Your Song", "artist": "Elton John", "year": 1970, "why": "A song about writing a song, with the hesitations left in. Listen for the spoken-style asides.", "focus": { "p": "I hope you don't mind", "m": "a polite way to introduce something you did" }, "ask": "Which gifts does he say he could not afford?" },
-    { "title": "Lean on Me", "artist": "Bill Withers", "year": 1972, "why": "A gospel hand-clap and an offer of help. The whole lyric is advice you could use.", "focus": { "p": "lean on someone", "m": "depend on someone for support" }, "ask": "What does the song say we all need, and what should we swallow?" },
-    { "title": "Feeling Good", "artist": "Nina Simone", "year": 1965, "why": "A new day described thing by thing. Brass arrives like sunrise halfway through.", "focus": { "p": "feel good", "m": "feel good / feel well / feel like: three different meanings" }, "ask": "Which creatures and things does she say know how she feels?" }
+    {
+      "title": "Let It Be",
+      "artist": "The Beatles",
+      "year": 1970,
+      "why": "Slow, clear, every word audible. Paul McCartney wrote it after a dream about his mother.",
+      "focus": {
+        "p": "let it be",
+        "m": "accept a situation and stop fighting it"
+      },
+      "ask": "Who gives the advice in this song, and when does she come?",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/ae/98/4c/ae984c7a-cd06-a7cd-e8bf-32cb15ba698d/00602567705475.rgb.jpg/600x600bb.jpg",
+      "album": "Let It Be"
+    },
+    {
+      "title": "Here Comes the Sun",
+      "artist": "The Beatles",
+      "year": 1969,
+      "why": "Written in a garden on the first warm day after a long winter. Listen for the relief.",
+      "focus": {
+        "p": "here comes the sun",
+        "m": "here comes + noun: announcing an arrival (here comes the bus)"
+      },
+      "ask": "What season is ending, and what is happening to the ice?",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/df/db/61/dfdb615d-47f8-06e9-9533-b96daccc029f/18UMGIM31076.rgb.jpg/600x600bb.jpg",
+      "album": "Abbey Road (Remastered)"
+    },
+    {
+      "title": "Imagine",
+      "artist": "John Lennon",
+      "year": 1971,
+      "why": "One idea per line in the simplest English possible. That simplicity is a skill.",
+      "focus": {
+        "p": "imagine",
+        "m": "imagine + -ing / imagine there is…: picture a situation in your mind"
+      },
+      "ask": "Count the things he asks you to imagine the world without.",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/21/e3/b0/21e3b048-c917-92c4-bd7d-ace44797b388/13UABIM52808.rgb.jpg/600x600bb.jpg",
+      "album": "Imagine"
+    },
+    {
+      "title": "Every Breath You Take",
+      "artist": "The Police",
+      "year": 1983,
+      "why": "Played at weddings for forty years. Listen twice and decide whether it is a love song at all.",
+      "focus": {
+        "p": "every breath you take",
+        "m": "take a breath, make a move, take a step: verb + noun pairs"
+      },
+      "ask": "Is the singer loving or watching? Which words told you?",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/a4/67/ba/a467ba62-87df-9d10-98d2-c517f68ac870/16UMGIM60882.rgb.jpg/600x600bb.jpg",
+      "album": "Synchronicity (Remastered 2003)"
+    },
+    {
+      "title": "Don't Speak",
+      "artist": "No Doubt",
+      "year": 1996,
+      "why": "A break-up song sung by the person being left. The voice does half the grammar for you.",
+      "focus": {
+        "p": "don't speak",
+        "m": "a negative imperative; compare 'say nothing' and 'be quiet'"
+      },
+      "ask": "Why does she not want to hear the explanation?",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/fe/0a/68/fe0a687a-537e-e902-0778-90465c118f77/00602547870575.rgb.jpg/600x600bb.jpg",
+      "album": "Tragic Kingdom"
+    },
+    {
+      "title": "Wish You Were Here",
+      "artist": "Pink Floyd",
+      "year": 1975,
+      "why": "About a friend who disappeared into himself. The guitar at the start sounds like a radio in another room.",
+      "focus": {
+        "p": "wish you were here",
+        "m": "wish + past simple for a wish about the present"
+      },
+      "ask": "The song asks you to tell two opposite things apart. Which pairs?",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/aa/e0/ab/aae0ab6a-d906-a189-81bf-70b56aa43f7a/886445635843.jpg/600x600bb.jpg",
+      "album": "Wish You Were Here"
+    },
+    {
+      "title": "Time",
+      "artist": "Pink Floyd",
+      "year": 1973,
+      "why": "The clocks at the start were recorded one by one in a shop. The lyric is about a wasted decade.",
+      "focus": {
+        "p": "time",
+        "m": "kill time, run out of time, in no time, time flies: four phrases to collect"
+      },
+      "ask": "What was the singer doing while the years went by?",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/3e/76/b0/3e76b0e3-762b-2286-a019-8afb19cee541/886445635829.jpg/600x600bb.jpg",
+      "album": "The Dark Side of the Moon"
+    },
+    {
+      "title": "Under Pressure",
+      "artist": "Queen & David Bowie",
+      "year": 1981,
+      "why": "Two singers who did not plan to meet, one famous bass line, a lyric that turns from fear to love.",
+      "focus": {
+        "p": "under pressure",
+        "m": "be / come / put someone under pressure"
+      },
+      "ask": "What does the song say pressure does to ordinary people?",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/ce/91/ac/ce91ac8d-99d8-b82b-6431-bef658189b28/602527717579.jpg/600x600bb.jpg",
+      "album": "Hot Space"
+    },
+    {
+      "title": "Blowin' in the Wind",
+      "artist": "Bob Dylan",
+      "year": 1963,
+      "why": "A song made almost entirely of questions, and one refusal to answer them.",
+      "focus": {
+        "p": "how many",
+        "m": "how many + plural noun; how much + uncountable"
+      },
+      "ask": "How many questions does he ask before the first answer?",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/63/3c/98/633c98ab-b4f3-3f40-798b-bdb49d923468/074640878626.jpg/600x600bb.jpg",
+      "album": "The Freewheelin' Bob Dylan"
+    },
+    {
+      "title": "The Sound of Silence",
+      "artist": "Simon & Garfunkel",
+      "year": 1964,
+      "why": "Two voices so close they sound like one. It is about people who talk and never say anything.",
+      "focus": {
+        "p": "the sound of silence",
+        "m": "a paradox: two opposite ideas joined on purpose"
+      },
+      "ask": "What are the people in the crowd doing wrong?",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/f9/8c/fa/f98cfa9e-282b-8a4f-33bd-ff3de9269963/074640926921.jpg/600x600bb.jpg",
+      "album": "Sounds of Silence"
+    },
+    {
+      "title": "Bridge Over Troubled Water",
+      "artist": "Simon & Garfunkel",
+      "year": 1970,
+      "why": "A promise to a friend, sung by Art Garfunkel alone. Gospel pace, dictionary-clear diction.",
+      "focus": {
+        "p": "troubled water",
+        "m": "troubled = full of problems; also 'troubled times', 'a troubled look'"
+      },
+      "ask": "List the situations in which the singer promises to help.",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/a3/84/0a/a3840a6d-44e8-0afe-fc3e-316c517dddfe/5099749521421.jpg/600x600bb.jpg",
+      "album": "Bridge Over Troubled Water"
+    },
+    {
+      "title": "What a Wonderful World",
+      "artist": "Louis Armstrong",
+      "year": 1967,
+      "why": "A list of ordinary things, sung by a man who had seen plenty of the other kind.",
+      "focus": {
+        "p": "what a wonderful world",
+        "m": "what + a + adjective + noun: an exclamation (what a day)"
+      },
+      "ask": "Which colours does he name, and what has each one?",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/2e/8c/2f/2e8c2f46-4148-d40d-61dc-2cc8e2493aab/12UMGIM11012.rgb.jpg/600x600bb.jpg",
+      "album": "What a Wonderful World"
+    },
+    {
+      "title": "Can't Help Falling in Love",
+      "artist": "Elvis Presley",
+      "year": 1961,
+      "why": "Based on an eighteenth-century French melody. Three minutes of soft consonants.",
+      "focus": {
+        "p": "can't help -ing",
+        "m": "cannot stop yourself doing something"
+      },
+      "ask": "Who rushes in, according to the opening line?",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/dc/79/4c/dc794ce3-b5e3-5cbe-ccf8-c10e695a38e8/886445009798.jpg/600x600bb.jpg",
+      "album": "Blue Hawaii (Original Soundtrack)"
+    },
+    {
+      "title": "My Way",
+      "artist": "Frank Sinatra",
+      "year": 1969,
+      "why": "A man looking back at his whole life in the past simple and present perfect. Listen for both tenses.",
+      "focus": {
+        "p": "my way",
+        "m": "do it my way = in the way I choose; also 'have it your way'"
+      },
+      "ask": "Which things does he say he has had 'a few' of?",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/5f/af/ed/5fafede5-320c-a7fd-438a-115bd8fe5ab3/00602537569076.rgb.jpg/600x600bb.jpg",
+      "album": "My Way (Expanded Edition)"
+    },
+    {
+      "title": "Hotel California",
+      "artist": "Eagles",
+      "year": 1977,
+      "why": "A story song: a traveller, a hotel, a door that will not open. Follow it like a short film.",
+      "focus": {
+        "p": "check out",
+        "m": "check out of a hotel; check something out = look at it"
+      },
+      "ask": "What can the guest do, and what can he never do?",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/88/16/2c/88162c3d-46db-8321-61f3-3a47404cfe76/075596050920.jpg/600x600bb.jpg",
+      "album": "Hotel California"
+    },
+    {
+      "title": "Dreams",
+      "artist": "Fleetwood Mac",
+      "year": 1977,
+      "why": "Written in ten minutes during a band break-up, about the band break-up.",
+      "focus": {
+        "p": "dreams",
+        "m": "have a dream, follow a dream, a dream come true"
+      },
+      "ask": "What does the singer say happens only when it rains?",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/4d/13/ba/4d13bac3-d3d5-7581-2c74-034219eadf2b/081227970949.jpg/600x600bb.jpg",
+      "album": "Rumours"
+    },
+    {
+      "title": "Three Little Birds",
+      "artist": "Bob Marley & The Wailers",
+      "year": 1977,
+      "why": "The easiest reggae song to understand, and the most repeated advice in pop music.",
+      "focus": {
+        "p": "don't worry",
+        "m": "worry about + noun / -ing; 'no worries' in casual speech"
+      },
+      "ask": "Where are the birds, and what is their message?",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/23/fa/f8/23faf820-c4fa-2bf1-d672-846971f5cf5c/06UMGIM31355.rgb.jpg/600x600bb.jpg",
+      "album": "Exodus (2013 Remaster)"
+    },
+    {
+      "title": "Redemption Song",
+      "artist": "Bob Marley & The Wailers",
+      "year": 1980,
+      "why": "Just a voice and an acoustic guitar. Written when he was already ill, about freeing the mind.",
+      "focus": {
+        "p": "redemption",
+        "m": "being saved from a bad past; redeem yourself"
+      },
+      "ask": "What kind of slavery does he ask people to free themselves from?",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/80/61/a5/8061a5cc-3372-7679-7396-e42e86041d21/15UMGIM05274.rgb.jpg/600x600bb.jpg",
+      "album": "Uprising"
+    },
+    {
+      "title": "Wonderwall",
+      "artist": "Oasis",
+      "year": 1995,
+      "why": "The song every guitarist learns first. Mancunian vowels: good practice for real British accents.",
+      "focus": {
+        "p": "by now",
+        "m": "by now = at this point in time (you should have realised by now)"
+      },
+      "ask": "What does the singer hope the other person will be for him?",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/04/92/e0/0492e08b-cbcc-9969-9ad6-8f5a0888068c/5051961007107.jpg/600x600bb.jpg",
+      "album": "(What's the Story) Morning Glory?"
+    },
+    {
+      "title": "Don't Look Back in Anger",
+      "artist": "Oasis",
+      "year": 1996,
+      "why": "A stadium sing-along with a gentle piece of advice in the title.",
+      "focus": {
+        "p": "look back in anger",
+        "m": "look back = think about the past; in anger = angrily"
+      },
+      "ask": "Who is Sally, and what should she not do?",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/34/2e/cb/342ecb17-ef19-816a-4ce5-e60b9ceec161/5051961073164.jpg/600x600bb.jpg",
+      "album": "(What's The Story) Morning Glory? [Deluxe Remastered Edition]"
+    },
+    {
+      "title": "Creep",
+      "artist": "Radiohead",
+      "year": 1993,
+      "why": "A song about not fitting in, sung quietly then very loudly. The verses are almost spoken.",
+      "focus": {
+        "p": "belong",
+        "m": "belong here / belong to someone / a sense of belonging"
+      },
+      "ask": "Which two words does he use to describe himself in the chorus?",
+      "art": "https://upload.wikimedia.org/wikipedia/en/0/0f/Radiohead.pablohoney.albumart.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+      "album": "Pablo Honey"
+    },
+    {
+      "title": "Fix You",
+      "artist": "Coldplay",
+      "year": 2005,
+      "why": "Written for a grieving friend. The first half is a hymn, the second half is a march.",
+      "focus": {
+        "p": "fix",
+        "m": "fix a problem, fix a time, fix someone (repair, in a kind sense)"
+      },
+      "ask": "Make a list of the 'when you…' situations in the first verse.",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/0c/82/48/0c8248a8-4a5b-d30d-8056-f32d650d2fc9/190295978068.jpg/600x600bb.jpg",
+      "album": "X&Y"
+    },
+    {
+      "title": "The Scientist",
+      "artist": "Coldplay",
+      "year": 2002,
+      "why": "The video runs backwards; the singer had to learn the words in reverse. Listen for apologies.",
+      "focus": {
+        "p": "go back to the start",
+        "m": "start again from the beginning"
+      },
+      "ask": "What does he say nobody told him?",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/b9/b4/2a/b9b42ad1-1e25-5096-da43-497a247e69a3/190295978051.jpg/600x600bb.jpg",
+      "album": "A Rush of Blood to the Head"
+    },
+    {
+      "title": "Someone Like You",
+      "artist": "Adele",
+      "year": 2011,
+      "why": "One voice, one piano, and a conversation with an ex. Every second line is a complete sentence.",
+      "focus": {
+        "p": "never mind",
+        "m": "it does not matter; forget it"
+      },
+      "ask": "What has the other person done since they parted?",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/eb/ca/25/ebca2596-cd1e-b295-91a3-771c868d0a79/191404113868.png/600x600bb.jpg",
+      "album": "21"
+    },
+    {
+      "title": "Shape of My Heart",
+      "artist": "Sting",
+      "year": 1993,
+      "why": "A gambler who plays not for money but to understand something. Card vocabulary throughout.",
+      "focus": {
+        "p": "deal",
+        "m": "deal the cards; a deal; deal with a problem"
+      },
+      "ask": "Why does the gambler play, if not for the money?",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/59/ac/f4/59acf4db-0ea8-a8e5-5607-01e931bb2d58/06UMGIM49867.rgb.jpg/600x600bb.jpg",
+      "album": "Ten Summoner's Tales"
+    },
+    {
+      "title": "Englishman in New York",
+      "artist": "Sting",
+      "year": 1987,
+      "why": "About being foreign and staying yourself. The line about manners is worth memorising.",
+      "focus": {
+        "p": "legal alien",
+        "m": "alien = a foreigner (formal, in law); also a being from space"
+      },
+      "ask": "List the small habits that mark the singer as English.",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/2b/4e/ec/2b4eec10-07f0-8f54-857e-44e9155b3091/22UM1IM21288.rgb.jpg/600x600bb.jpg",
+      "album": "...Nothing Like the Sun"
+    },
+    {
+      "title": "Brothers in Arms",
+      "artist": "Dire Straits",
+      "year": 1985,
+      "why": "A soldier's last words to his comrades. Slow, every consonant clear, a guitar instead of a chorus.",
+      "focus": {
+        "p": "brothers in arms",
+        "m": "fellow soldiers; people who fought together"
+      },
+      "ask": "Where does the soldier say he was born, and where will he die?",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/e8/bd/54/e8bd54fd-6595-4ebf-aa4c-58139ed316e6/dj.bngafruf.jpg/600x600bb.jpg",
+      "album": "Brothers In Arms"
+    },
+    {
+      "title": "Losing My Religion",
+      "artist": "R.E.M.",
+      "year": 1991,
+      "why": "The title is a Southern American idiom, not about religion at all. A mandolin carries the whole song.",
+      "focus": {
+        "p": "lose my religion",
+        "m": "US South idiom: lose your patience or temper"
+      },
+      "ask": "Where is the singer standing, and what does he say he has done too much of?",
+      "art": "https://upload.wikimedia.org/wikipedia/en/9/9b/R.E.M._-_Out_of_Time.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+      "album": "Out of Time (album)"
+    },
+    {
+      "title": "With or Without You",
+      "artist": "U2",
+      "year": 1987,
+      "why": "Four chords for five minutes and it never gets boring. A lesson in building tension.",
+      "focus": {
+        "p": "with or without",
+        "m": "a fixed pair; also 'sooner or later', 'more or less'"
+      },
+      "ask": "Which things does he say he cannot do?",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/8f/e2/c3/8fe2c384-f6cb-9af7-371d-2b6a9b204e59/17UMGIM79292.rgb.jpg/600x600bb.jpg",
+      "album": "The Joshua Tree"
+    },
+    {
+      "title": "Come As You Are",
+      "artist": "Nirvana",
+      "year": 1991,
+      "why": "Three words of welcome in the title, then a verse full of contradictions on purpose.",
+      "focus": {
+        "p": "come as you are",
+        "m": "come without changing or dressing up"
+      },
+      "ask": "Find two instructions in the lyric that cancel each other out.",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/95/fd/b9/95fdb9b2-6d2b-92a6-97f2-51c1a6d77f1a/00602527874609.rgb.jpg/600x600bb.jpg",
+      "album": "Nevermind"
+    },
+    {
+      "title": "Fast Car",
+      "artist": "Tracy Chapman",
+      "year": 1988,
+      "why": "A whole life in four minutes: leaving, working, hoping, repeating. Story told in plain past tense.",
+      "focus": {
+        "p": "make a deal",
+        "m": "agree an arrangement; also 'a big deal', 'no big deal'"
+      },
+      "ask": "What is the deal the singer suggests at the start?",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/b8/c4/31/b8c431e9-a67d-3917-72e5-be9f5a1ebc46/075596077460.jpg/600x600bb.jpg",
+      "album": "Tracy Chapman"
+    },
+    {
+      "title": "Hallelujah",
+      "artist": "Leonard Cohen",
+      "year": 1984,
+      "why": "Eighty verses were written; four survive. Even the sad lines keep a straight face.",
+      "focus": {
+        "p": "hallelujah",
+        "m": "a Hebrew word of praise; in English speech, relief ('finally, hallelujah')"
+      },
+      "ask": "What two kinds of hallelujah does the song describe?",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/e0/d1/24/e0d12470-d938-8c1c-484d-35fa4e6d6a70/dj.kddlcyae.jpg/600x600bb.jpg",
+      "album": "Various Positions"
+    },
+    {
+      "title": "Dreams",
+      "artist": "The Cranberries",
+      "year": 1993,
+      "why": "An Irish voice that slides between notes. The lyric is about change arriving from every direction.",
+      "focus": {
+        "p": "in every possible way",
+        "m": "in every way; possible adds emphasis"
+      },
+      "ask": "What is changing, and how often?",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/5c/cb/18/5ccb18f7-ab44-3478-cf33-7953837907d2/18UMGIM43740.rgb.jpg/600x600bb.jpg",
+      "album": "Everybody Else Is Doing It, So Why Can't We? (Remastered 2026)"
+    },
+    {
+      "title": "Father and Son",
+      "artist": "Cat Stevens",
+      "year": 1970,
+      "why": "Two voices in one singer: the father low and slow, the son higher and quicker.",
+      "focus": {
+        "p": "settle down",
+        "m": "start a calm, stable life; also 'calm down'"
+      },
+      "ask": "What does the father advise, and what does the son answer?",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/fc/e6/a9/fce6a952-aa1b-4c75-50d5-da7716d1bd5c/20UMGIM86272.rgb.jpg/600x600bb.jpg",
+      "album": "Tea for the Tillerman (2020 Remaster)"
+    },
+    {
+      "title": "Stand by Me",
+      "artist": "Ben E. King",
+      "year": 1961,
+      "why": "A bass line you will recognise in two seconds and a promise in three words.",
+      "focus": {
+        "p": "stand by someone",
+        "m": "support someone in a hard time"
+      },
+      "ask": "Which frightening things does he say he will not fear?",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music/y2005/m06/d02/h06/s05.iowydpqe.jpg/600x600bb.jpg",
+      "album": "Don't Play That Song!"
+    },
+    {
+      "title": "Piano Man",
+      "artist": "Billy Joel",
+      "year": 1973,
+      "why": "A bar on a Saturday night, one character per verse. A gallery of small portraits.",
+      "focus": {
+        "p": "in the mood for",
+        "m": "feel like having or doing something"
+      },
+      "ask": "Name three people in the bar and what each one does.",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Features125/v4/67/f9/8d/67f98d03-7896-153f-4965-a92458c06965/dj.aiuntmgo.jpg/600x600bb.jpg",
+      "album": "Piano Man"
+    },
+    {
+      "title": "Yesterday",
+      "artist": "The Beatles",
+      "year": 1965,
+      "why": "The most covered song ever written. Past tense all the way through, until one 'now'.",
+      "focus": {
+        "p": "yesterday",
+        "m": "yesterday, the day before, the other day: three ways to point backwards"
+      },
+      "ask": "What has changed between yesterday and today for the singer?",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/1a/19/db/1a19db26-17ad-b986-11a9-f72ac7a6194b/18UMGIM31214.rgb.jpg/600x600bb.jpg",
+      "album": "Help!"
+    },
+    {
+      "title": "Your Song",
+      "artist": "Elton John",
+      "year": 1970,
+      "why": "A song about writing a song, with the hesitations left in. Listen for the spoken-style asides.",
+      "focus": {
+        "p": "I hope you don't mind",
+        "m": "a polite way to introduce something you did"
+      },
+      "ask": "Which gifts does he say he could not afford?",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/a9/52/e6/a952e6c5-a5e1-a56d-a6f4-b01ca42a4368/06UMGIM50695.rgb.jpg/600x600bb.jpg",
+      "album": "Elton John"
+    },
+    {
+      "title": "Lean on Me",
+      "artist": "Bill Withers",
+      "year": 1972,
+      "why": "A gospel hand-clap and an offer of help. The whole lyric is advice you could use.",
+      "focus": {
+        "p": "lean on someone",
+        "m": "depend on someone for support"
+      },
+      "ask": "What does the song say we all need, and what should we swallow?",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/a3/a6/89/a3a68964-ea23-9fa1-d123-eb9728997231/886445193213.jpg/600x600bb.jpg",
+      "album": "Still Bill"
+    },
+    {
+      "title": "Feeling Good",
+      "artist": "Nina Simone",
+      "year": 1965,
+      "why": "A new day described thing by thing. Brass arrives like sunrise halfway through.",
+      "focus": {
+        "p": "feel good",
+        "m": "feel good / feel well / feel like: three different meanings"
+      },
+      "ask": "Which creatures and things does she say know how she feels?",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/18/db/05/18db0507-f276-d93d-a4a7-e856a3f1590a/13UAAIM08283.rgb.jpg/600x600bb.jpg",
+      "album": "I Put a Spell On You"
+    }
   ],
   "words": [
-    { "w": "nuance", "pos": "noun", "m": "a small difference in meaning, tone or feeling", "ex": "Her answer showed real nuance: she agreed, but with conditions.", "col": ["subtle nuance", "capture the nuance"], "say": "Describe a nuance in your own language that English lacks." },
-    { "w": "resilient", "pos": "adjective", "m": "able to recover quickly from difficulty", "ex": "Children are often more resilient than adults expect.", "col": ["remarkably resilient", "a resilient economy"], "say": "Who is the most resilient person you know, and why?" },
-    { "w": "meticulous", "pos": "adjective", "m": "very careful about every detail", "ex": "He kept meticulous notes on every lesson.", "col": ["meticulous planning", "meticulous about"], "say": "What is one task you are meticulous about?" },
-    { "w": "ubiquitous", "pos": "adjective", "m": "seeming to be everywhere", "ex": "Smartphones have become ubiquitous in classrooms.", "col": ["the ubiquitous smartphone", "increasingly ubiquitous"], "say": "Name something ubiquitous today that did not exist when you were a child." },
-    { "w": "ambivalent", "pos": "adjective", "m": "having mixed feelings about something", "ex": "I am ambivalent about living abroad: tempting, but far from family.", "col": ["ambivalent about", "deeply ambivalent"], "say": "What are you ambivalent about at the moment?" },
-    { "w": "compelling", "pos": "adjective", "m": "so strong or interesting that it holds attention or convinces", "ex": "The documentary made a compelling case for cycling lanes.", "col": ["a compelling argument", "compelling evidence"], "say": "Give a compelling reason to learn a third language." },
-    { "w": "detrimental", "pos": "adjective", "m": "harmful", "ex": "Late nights are detrimental to memory.", "col": ["detrimental to", "a detrimental effect"], "say": "Name a habit that is detrimental to studying." },
-    { "w": "feasible", "pos": "adjective", "m": "possible and practical to do", "ex": "Is it feasible to finish the essay in forty minutes?", "col": ["economically feasible", "a feasible plan"], "say": "Is a car-free city centre feasible where you live?" },
-    { "w": "inevitable", "pos": "adjective", "m": "certain to happen; unavoidable", "ex": "Some mistakes are inevitable when you speak fast.", "col": ["seem inevitable", "the inevitable result"], "say": "What change in your city seems inevitable?" },
-    { "w": "profound", "pos": "adjective", "m": "very great or deep (of an effect, feeling or idea)", "ex": "The book had a profound effect on how I plan my days.", "col": ["a profound effect", "profound changes"], "say": "What has had a profound effect on your English?" },
-    { "w": "scrutinise", "pos": "verb", "m": "to examine something very carefully", "ex": "Examiners scrutinise the second paragraph more than you think.", "col": ["scrutinise closely", "come under scrutiny"], "say": "What should governments scrutinise more closely?" },
-    { "w": "subtle", "pos": "adjective", "m": "not obvious; delicate and hard to notice", "ex": "There is a subtle difference between 'fun' and 'funny'.", "col": ["a subtle difference", "subtle changes"], "say": "Describe a subtle difference between two words you confuse." },
-    { "w": "thrive", "pos": "verb", "m": "to grow or develop well; to flourish", "ex": "Small shops thrive when parking is easy.", "col": ["thrive on", "a thriving business"], "say": "In what conditions do you thrive?" },
-    { "w": "trivial", "pos": "adjective", "m": "of little importance", "ex": "Spelling may seem trivial, but it costs marks.", "col": ["a trivial matter", "far from trivial"], "say": "What do people argue about that is actually trivial?" },
-    { "w": "versatile", "pos": "adjective", "m": "able to do many different things well", "ex": "English is a versatile word: it can be a noun or an adjective.", "col": ["a versatile player", "remarkably versatile"], "say": "Name a versatile person or tool in your life." },
-    { "w": "alleviate", "pos": "verb", "m": "to make a problem or pain less severe", "ex": "A short walk alleviates the tiredness of a long lesson.", "col": ["alleviate poverty", "alleviate the pressure"], "say": "How could a city alleviate traffic?" },
-    { "w": "coherent", "pos": "adjective", "m": "logical and well organised; easy to follow", "ex": "A coherent essay moves in one direction.", "col": ["a coherent argument", "coherent and cohesive"], "say": "What makes a speaker sound coherent?" },
-    { "w": "deteriorate", "pos": "verb", "m": "to become worse", "ex": "Air quality deteriorates in winter.", "col": ["deteriorate rapidly", "deteriorating health"], "say": "What has deteriorated in your town in the last ten years?" },
-    { "w": "enhance", "pos": "verb", "m": "to improve the quality or value of something", "ex": "Reading aloud enhances pronunciation.", "col": ["enhance the quality", "greatly enhance"], "say": "What enhances a city for young people?" },
-    { "w": "exacerbate", "pos": "verb", "m": "to make a bad situation worse", "ex": "Cheap cars exacerbate congestion.", "col": ["exacerbate the problem", "further exacerbate"], "say": "What exacerbates stress before an exam?" },
-    { "w": "hinder", "pos": "verb", "m": "to make progress difficult", "ex": "Fear of mistakes hinders fluency.", "col": ["hinder progress", "hinder development"], "say": "What hinders people from learning languages?" },
-    { "w": "implement", "pos": "verb", "m": "to put a plan or decision into action", "ex": "The school implemented a no-phone rule.", "col": ["implement a policy", "fully implemented"], "say": "What rule would you implement at your school?" },
-    { "w": "mitigate", "pos": "verb", "m": "to reduce the harm or seriousness of something", "ex": "Trees mitigate the heat of summer streets.", "col": ["mitigate the effects", "mitigate risk"], "say": "How can a family mitigate its impact on the environment?" },
-    { "w": "notion", "pos": "noun", "m": "an idea or belief", "ex": "The notion that talent is fixed does a lot of damage.", "col": ["the notion that", "reject the notion"], "say": "What common notion about learning do you disagree with?" },
-    { "w": "paramount", "pos": "adjective", "m": "more important than anything else", "ex": "In Part 2, keeping talking is paramount.", "col": ["of paramount importance", "paramount concern"], "say": "What is paramount when choosing a job?" },
-    { "w": "pragmatic", "pos": "adjective", "m": "dealing with things practically rather than by theory", "ex": "A pragmatic learner records herself instead of reading about accents.", "col": ["a pragmatic approach", "pragmatic solutions"], "say": "Are you more pragmatic or more idealistic?" },
-    { "w": "prevalent", "pos": "adjective", "m": "common, widespread at a particular time or place", "ex": "Online lessons are now prevalent in cities.", "col": ["increasingly prevalent", "prevalent among"], "say": "What habit is prevalent among your friends?" },
-    { "w": "reluctant", "pos": "adjective", "m": "unwilling and hesitant", "ex": "Many students are reluctant to speak first.", "col": ["reluctant to", "a reluctant agreement"], "say": "What are you reluctant to do, but do anyway?" },
-    { "w": "sustain", "pos": "verb", "m": "to keep something going over time", "ex": "It is hard to sustain motivation for a year.", "col": ["sustain growth", "sustainable development"], "say": "How do you sustain a good habit?" },
-    { "w": "tangible", "pos": "noun-like adjective", "m": "real and able to be seen, touched or measured", "ex": "A band score is tangible; confidence is not.", "col": ["tangible benefits", "tangible evidence"], "say": "What tangible result do you want by December?" },
-    { "w": "underpin", "pos": "verb", "m": "to support or form the basis of something", "ex": "Vocabulary underpins every IELTS skill.", "col": ["underpin the economy", "underpinned by"], "say": "What underpins a good friendship?" },
-    { "w": "vulnerable", "pos": "adjective", "m": "easily harmed, physically or emotionally", "ex": "Older people are vulnerable to heat.", "col": ["vulnerable to", "vulnerable groups"], "say": "Which group in society is most vulnerable, and why?" },
-    { "w": "bleak", "pos": "adjective", "m": "without hope or comfort; cold and empty", "ex": "The report paints a bleak picture of city air.", "col": ["a bleak future", "bleak and grey"], "say": "Describe a bleak place you have seen." },
-    { "w": "candid", "pos": "adjective", "m": "honest and direct, even when it is uncomfortable", "ex": "Her candid feedback saved me a month.", "col": ["a candid conversation", "to be candid"], "say": "When is it better not to be candid?" },
-    { "w": "daunting", "pos": "adjective", "m": "frightening because it seems difficult", "ex": "A 250-word essay looks daunting until you plan it.", "col": ["a daunting task", "daunting prospect"], "say": "What is the most daunting thing about speaking English?" },
-    { "w": "elaborate", "pos": "verb", "m": "to add more detail or explanation", "ex": "Examiners want you to elaborate, not just answer.", "col": ["elaborate on", "elaborate further"], "say": "Answer a question, then elaborate for thirty seconds." },
-    { "w": "fleeting", "pos": "adjective", "m": "lasting only a short time", "ex": "A fleeting moment of panic before the recording starts.", "col": ["a fleeting glimpse", "fleeting moments"], "say": "Describe a fleeting moment you remember well." },
-    { "w": "genuine", "pos": "adjective", "m": "real, sincere; not fake", "ex": "A genuine question gets a longer answer.", "col": ["a genuine interest", "genuine concern"], "say": "What is one genuine interest of yours outside study?" },
-    { "w": "hectic", "pos": "adjective", "m": "very busy and full of activity", "ex": "Exam week is hectic for teachers too.", "col": ["a hectic schedule", "hectic lifestyle"], "say": "Describe your most hectic day of the week." },
-    { "w": "immerse", "pos": "verb", "m": "to involve yourself completely in something", "ex": "Immerse yourself: films, songs, labels on tins.", "col": ["immerse yourself in", "fully immersed"], "say": "How do you immerse yourself in English at home?" },
-    { "w": "jeopardise", "pos": "verb", "m": "to put something at risk", "ex": "One late night can jeopardise a week of sleep.", "col": ["jeopardise your chances", "seriously jeopardise"], "say": "What could jeopardise your target score?" },
-    { "w": "keen", "pos": "adjective", "m": "eager, enthusiastic", "ex": "She is keen on films and keen to discuss them.", "col": ["keen on", "keen to", "a keen interest"], "say": "What are you keen to try next year?" },
-    { "w": "lucid", "pos": "adjective", "m": "clear and easy to understand", "ex": "A lucid answer uses short sentences.", "col": ["a lucid explanation", "lucid prose"], "say": "Who explains things most lucidly in your life?" },
-    { "w": "mundane", "pos": "adjective", "m": "ordinary and dull", "ex": "Even mundane tasks become practice if you narrate them in English.", "col": ["mundane tasks", "the mundane details"], "say": "Describe a mundane routine in interesting words." },
-    { "w": "negligible", "pos": "adjective", "m": "so small that it does not matter", "ex": "The cost of a second-hand book is negligible.", "col": ["a negligible effect", "almost negligible"], "say": "What has a negligible effect that people think is important?" },
-    { "w": "outweigh", "pos": "verb", "m": "to be greater or more important than", "ex": "The benefits of early sleep outweigh the lost hour.", "col": ["outweigh the drawbacks", "far outweigh"], "say": "Do the advantages of city life outweigh the disadvantages?" },
-    { "w": "plausible", "pos": "adjective", "m": "seeming reasonable or likely to be true", "ex": "It is a plausible excuse, but still an excuse.", "col": ["a plausible explanation", "entirely plausible"], "say": "Give a plausible reason why people read less." },
-    { "w": "quaint", "pos": "adjective", "m": "attractively old-fashioned or unusual", "ex": "The old quarter is quaint, with tiny bakeries.", "col": ["a quaint village", "quaint customs"], "say": "Describe a quaint place near your home." },
-    { "w": "robust", "pos": "adjective", "m": "strong and unlikely to fail", "ex": "A robust routine survives a bad week.", "col": ["a robust system", "robust growth"], "say": "What makes a study routine robust?" },
-    { "w": "sceptical", "pos": "adjective", "m": "not easily convinced; having doubts", "ex": "I am sceptical of apps that promise fluency in a month.", "col": ["sceptical about", "remain sceptical"], "say": "What claim are you sceptical about?" },
-    { "w": "tedious", "pos": "adjective", "m": "too long, slow and boring", "ex": "Copying word lists is tedious; using them is not.", "col": ["a tedious task", "tedious and repetitive"], "say": "What tedious task would you automate?" },
-    { "w": "unprecedented", "pos": "adjective", "m": "never done or known before", "ex": "The city grew at an unprecedented rate.", "col": ["an unprecedented level", "unprecedented change"], "say": "Name an unprecedented change in your lifetime." },
-    { "w": "vivid", "pos": "adjective", "m": "producing clear, strong images in the mind", "ex": "A vivid example beats three general sentences.", "col": ["a vivid memory", "vivid colours"], "say": "Describe a vivid memory from childhood." },
-    { "w": "weary", "pos": "adjective", "m": "very tired, often after a long effort", "ex": "By the third passage most candidates are weary.", "col": ["weary of", "a weary sigh"], "say": "What are you weary of hearing people say?" },
-    { "w": "yearn", "pos": "verb", "m": "to want something very much, with longing", "ex": "In winter everyone yearns for the first warm day.", "col": ["yearn for", "yearn to"], "say": "What do you yearn for when you are abroad?" },
-    { "w": "curb", "pos": "verb", "m": "to control or limit something", "ex": "Cities curb car use with high parking fees.", "col": ["curb spending", "curb emissions"], "say": "How can parents curb screen time without a fight?" },
-    { "w": "dwell on", "pos": "phrasal verb", "m": "to keep thinking or talking about something, especially something bad", "ex": "Do not dwell on one wrong answer during the test.", "col": ["dwell on the past", "no point dwelling on"], "say": "What do people dwell on too much?" },
-    { "w": "take for granted", "pos": "phrase", "m": "to fail to appreciate something because it is always there", "ex": "We take clean water for granted until it stops.", "col": ["take someone for granted", "taken for granted"], "say": "What do you take for granted that others do not have?" },
-    { "w": "in hindsight", "pos": "phrase", "m": "looking back at the past with the knowledge you have now", "ex": "In hindsight, I should have started Anki in March.", "col": ["with the benefit of hindsight", "in hindsight"], "say": "What would you do differently, in hindsight?" },
-    { "w": "at the expense of", "pos": "phrase", "m": "causing loss or harm to something else", "ex": "Speed at the expense of accuracy costs marks.", "col": ["at the expense of quality", "at someone's expense"], "say": "What do people gain at the expense of their health?" }
+    {
+      "w": "nuance",
+      "pos": "noun",
+      "m": "a small difference in meaning, tone or feeling",
+      "ex": "Her answer showed real nuance: she agreed, but with conditions.",
+      "col": [
+        "subtle nuance",
+        "capture the nuance"
+      ],
+      "say": "Describe a nuance in your own language that English lacks."
+    },
+    {
+      "w": "resilient",
+      "pos": "adjective",
+      "m": "able to recover quickly from difficulty",
+      "ex": "Children are often more resilient than adults expect.",
+      "col": [
+        "remarkably resilient",
+        "a resilient economy"
+      ],
+      "say": "Who is the most resilient person you know, and why?"
+    },
+    {
+      "w": "meticulous",
+      "pos": "adjective",
+      "m": "very careful about every detail",
+      "ex": "He kept meticulous notes on every lesson.",
+      "col": [
+        "meticulous planning",
+        "meticulous about"
+      ],
+      "say": "What is one task you are meticulous about?"
+    },
+    {
+      "w": "ubiquitous",
+      "pos": "adjective",
+      "m": "seeming to be everywhere",
+      "ex": "Smartphones have become ubiquitous in classrooms.",
+      "col": [
+        "the ubiquitous smartphone",
+        "increasingly ubiquitous"
+      ],
+      "say": "Name something ubiquitous today that did not exist when you were a child."
+    },
+    {
+      "w": "ambivalent",
+      "pos": "adjective",
+      "m": "having mixed feelings about something",
+      "ex": "I am ambivalent about living abroad: tempting, but far from family.",
+      "col": [
+        "ambivalent about",
+        "deeply ambivalent"
+      ],
+      "say": "What are you ambivalent about at the moment?"
+    },
+    {
+      "w": "compelling",
+      "pos": "adjective",
+      "m": "so strong or interesting that it holds attention or convinces",
+      "ex": "The documentary made a compelling case for cycling lanes.",
+      "col": [
+        "a compelling argument",
+        "compelling evidence"
+      ],
+      "say": "Give a compelling reason to learn a third language."
+    },
+    {
+      "w": "detrimental",
+      "pos": "adjective",
+      "m": "harmful",
+      "ex": "Late nights are detrimental to memory.",
+      "col": [
+        "detrimental to",
+        "a detrimental effect"
+      ],
+      "say": "Name a habit that is detrimental to studying."
+    },
+    {
+      "w": "feasible",
+      "pos": "adjective",
+      "m": "possible and practical to do",
+      "ex": "Is it feasible to finish the essay in forty minutes?",
+      "col": [
+        "economically feasible",
+        "a feasible plan"
+      ],
+      "say": "Is a car-free city centre feasible where you live?"
+    },
+    {
+      "w": "inevitable",
+      "pos": "adjective",
+      "m": "certain to happen; unavoidable",
+      "ex": "Some mistakes are inevitable when you speak fast.",
+      "col": [
+        "seem inevitable",
+        "the inevitable result"
+      ],
+      "say": "What change in your city seems inevitable?"
+    },
+    {
+      "w": "profound",
+      "pos": "adjective",
+      "m": "very great or deep (of an effect, feeling or idea)",
+      "ex": "The book had a profound effect on how I plan my days.",
+      "col": [
+        "a profound effect",
+        "profound changes"
+      ],
+      "say": "What has had a profound effect on your English?"
+    },
+    {
+      "w": "scrutinise",
+      "pos": "verb",
+      "m": "to examine something very carefully",
+      "ex": "Examiners scrutinise the second paragraph more than you think.",
+      "col": [
+        "scrutinise closely",
+        "come under scrutiny"
+      ],
+      "say": "What should governments scrutinise more closely?"
+    },
+    {
+      "w": "subtle",
+      "pos": "adjective",
+      "m": "not obvious; delicate and hard to notice",
+      "ex": "There is a subtle difference between 'fun' and 'funny'.",
+      "col": [
+        "a subtle difference",
+        "subtle changes"
+      ],
+      "say": "Describe a subtle difference between two words you confuse."
+    },
+    {
+      "w": "thrive",
+      "pos": "verb",
+      "m": "to grow or develop well; to flourish",
+      "ex": "Small shops thrive when parking is easy.",
+      "col": [
+        "thrive on",
+        "a thriving business"
+      ],
+      "say": "In what conditions do you thrive?"
+    },
+    {
+      "w": "trivial",
+      "pos": "adjective",
+      "m": "of little importance",
+      "ex": "Spelling may seem trivial, but it costs marks.",
+      "col": [
+        "a trivial matter",
+        "far from trivial"
+      ],
+      "say": "What do people argue about that is actually trivial?"
+    },
+    {
+      "w": "versatile",
+      "pos": "adjective",
+      "m": "able to do many different things well",
+      "ex": "English is a versatile word: it can be a noun or an adjective.",
+      "col": [
+        "a versatile player",
+        "remarkably versatile"
+      ],
+      "say": "Name a versatile person or tool in your life."
+    },
+    {
+      "w": "alleviate",
+      "pos": "verb",
+      "m": "to make a problem or pain less severe",
+      "ex": "A short walk alleviates the tiredness of a long lesson.",
+      "col": [
+        "alleviate poverty",
+        "alleviate the pressure"
+      ],
+      "say": "How could a city alleviate traffic?"
+    },
+    {
+      "w": "coherent",
+      "pos": "adjective",
+      "m": "logical and well organised; easy to follow",
+      "ex": "A coherent essay moves in one direction.",
+      "col": [
+        "a coherent argument",
+        "coherent and cohesive"
+      ],
+      "say": "What makes a speaker sound coherent?"
+    },
+    {
+      "w": "deteriorate",
+      "pos": "verb",
+      "m": "to become worse",
+      "ex": "Air quality deteriorates in winter.",
+      "col": [
+        "deteriorate rapidly",
+        "deteriorating health"
+      ],
+      "say": "What has deteriorated in your town in the last ten years?"
+    },
+    {
+      "w": "enhance",
+      "pos": "verb",
+      "m": "to improve the quality or value of something",
+      "ex": "Reading aloud enhances pronunciation.",
+      "col": [
+        "enhance the quality",
+        "greatly enhance"
+      ],
+      "say": "What enhances a city for young people?"
+    },
+    {
+      "w": "exacerbate",
+      "pos": "verb",
+      "m": "to make a bad situation worse",
+      "ex": "Cheap cars exacerbate congestion.",
+      "col": [
+        "exacerbate the problem",
+        "further exacerbate"
+      ],
+      "say": "What exacerbates stress before an exam?"
+    },
+    {
+      "w": "hinder",
+      "pos": "verb",
+      "m": "to make progress difficult",
+      "ex": "Fear of mistakes hinders fluency.",
+      "col": [
+        "hinder progress",
+        "hinder development"
+      ],
+      "say": "What hinders people from learning languages?"
+    },
+    {
+      "w": "implement",
+      "pos": "verb",
+      "m": "to put a plan or decision into action",
+      "ex": "The school implemented a no-phone rule.",
+      "col": [
+        "implement a policy",
+        "fully implemented"
+      ],
+      "say": "What rule would you implement at your school?"
+    },
+    {
+      "w": "mitigate",
+      "pos": "verb",
+      "m": "to reduce the harm or seriousness of something",
+      "ex": "Trees mitigate the heat of summer streets.",
+      "col": [
+        "mitigate the effects",
+        "mitigate risk"
+      ],
+      "say": "How can a family mitigate its impact on the environment?"
+    },
+    {
+      "w": "notion",
+      "pos": "noun",
+      "m": "an idea or belief",
+      "ex": "The notion that talent is fixed does a lot of damage.",
+      "col": [
+        "the notion that",
+        "reject the notion"
+      ],
+      "say": "What common notion about learning do you disagree with?"
+    },
+    {
+      "w": "paramount",
+      "pos": "adjective",
+      "m": "more important than anything else",
+      "ex": "In Part 2, keeping talking is paramount.",
+      "col": [
+        "of paramount importance",
+        "paramount concern"
+      ],
+      "say": "What is paramount when choosing a job?"
+    },
+    {
+      "w": "pragmatic",
+      "pos": "adjective",
+      "m": "dealing with things practically rather than by theory",
+      "ex": "A pragmatic learner records herself instead of reading about accents.",
+      "col": [
+        "a pragmatic approach",
+        "pragmatic solutions"
+      ],
+      "say": "Are you more pragmatic or more idealistic?"
+    },
+    {
+      "w": "prevalent",
+      "pos": "adjective",
+      "m": "common, widespread at a particular time or place",
+      "ex": "Online lessons are now prevalent in cities.",
+      "col": [
+        "increasingly prevalent",
+        "prevalent among"
+      ],
+      "say": "What habit is prevalent among your friends?"
+    },
+    {
+      "w": "reluctant",
+      "pos": "adjective",
+      "m": "unwilling and hesitant",
+      "ex": "Many students are reluctant to speak first.",
+      "col": [
+        "reluctant to",
+        "a reluctant agreement"
+      ],
+      "say": "What are you reluctant to do, but do anyway?"
+    },
+    {
+      "w": "sustain",
+      "pos": "verb",
+      "m": "to keep something going over time",
+      "ex": "It is hard to sustain motivation for a year.",
+      "col": [
+        "sustain growth",
+        "sustainable development"
+      ],
+      "say": "How do you sustain a good habit?"
+    },
+    {
+      "w": "tangible",
+      "pos": "noun-like adjective",
+      "m": "real and able to be seen, touched or measured",
+      "ex": "A band score is tangible; confidence is not.",
+      "col": [
+        "tangible benefits",
+        "tangible evidence"
+      ],
+      "say": "What tangible result do you want by December?"
+    },
+    {
+      "w": "underpin",
+      "pos": "verb",
+      "m": "to support or form the basis of something",
+      "ex": "Vocabulary underpins every IELTS skill.",
+      "col": [
+        "underpin the economy",
+        "underpinned by"
+      ],
+      "say": "What underpins a good friendship?"
+    },
+    {
+      "w": "vulnerable",
+      "pos": "adjective",
+      "m": "easily harmed, physically or emotionally",
+      "ex": "Older people are vulnerable to heat.",
+      "col": [
+        "vulnerable to",
+        "vulnerable groups"
+      ],
+      "say": "Which group in society is most vulnerable, and why?"
+    },
+    {
+      "w": "bleak",
+      "pos": "adjective",
+      "m": "without hope or comfort; cold and empty",
+      "ex": "The report paints a bleak picture of city air.",
+      "col": [
+        "a bleak future",
+        "bleak and grey"
+      ],
+      "say": "Describe a bleak place you have seen."
+    },
+    {
+      "w": "candid",
+      "pos": "adjective",
+      "m": "honest and direct, even when it is uncomfortable",
+      "ex": "Her candid feedback saved me a month.",
+      "col": [
+        "a candid conversation",
+        "to be candid"
+      ],
+      "say": "When is it better not to be candid?"
+    },
+    {
+      "w": "daunting",
+      "pos": "adjective",
+      "m": "frightening because it seems difficult",
+      "ex": "A 250-word essay looks daunting until you plan it.",
+      "col": [
+        "a daunting task",
+        "daunting prospect"
+      ],
+      "say": "What is the most daunting thing about speaking English?"
+    },
+    {
+      "w": "elaborate",
+      "pos": "verb",
+      "m": "to add more detail or explanation",
+      "ex": "Examiners want you to elaborate, not just answer.",
+      "col": [
+        "elaborate on",
+        "elaborate further"
+      ],
+      "say": "Answer a question, then elaborate for thirty seconds."
+    },
+    {
+      "w": "fleeting",
+      "pos": "adjective",
+      "m": "lasting only a short time",
+      "ex": "A fleeting moment of panic before the recording starts.",
+      "col": [
+        "a fleeting glimpse",
+        "fleeting moments"
+      ],
+      "say": "Describe a fleeting moment you remember well."
+    },
+    {
+      "w": "genuine",
+      "pos": "adjective",
+      "m": "real, sincere; not fake",
+      "ex": "A genuine question gets a longer answer.",
+      "col": [
+        "a genuine interest",
+        "genuine concern"
+      ],
+      "say": "What is one genuine interest of yours outside study?"
+    },
+    {
+      "w": "hectic",
+      "pos": "adjective",
+      "m": "very busy and full of activity",
+      "ex": "Exam week is hectic for teachers too.",
+      "col": [
+        "a hectic schedule",
+        "hectic lifestyle"
+      ],
+      "say": "Describe your most hectic day of the week."
+    },
+    {
+      "w": "immerse",
+      "pos": "verb",
+      "m": "to involve yourself completely in something",
+      "ex": "Immerse yourself: films, songs, labels on tins.",
+      "col": [
+        "immerse yourself in",
+        "fully immersed"
+      ],
+      "say": "How do you immerse yourself in English at home?"
+    },
+    {
+      "w": "jeopardise",
+      "pos": "verb",
+      "m": "to put something at risk",
+      "ex": "One late night can jeopardise a week of sleep.",
+      "col": [
+        "jeopardise your chances",
+        "seriously jeopardise"
+      ],
+      "say": "What could jeopardise your target score?"
+    },
+    {
+      "w": "keen",
+      "pos": "adjective",
+      "m": "eager, enthusiastic",
+      "ex": "She is keen on films and keen to discuss them.",
+      "col": [
+        "keen on",
+        "keen to",
+        "a keen interest"
+      ],
+      "say": "What are you keen to try next year?"
+    },
+    {
+      "w": "lucid",
+      "pos": "adjective",
+      "m": "clear and easy to understand",
+      "ex": "A lucid answer uses short sentences.",
+      "col": [
+        "a lucid explanation",
+        "lucid prose"
+      ],
+      "say": "Who explains things most lucidly in your life?"
+    },
+    {
+      "w": "mundane",
+      "pos": "adjective",
+      "m": "ordinary and dull",
+      "ex": "Even mundane tasks become practice if you narrate them in English.",
+      "col": [
+        "mundane tasks",
+        "the mundane details"
+      ],
+      "say": "Describe a mundane routine in interesting words."
+    },
+    {
+      "w": "negligible",
+      "pos": "adjective",
+      "m": "so small that it does not matter",
+      "ex": "The cost of a second-hand book is negligible.",
+      "col": [
+        "a negligible effect",
+        "almost negligible"
+      ],
+      "say": "What has a negligible effect that people think is important?"
+    },
+    {
+      "w": "outweigh",
+      "pos": "verb",
+      "m": "to be greater or more important than",
+      "ex": "The benefits of early sleep outweigh the lost hour.",
+      "col": [
+        "outweigh the drawbacks",
+        "far outweigh"
+      ],
+      "say": "Do the advantages of city life outweigh the disadvantages?"
+    },
+    {
+      "w": "plausible",
+      "pos": "adjective",
+      "m": "seeming reasonable or likely to be true",
+      "ex": "It is a plausible excuse, but still an excuse.",
+      "col": [
+        "a plausible explanation",
+        "entirely plausible"
+      ],
+      "say": "Give a plausible reason why people read less."
+    },
+    {
+      "w": "quaint",
+      "pos": "adjective",
+      "m": "attractively old-fashioned or unusual",
+      "ex": "The old quarter is quaint, with tiny bakeries.",
+      "col": [
+        "a quaint village",
+        "quaint customs"
+      ],
+      "say": "Describe a quaint place near your home."
+    },
+    {
+      "w": "robust",
+      "pos": "adjective",
+      "m": "strong and unlikely to fail",
+      "ex": "A robust routine survives a bad week.",
+      "col": [
+        "a robust system",
+        "robust growth"
+      ],
+      "say": "What makes a study routine robust?"
+    },
+    {
+      "w": "sceptical",
+      "pos": "adjective",
+      "m": "not easily convinced; having doubts",
+      "ex": "I am sceptical of apps that promise fluency in a month.",
+      "col": [
+        "sceptical about",
+        "remain sceptical"
+      ],
+      "say": "What claim are you sceptical about?"
+    },
+    {
+      "w": "tedious",
+      "pos": "adjective",
+      "m": "too long, slow and boring",
+      "ex": "Copying word lists is tedious; using them is not.",
+      "col": [
+        "a tedious task",
+        "tedious and repetitive"
+      ],
+      "say": "What tedious task would you automate?"
+    },
+    {
+      "w": "unprecedented",
+      "pos": "adjective",
+      "m": "never done or known before",
+      "ex": "The city grew at an unprecedented rate.",
+      "col": [
+        "an unprecedented level",
+        "unprecedented change"
+      ],
+      "say": "Name an unprecedented change in your lifetime."
+    },
+    {
+      "w": "vivid",
+      "pos": "adjective",
+      "m": "producing clear, strong images in the mind",
+      "ex": "A vivid example beats three general sentences.",
+      "col": [
+        "a vivid memory",
+        "vivid colours"
+      ],
+      "say": "Describe a vivid memory from childhood."
+    },
+    {
+      "w": "weary",
+      "pos": "adjective",
+      "m": "very tired, often after a long effort",
+      "ex": "By the third passage most candidates are weary.",
+      "col": [
+        "weary of",
+        "a weary sigh"
+      ],
+      "say": "What are you weary of hearing people say?"
+    },
+    {
+      "w": "yearn",
+      "pos": "verb",
+      "m": "to want something very much, with longing",
+      "ex": "In winter everyone yearns for the first warm day.",
+      "col": [
+        "yearn for",
+        "yearn to"
+      ],
+      "say": "What do you yearn for when you are abroad?"
+    },
+    {
+      "w": "curb",
+      "pos": "verb",
+      "m": "to control or limit something",
+      "ex": "Cities curb car use with high parking fees.",
+      "col": [
+        "curb spending",
+        "curb emissions"
+      ],
+      "say": "How can parents curb screen time without a fight?"
+    },
+    {
+      "w": "dwell on",
+      "pos": "phrasal verb",
+      "m": "to keep thinking or talking about something, especially something bad",
+      "ex": "Do not dwell on one wrong answer during the test.",
+      "col": [
+        "dwell on the past",
+        "no point dwelling on"
+      ],
+      "say": "What do people dwell on too much?"
+    },
+    {
+      "w": "take for granted",
+      "pos": "phrase",
+      "m": "to fail to appreciate something because it is always there",
+      "ex": "We take clean water for granted until it stops.",
+      "col": [
+        "take someone for granted",
+        "taken for granted"
+      ],
+      "say": "What do you take for granted that others do not have?"
+    },
+    {
+      "w": "in hindsight",
+      "pos": "phrase",
+      "m": "looking back at the past with the knowledge you have now",
+      "ex": "In hindsight, I should have started Anki in March.",
+      "col": [
+        "with the benefit of hindsight",
+        "in hindsight"
+      ],
+      "say": "What would you do differently, in hindsight?"
+    },
+    {
+      "w": "at the expense of",
+      "pos": "phrase",
+      "m": "causing loss or harm to something else",
+      "ex": "Speed at the expense of accuracy costs marks.",
+      "col": [
+        "at the expense of quality",
+        "at someone's expense"
+      ],
+      "say": "What do people gain at the expense of their health?"
+    }
   ],
   "films": [
-    { "title": "Dead Poets Society", "year": 1989, "dir": "Peter Weir", "why": "A teacher who makes boys stand on desks to see the room differently. Slow, warm, full of poetry read aloud.", "listen": { "p": "seize the day", "m": "the English for the Latin motto at the heart of the film: make the most of today" }, "ask": "Should teachers break rules to inspire students? Where is the line?" },
-    { "title": "Good Will Hunting", "year": 1997, "dir": "Gus Van Sant", "why": "A janitor who is a genius, a therapist who will not give up. Boston accents and long, honest conversations.", "listen": { "p": "it's not your fault", "m": "fault = responsibility for a mistake; compare 'to blame'" }, "ask": "Is talent wasted if a person chooses an ordinary life?" },
-    { "title": "The Truman Show", "year": 1998, "dir": "Peter Weir", "why": "A man whose whole life is a television programme, and he does not know. Funny first, then not.", "listen": { "p": "in case I don't see you", "m": "in case = because something might happen" }, "ask": "Would you leave a comfortable world that is fake for a real one that is hard?" },
-    { "title": "Forrest Gump", "year": 1994, "dir": "Robert Zemeckis", "why": "Thirty years of American history told by a man who keeps running. Simple sentences, big feelings.", "listen": { "p": "like a box of chocolates", "m": "a simile: as unpredictable as… ; collect 'like a' comparisons" }, "ask": "Is a simple life a happy life? Use Forrest as an example." },
-    { "title": "The Shawshank Redemption", "year": 1994, "dir": "Frank Darabont", "why": "Twenty years in prison, patience, and a friendship. The narration is the clearest English in cinema.", "listen": { "p": "get busy living", "m": "get busy + -ing: start doing something with energy" }, "ask": "Why do people say hope is dangerous? Do you agree?" },
-    { "title": "The King's Speech", "year": 2010, "dir": "Tom Hooper", "why": "A king who stammers and the speech teacher who treats him as an equal. A film about pronunciation.", "listen": { "p": "find your voice", "m": "become able to express yourself; also literal, here" }, "ask": "How much does confidence matter compared with accuracy when speaking?" },
-    { "title": "About Time", "year": 2013, "dir": "Richard Curtis", "why": "A man who can relive any day, and learns to live each one once. British English, gentle pace.", "listen": { "p": "make the most of", "m": "get the maximum benefit or pleasure from something" }, "ask": "If you could repeat one day, would it make you happier or less present?" },
-    { "title": "Groundhog Day", "year": 1993, "dir": "Harold Ramis", "why": "The same day, again and again, until a cynical man gets it right. The title became an English idiom.", "listen": { "p": "Groundhog Day", "m": "now an idiom: a situation that repeats itself tediously" }, "ask": "What would you learn if you had unlimited time and no consequences?" },
-    { "title": "The Intern", "year": 2015, "dir": "Nancy Meyers", "why": "A seventy-year-old intern at a fashion start-up. Office English, polite and modern.", "listen": { "p": "experience never gets old", "m": "get old = become boring or stale (and the pun on age)" }, "ask": "What can older and younger colleagues learn from each other?" },
-    { "title": "Whiplash", "year": 2014, "dir": "Damien Chazelle", "why": "A drummer and a teacher who pushes too far. Loud, fast, and a question about how we get good.", "listen": { "p": "not quite", "m": "not quite = almost but not exactly; a soft British-style no" }, "ask": "Does pressure make people better, or just afraid?" },
-    { "title": "The Pursuit of Happyness", "year": 2006, "dir": "Gabriele Muccino", "why": "A father and son with nowhere to sleep, and an unpaid internship. Based on a true story.", "listen": { "p": "the pursuit of", "m": "pursuit = the effort to achieve something; pursue a career" }, "ask": "Is money a condition for happiness? Where does the film stand?" },
-    { "title": "Before Sunrise", "year": 1995, "dir": "Richard Linklater", "why": "Two strangers walk around Vienna for one night and talk. Nothing happens; everything happens.", "listen": { "p": "get to know", "m": "gradually become familiar with a person or place" }, "ask": "Can you really know someone in one conversation?" },
-    { "title": "The Terminal", "year": 2004, "dir": "Steven Spielberg", "why": "A man trapped in an airport learns English from television and kindness. Watch how he does it.", "listen": { "p": "in the meantime", "m": "while waiting for something else to happen" }, "ask": "What is the best way to learn a language without a classroom?" },
-    { "title": "Notting Hill", "year": 1999, "dir": "Roger Michell", "why": "A bookshop owner and a film star. London English at its most polite and most awkward.", "listen": { "p": "just a", "m": "'just a' softens or makes something smaller: just a girl, just a thought" }, "ask": "Does fame make an ordinary life impossible?" },
-    { "title": "Up", "year": 2009, "dir": "Pete Docter", "why": "The first ten minutes tell a whole marriage without words. Then a house flies.", "listen": { "p": "adventure is out there", "m": "out there = in the wider world, waiting" }, "ask": "What makes an ordinary life an adventure?" },
-    { "title": "Paddington 2", "year": 2017, "dir": "Paul King", "why": "A polite bear in London and a village of good manners. The best British English for learners.", "listen": { "p": "if we're kind and polite", "m": "a first conditional used as a rule for life" }, "ask": "Is politeness a strength or a weakness in a big city?" },
-    { "title": "Inside Out", "year": 2015, "dir": "Pete Docter", "why": "Five emotions inside one girl's head. The vocabulary of feelings, made visible.", "listen": { "p": "core memory", "m": "core = central, most important; also core skills, core values" }, "ask": "Is sadness useful? What does the film argue?" },
-    { "title": "12 Angry Men", "year": 1957, "dir": "Sidney Lumet", "why": "One room, twelve men, one decision. The whole film is an argument, and it is black and white.", "listen": { "p": "reasonable doubt", "m": "a legal standard: enough doubt that a sensible person would hesitate" }, "ask": "Can one person change the mind of a group? How?" }
+    {
+      "title": "Dead Poets Society",
+      "year": 1989,
+      "dir": "Peter Weir",
+      "why": "A teacher who makes boys stand on desks to see the room differently. Slow, warm, full of poetry read aloud.",
+      "listen": {
+        "p": "seize the day",
+        "m": "the English for the Latin motto at the heart of the film: make the most of today"
+      },
+      "ask": "Should teachers break rules to inspire students? Where is the line?",
+      "wiki": "Dead Poets Society",
+      "poster": "https://upload.wikimedia.org/wikipedia/en/8/86/Dead_poets_society.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
+    },
+    {
+      "title": "Good Will Hunting",
+      "year": 1997,
+      "dir": "Gus Van Sant",
+      "why": "A janitor who is a genius, a therapist who will not give up. Boston accents and long, honest conversations.",
+      "listen": {
+        "p": "it's not your fault",
+        "m": "fault = responsibility for a mistake; compare 'to blame'"
+      },
+      "ask": "Is talent wasted if a person chooses an ordinary life?",
+      "wiki": "Good Will Hunting",
+      "poster": "https://upload.wikimedia.org/wikipedia/en/5/52/Good_Will_Hunting.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
+    },
+    {
+      "title": "The Truman Show",
+      "year": 1998,
+      "dir": "Peter Weir",
+      "why": "A man whose whole life is a television programme, and he does not know. Funny first, then not.",
+      "listen": {
+        "p": "in case I don't see you",
+        "m": "in case = because something might happen"
+      },
+      "ask": "Would you leave a comfortable world that is fake for a real one that is hard?",
+      "wiki": "The Truman Show",
+      "poster": "https://upload.wikimedia.org/wikipedia/en/c/cd/Trumanshow.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
+    },
+    {
+      "title": "Forrest Gump",
+      "year": 1994,
+      "dir": "Robert Zemeckis",
+      "why": "Thirty years of American history told by a man who keeps running. Simple sentences, big feelings.",
+      "listen": {
+        "p": "like a box of chocolates",
+        "m": "a simile: as unpredictable as… ; collect 'like a' comparisons"
+      },
+      "ask": "Is a simple life a happy life? Use Forrest as an example.",
+      "wiki": "Forrest Gump",
+      "poster": "https://upload.wikimedia.org/wikipedia/en/6/67/Forrest_Gump_poster.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
+    },
+    {
+      "title": "The Shawshank Redemption",
+      "year": 1994,
+      "dir": "Frank Darabont",
+      "why": "Twenty years in prison, patience, and a friendship. The narration is the clearest English in cinema.",
+      "listen": {
+        "p": "get busy living",
+        "m": "get busy + -ing: start doing something with energy"
+      },
+      "ask": "Why do people say hope is dangerous? Do you agree?",
+      "wiki": "The Shawshank Redemption",
+      "poster": "https://upload.wikimedia.org/wikipedia/en/8/81/ShawshankRedemptionMoviePoster.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
+    },
+    {
+      "title": "The King's Speech",
+      "year": 2010,
+      "dir": "Tom Hooper",
+      "why": "A king who stammers and the speech teacher who treats him as an equal. A film about pronunciation.",
+      "listen": {
+        "p": "find your voice",
+        "m": "become able to express yourself; also literal, here"
+      },
+      "ask": "How much does confidence matter compared with accuracy when speaking?",
+      "wiki": "The King's Speech",
+      "poster": "https://upload.wikimedia.org/wikipedia/en/4/4a/The_King%27s_Speech_poster.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
+    },
+    {
+      "title": "About Time",
+      "year": 2013,
+      "dir": "Richard Curtis",
+      "why": "A man who can relive any day, and learns to live each one once. British English, gentle pace.",
+      "listen": {
+        "p": "make the most of",
+        "m": "get the maximum benefit or pleasure from something"
+      },
+      "ask": "If you could repeat one day, would it make you happier or less present?",
+      "wiki": "About Time (2013 film)",
+      "poster": "https://upload.wikimedia.org/wikipedia/en/7/7c/About_Time_%282013_film%29_Poster.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
+    },
+    {
+      "title": "Groundhog Day",
+      "year": 1993,
+      "dir": "Harold Ramis",
+      "why": "The same day, again and again, until a cynical man gets it right. The title became an English idiom.",
+      "listen": {
+        "p": "Groundhog Day",
+        "m": "now an idiom: a situation that repeats itself tediously"
+      },
+      "ask": "What would you learn if you had unlimited time and no consequences?",
+      "wiki": "Groundhog Day (film)",
+      "poster": "https://upload.wikimedia.org/wikipedia/en/b/b1/Groundhog_Day_%28movie_poster%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
+    },
+    {
+      "title": "The Intern",
+      "year": 2015,
+      "dir": "Nancy Meyers",
+      "why": "A seventy-year-old intern at a fashion start-up. Office English, polite and modern.",
+      "listen": {
+        "p": "experience never gets old",
+        "m": "get old = become boring or stale (and the pun on age)"
+      },
+      "ask": "What can older and younger colleagues learn from each other?",
+      "wiki": "The Intern (2015 film)",
+      "poster": "https://upload.wikimedia.org/wikipedia/en/c/c9/The_Intern_Poster.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
+    },
+    {
+      "title": "Whiplash",
+      "year": 2014,
+      "dir": "Damien Chazelle",
+      "why": "A drummer and a teacher who pushes too far. Loud, fast, and a question about how we get good.",
+      "listen": {
+        "p": "not quite",
+        "m": "not quite = almost but not exactly; a soft British-style no"
+      },
+      "ask": "Does pressure make people better, or just afraid?",
+      "wiki": "Whiplash (2014 film)",
+      "poster": "https://upload.wikimedia.org/wikipedia/en/0/01/Whiplash_poster.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
+    },
+    {
+      "title": "The Pursuit of Happyness",
+      "year": 2006,
+      "dir": "Gabriele Muccino",
+      "why": "A father and son with nowhere to sleep, and an unpaid internship. Based on a true story.",
+      "listen": {
+        "p": "the pursuit of",
+        "m": "pursuit = the effort to achieve something; pursue a career"
+      },
+      "ask": "Is money a condition for happiness? Where does the film stand?",
+      "wiki": "The Pursuit of Happyness",
+      "poster": "https://upload.wikimedia.org/wikipedia/en/8/81/Poster-pursuithappyness.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
+    },
+    {
+      "title": "Before Sunrise",
+      "year": 1995,
+      "dir": "Richard Linklater",
+      "why": "Two strangers walk around Vienna for one night and talk. Nothing happens; everything happens.",
+      "listen": {
+        "p": "get to know",
+        "m": "gradually become familiar with a person or place"
+      },
+      "ask": "Can you really know someone in one conversation?",
+      "wiki": "Before Sunrise",
+      "poster": "https://upload.wikimedia.org/wikipedia/en/d/da/Before_Sunrise_poster.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
+    },
+    {
+      "title": "The Terminal",
+      "year": 2004,
+      "dir": "Steven Spielberg",
+      "why": "A man trapped in an airport learns English from television and kindness. Watch how he does it.",
+      "listen": {
+        "p": "in the meantime",
+        "m": "while waiting for something else to happen"
+      },
+      "ask": "What is the best way to learn a language without a classroom?",
+      "wiki": "The Terminal",
+      "poster": "https://upload.wikimedia.org/wikipedia/en/8/86/Movie_poster_the_terminal.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
+    },
+    {
+      "title": "Notting Hill",
+      "year": 1999,
+      "dir": "Roger Michell",
+      "why": "A bookshop owner and a film star. London English at its most polite and most awkward.",
+      "listen": {
+        "p": "just a",
+        "m": "'just a' softens or makes something smaller: just a girl, just a thought"
+      },
+      "ask": "Does fame make an ordinary life impossible?",
+      "wiki": "Notting Hill (film)",
+      "poster": "https://upload.wikimedia.org/wikipedia/en/3/38/NottingHillRobertsGrant.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
+    },
+    {
+      "title": "Up",
+      "year": 2009,
+      "dir": "Pete Docter",
+      "why": "The first ten minutes tell a whole marriage without words. Then a house flies.",
+      "listen": {
+        "p": "adventure is out there",
+        "m": "out there = in the wider world, waiting"
+      },
+      "ask": "What makes an ordinary life an adventure?",
+      "wiki": "Up (2009 film)",
+      "poster": "https://upload.wikimedia.org/wikipedia/en/0/05/Up_%282009_film%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
+    },
+    {
+      "title": "Paddington 2",
+      "year": 2017,
+      "dir": "Paul King",
+      "why": "A polite bear in London and a village of good manners. The best British English for learners.",
+      "listen": {
+        "p": "if we're kind and polite",
+        "m": "a first conditional used as a rule for life"
+      },
+      "ask": "Is politeness a strength or a weakness in a big city?",
+      "wiki": "Paddington 2",
+      "poster": "https://upload.wikimedia.org/wikipedia/en/b/b6/Paddington_2_poster.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
+    },
+    {
+      "title": "Inside Out",
+      "year": 2015,
+      "dir": "Pete Docter",
+      "why": "Five emotions inside one girl's head. The vocabulary of feelings, made visible.",
+      "listen": {
+        "p": "core memory",
+        "m": "core = central, most important; also core skills, core values"
+      },
+      "ask": "Is sadness useful? What does the film argue?",
+      "wiki": "Inside Out (2015 film)",
+      "poster": "https://upload.wikimedia.org/wikipedia/en/0/0a/Inside_Out_%282015_film%29_poster.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
+    },
+    {
+      "title": "12 Angry Men",
+      "year": 1957,
+      "dir": "Sidney Lumet",
+      "why": "One room, twelve men, one decision. The whole film is an argument, and it is black and white.",
+      "listen": {
+        "p": "reasonable doubt",
+        "m": "a legal standard: enough doubt that a sensible person would hesitate"
+      },
+      "ask": "Can one person change the mind of a group? How?",
+      "wiki": "12 Angry Men (1957 film)",
+      "poster": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b5/12_Angry_Men_%281957_film_poster%29.jpg/330px-12_Angry_Men_%281957_film_poster%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+    }
   ]
 }

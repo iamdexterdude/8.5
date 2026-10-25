@@ -26,6 +26,28 @@ export async function forDay(date = todayISO()) {
   return { date, word, song, film };
 }
 
+// ---------- artwork for the teacher's own picks: looked up once in the iTunes catalogue, remembered on the device ----------
+const pending = new Map();   // one lookup per song, however many times the screen redraws meanwhile
+export function artFor(s) {
+  if (s.art) return Promise.resolve(s.art);
+  if (!s.title) return Promise.resolve("");
+  const key = `${s.artist || ""}|${s.title}`.toLowerCase(), cache = store.S.kv["art-cache"] || {};
+  if (key in cache) return Promise.resolve(cache[key]);
+  if (pending.has(key)) return pending.get(key);
+  const p = (async () => {
+    let url = "";
+    try {
+      const r = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(`${s.artist || ""} ${s.title}`.trim())}&media=music&entity=song&limit=1`);
+      const j = await r.json(); url = (j.results?.[0]?.artworkUrl100 || "").replace(/100x100bb/, "600x600bb");
+    } catch {}
+    await store.setSetting("art-cache", { ...(store.S.kv["art-cache"] || {}), [key]: url });
+    pending.delete(key);
+    return url;
+  })();
+  pending.set(key, p);
+  return p;
+}
+
 // ---------- links: nothing is embedded, nothing is stored; she opens the song or the film where it lives ----------
 const q = (s) => encodeURIComponent(s);
 export const listenLink = (s) => s.url || `https://www.youtube.com/results?search_query=${q(`${s.artist} ${s.title}`)}`;
