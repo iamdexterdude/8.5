@@ -150,7 +150,7 @@ export function hideSplash() {
   const s = document.getElementById("splash");
   if (!s || s.dataset.gone) return Promise.resolve();
   s.dataset.gone = "1";
-  const start = window.__splash?.start || Date.now(), min = matchMedia("(prefers-reduced-motion: reduce)").matches ? 600 : 6400;   // the four movements take about 6 s
+  const start = window.__splash?.start || Date.now(), min = matchMedia("(prefers-reduced-motion: reduce)").matches ? 600 : 8000;   // the four movements take about 7.5 s
   return new Promise((res) => {
     const go = () => {
       const r = s.querySelector(".dot")?.getBoundingClientRect();
