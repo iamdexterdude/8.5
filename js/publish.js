@@ -49,4 +49,34 @@ export async function fetchPublished(path) {
 }
 export async function encryptOnly(obj) { return encryptJson(obj, FEED_KEY); }
 
+// ---- "Send to Claude": the request (and any attached files, in pieces small enough for the relay) goes to requests/<id>/ in the feed.
+// The watcher on the teacher's PC picks it up, has Claude Code build and publish the day, and answers in requests/<id>/status.json.
+const PART = 1200 * 1024;
+function bytesToB64(buf) {
+  const b = new Uint8Array(buf); let s = "";
+  for (let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000));
+  return btoa(s);
+}
+export async function sendToClaude({ date, text, files = [] }, progress = () => {}) {
+  const id = `${date}-${Math.random().toString(36).slice(2, 8)}`, meta = [];
+  let n = 0;
+  for (const [i, f] of files.entries()) {
+    const buf = await f.arrayBuffer(), parts = Math.max(1, Math.ceil(buf.byteLength / PART));
+    for (let k = 0; k < parts; k++) {
+      progress(`Uploading ${f.name}${parts > 1 ? ` (${k + 1} of ${parts})` : ""}…`);
+      await putEncrypted(`requests/${id}/part-${n}.json`, { file: i, part: k, data: bytesToB64(buf.slice(k * PART, (k + 1) * PART)) }, "Attachment for Claude");
+      n++;
+    }
+    meta.push({ name: f.name, type: f.type || "application/octet-stream", size: buf.byteLength, parts });
+  }
+  progress("Sending…");
+  // the request goes last: the watcher only starts once it exists, so every piece is already there
+  await putEncrypted(`requests/${id}/request.json`, { id, date, text, files: meta, sentAt: new Date().toISOString() }, `Homework for ${date}, for Claude`);
+  return id;
+}
+export async function claudeStatus(id) {
+  const r = await relay("read", withPassword({ path: `requests/${id}/status.json` }));
+  return r.content ? decryptJson(JSON.parse(r.content), FEED_KEY) : null;
+}
+
 export { validateHomework } from "./validate.js";
