@@ -7,3 +7,7 @@ course/
 tools/teacher/.classcode
 tools/teacher/config.json
 backend/.vercel
+
+# Send to Claude: the watcher's working folder and log
+work/
+tools/teacher/watch.log*

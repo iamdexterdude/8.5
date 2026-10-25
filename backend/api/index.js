@@ -1,5 +1,5 @@
 // The 8.5 relay. POST JSON { op, ... }.
-//   teacher (password checked against teacher.json in the feed repo): login, publish, remove, password, list
+//   teacher (password checked against teacher.json in the feed repo): login, publish, remove, password, list, read
 //   student (no password):                                             upload (a file to the teacher's Telegram), notify (a line of text)
 import { pbkdf2Sync, timingSafeEqual, randomBytes } from "node:crypto";
 
@@ -9,7 +9,9 @@ const GH = process.env.GITHUB_TOKEN || "", TG = process.env.TG_BOT_TOKEN || "", 
 const PEPPER = process.env.TEACHER_PEPPER || "";
 const MIN_PW = 4;
 const ORIGINS = [/^https:\/\/iamdexterdude\.github\.io$/, /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/];
-const PATH_OK = /^(hw\/\d{4}-\d{2}-\d{2}\.json|config\.json|requests\/[a-z0-9-]{1,40}\.json)$/;
+const PATH_OK = /^(hw\/\d{4}-\d{2}-\d{2}\.json|config\.json|requests\/[a-z0-9-]{1,40}\/(request|part-\d{1,3})\.json)$/;
+// "Send to Claude": the request and its attachments go to requests/<id>/; the watcher on the teacher's PC answers in status.json
+const READ_OK = /^requests\/[a-z0-9-]{1,40}\/status\.json$/;
 const MAX_FILE = 3.5 * 1024 * 1024;
 
 // ---- password: salted PBKDF2 with a server-side pepper. The hash file is public (feed repo); without the pepper it is useless.
@@ -89,7 +91,7 @@ export default async function handler(req, res) {
       const fd = new FormData(); fd.append("chat_id", CHAT); fd.append("text", String(b.text || "").slice(0, 3000)); await tg("sendMessage", fd); return send(res, 200, { ok: true });
     }
     // ---------- teacher
-    if (!["login", "publish", "remove", "password", "list"].includes(op)) return send(res, 400, { ok: false, error: "Unknown op." });
+    if (!["login", "publish", "remove", "password", "list", "read"].includes(op)) return send(res, 400, { ok: false, error: "Unknown op." });
     if (blocked(ip)) return send(res, 429, { ok: false, error: "Too many wrong passwords. Wait fifteen minutes." });
     const rec = await teacherRecord();
     if (!rec) return send(res, 409, { ok: false, error: "No teacher password is set yet. Run: node tools/teacher/publish.mjs password" });
@@ -102,12 +104,19 @@ export default async function handler(req, res) {
     }
     if (op === "publish") {
       if (!PATH_OK.test(String(b.path || ""))) return send(res, 400, { ok: false, error: "Bad path." });
-      if (typeof b.content !== "string" || b.content.length > 2000000) return send(res, 400, { ok: false, error: "Bad content." });
+      if (typeof b.content !== "string" || b.content.length > (b.path.startsWith("requests/") ? 3200000 : 2000000)) return send(res, 400, { ok: false, error: "Bad content." });
       const sha = await putFile(b.path, b.content, String(b.message || "Publish " + b.path).slice(0, 200)); return send(res, 200, { ok: true, sha });
     }
     if (op === "remove") {
       if (!PATH_OK.test(String(b.path || ""))) return send(res, 400, { ok: false, error: "Bad path." });
       return send(res, 200, { ok: true, removed: await removeFile(b.path, "Remove " + b.path) });
+    }
+    if (op === "read") {
+      if (!READ_OK.test(String(b.path || ""))) return send(res, 400, { ok: false, error: "Bad path." });
+      const r = await gh(`contents/${b.path}?ref=${BRANCH}`, { headers: { Accept: "application/vnd.github.raw+json" } });
+      if (r.status === 404) return send(res, 200, { ok: true, content: null });
+      if (!r.ok) throw new Error("GitHub " + r.status);
+      return send(res, 200, { ok: true, content: await r.text() });
     }
     if (op === "list") {
       const r = await gh(`contents/${encodeURIComponent(String(b.dir || "hw"))}?ref=${BRANCH}`);

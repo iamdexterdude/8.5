@@ -1,0 +1,161 @@
+{
+  "v": 1,
+  "date": "2026-10-14",
+  "lesson": {
+    "no": "2",
+    "title": "Part 2 and essay structure",
+    "focus": "the Part 2 notes method, planning a Task 2 essay in five minutes",
+    "time": "19:00",
+    "link": ""
+  },
+  "tasks": [
+    {
+      "id": "speaking",
+      "title": "Speaking",
+      "summary": "Two Part 1 topics",
+      "minutes": 120,
+      "steps": [
+        {
+          "id": "q",
+          "type": "questions",
+          "title": "Part 1 questions",
+          "intro": "Read every question once before you answer any of them.",
+          "groups": [
+            {
+              "name": "Hometown",
+              "questions": [
+                "Where is your hometown?",
+                "What do you like most about it?",
+                "Has it changed much since you were a child?",
+                "Would you like to live there in the future?",
+                "What is the most interesting part of your town?"
+              ]
+            },
+            {
+              "name": "Weekends",
+              "questions": [
+                "What do you usually do at the weekend?",
+                "Do you prefer to spend weekends alone or with friends?",
+                "Did you do anything special last weekend?",
+                "Are weekends important to you?",
+                "What would you like to do more often at weekends?"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "sa",
+          "type": "read",
+          "title": "Sample answer",
+          "intro": "Read it twice: once for meaning, once for the phrases.",
+          "paragraphs": [
+            "I come from a mid-sized town in the Fergana Valley, which is known for its orchards and its slow pace of life. What I like most is that everyone seems to know each other, so there is a real sense of community.",
+            "It has changed a great deal since I was a child. New apartment blocks have sprung up on the outskirts, and the old bazaar has been renovated, although it has kept its character."
+          ],
+          "highlights": [
+            "slow pace of life",
+            "a real sense of community",
+            "a great deal",
+            "sprung up",
+            "kept its character"
+          ]
+        },
+        {
+          "id": "w",
+          "type": "words",
+          "title": "New words",
+          "deck": "Speaking: Hometown and Weekends",
+          "cards": [
+            {
+              "front": "a slow pace of life",
+              "back": "a calm, unhurried way of living\nExample: My town has a slow pace of life."
+            },
+            {
+              "front": "a sense of community",
+              "back": "the feeling that people belong together and help each other\nExample: There is a real sense of community here."
+            },
+            {
+              "front": "to spring up",
+              "back": "to appear suddenly\nExample: New cafes have sprung up everywhere."
+            },
+            {
+              "front": "to keep its character",
+              "back": "to stay the same in spirit after changes\nExample: The bazaar has kept its character."
+            },
+            {
+              "front": "to unwind",
+              "back": "to relax after work or study\nExample: I unwind by walking in the park."
+            }
+          ]
+        },
+        {
+          "id": "ph",
+          "type": "photos",
+          "title": "Your written answers",
+          "label": "Speaking written answers",
+          "prompt": "Write an answer to each question by hand. Highlight every new phrase you used. Photograph the pages."
+        },
+        {
+          "id": "rec",
+          "type": "record",
+          "title": "Record your answers",
+          "label": "Speaking recordings",
+          "prompt": "One answer per question, 20 to 40 seconds each. Do not read from your notes.",
+          "max": 90,
+          "questions": [
+            "Where is your hometown?",
+            "What do you like most about it?",
+            "Has it changed much since you were a child?",
+            "What do you usually do at the weekend?",
+            "Did you do anything special last weekend?"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "writing",
+      "title": "Writing",
+      "summary": "Review what was taught",
+      "minutes": 20,
+      "steps": [
+        {
+          "id": "wc",
+          "type": "check",
+          "title": "Review the lesson",
+          "text": "Go back over the Part 2 notes method and the five-minute essay plan from today's lesson.",
+          "button": "I reviewed it"
+        },
+        {
+          "id": "wn",
+          "type": "photos",
+          "title": "Upload your notes",
+          "label": "Writing lesson notes",
+          "prompt": "Photograph the notes you took in the lesson."
+        }
+      ]
+    },
+    {
+      "id": "reading",
+      "title": "Reading",
+      "summary": "One passage",
+      "minutes": 40,
+      "steps": [
+        {
+          "id": "rv",
+          "type": "watch",
+          "title": "Watch the video walkthrough",
+          "url": "https://t.me/c/4384453771/1",
+          "minutes": 35,
+          "text": "Reading marathon, one passage. Pause and think before each answer is explained."
+        },
+        {
+          "id": "rc",
+          "type": "check",
+          "title": "Check",
+          "text": "Make sure you understand every question and why each answer is right.",
+          "button": "I understand every question"
+        }
+      ]
+    }
+  ]
+}

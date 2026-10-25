@@ -1,10 +1,10 @@
-// Teacher mode: build each day's homework and publish it, tell Claude what to set, class settings, music.
+// Teacher mode: build each day's homework and publish it, or send it to Claude in words; class settings, music.
 // One password opens it; the relay checks the password and does the publishing. Nothing else is ever typed.
 import { h, icon, todayISO, addDays, fmtDate } from "../util.js";
 import * as store from "../store.js";
 import * as hw from "../homework.js";
-import { adminLoad, adminSave, putEncrypted, removePublished, listPublished, fetchPublished, encryptOnly, sendTeacherNote, validateHomework, session, lock, unlock, changePassword } from "../publish.js";
-import { SITE, CLAUDE_BOT } from "../feedkey.js";
+import { adminLoad, adminSave, putEncrypted, removePublished, listPublished, fetchPublished, encryptOnly, sendTeacherNote, sendToClaude, claudeStatus, validateHomework, session, lock, unlock, changePassword } from "../publish.js";
+import { SITE } from "../feedkey.js";
 import { head, toast, sheet } from "../ui.js";
 import { homeworkSection } from "./hwview.js";
 
@@ -182,28 +182,89 @@ async function download() {
 }
 
 // ------------------------------------------------------------------ tell Claude
-// Write the homework in your own words; Claude turns it into the day's homework and publishes it.
+// Write the homework in your own words and press Send. The watcher on the teacher's PC hands it to Claude Code, which builds the day,
+// checks it and publishes it. This screen follows the request until it is live; Telegram says so too.
 const tellKey = (d) => "eight-tell-" + d;
+let tellFiles = [];      // attachments for the next Send, kept while teacher mode stays open
+let tellPoll = 0;        // the status poll that is running, so only one ever runs
+const MAX_ATTACH = 25 * 1024 * 1024;
+const STEP_TEXT = { picked: "The PC has it. Claude is reading your note…", building: "Claude is building the homework…", fixing: "Claude is fixing a problem it found…", publishing: "Publishing it to her app…" };
+const kb = (n) => (n >= 1048576 ? (n / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(n / 1024)) + " KB");
 function claudeTab(ctx) {
   const a = adminLoad(); let date = a.tellDate || defaultDate();
-  const ta = h("textarea", { rows: 12, placeholder: "For example:\nSpeaking: two Part 1 topics, Hometown and Weekends, 12 questions, the sample answer is in the PDF I will attach, highlight the phrases in bold. She writes answers by hand, photographs them, and records one answer per question.\nWriting: review today's lesson on Task 2 planning, upload notes.\nReading: watch RM13 day 4 passage 3 walkthrough (link), make sure she understands every question.", "aria-label": "Tell Claude the homework" });
+  const ta = h("textarea", { rows: 12, placeholder: "For example:\nSpeaking: two Part 1 topics, Hometown and Weekends, 12 questions, the sample answer is in the PDF I attached, highlight the phrases in bold. She writes answers by hand, photographs them, and records one answer per question.\nWriting: review today's lesson on Task 2 planning, upload notes.\nReading: watch RM13 day 4 passage 3 walkthrough (link), make sure she understands every question.", "aria-label": "Tell Claude the homework" });
   try { ta.value = localStorage.getItem(tellKey(date)) || ""; } catch {}
   const dateIn = h("input", { type: "date", value: date, "aria-label": "Homework for", onchange: (e) => { date = e.target.value; adminSave({ tellDate: date }); try { ta.value = localStorage.getItem(tellKey(date)) || ""; } catch {} } });
   ta.addEventListener("input", () => { try { localStorage.setItem(tellKey(date), ta.value); } catch {} });
   const out = h("div", { class: "small muted", "aria-live": "polite", style: { marginTop: "8px" } });
-  const message = () => `8.5 homework for ${date} (${fmtDate(date, { weekday: "long" })}).\n\n${ta.value.trim()}\n\nClaude: build the homework file from this and publish it with: node tools/teacher/publish.mjs homework <file>`;
-  const need = () => { if (!ta.value.trim()) { out.textContent = "Write the homework first."; return false; } return true; };
+  const status = h("div", { class: "tellstatus", "aria-live": "polite" });
+  const message = () => `8.5 homework for ${date} (${fmtDate(date, { weekday: "long" })}).\n\n${ta.value.trim()}\n\nClaude: in the 8.5 project folder, follow .claude/skills/publish-homework/SKILL.md and publish it.`;
+  const need = () => { if (!ta.value.trim()) { out.textContent = "Write the homework first."; return false; } if (!date) { out.textContent = "Pick the day."; return false; } return true; };
+
+  const fileIn = h("input", { type: "file", multiple: true, accept: ".pdf,image/*,.txt,.doc,.docx", hidden: true, onchange: (e) => { tellFiles.push(...e.target.files); e.target.value = ""; drawFiles(); } });
+  const fileList = h("ul", { class: "rows", style: { marginTop: "8px" } });
+  function drawFiles() {
+    fileList.hidden = !tellFiles.length;
+    fileList.replaceChildren(...tellFiles.map((f, i) => h("li", null, h("div", { class: "row", style: { minHeight: "48px" } },
+      h("div", { class: "grow" }, h("div", { class: "title" }, f.name), h("div", { class: "sub" }, kb(f.size))),
+      h("button", { class: "btn small quiet", "aria-label": `Remove ${f.name}`, onclick: () => { tellFiles.splice(i, 1); drawFiles(); } }, icon("close", 16))))));
+  }
+  drawFiles();
+
+  const sendBtn = h("button", { class: "btn primary", onclick: send }, icon("upload", 18), "Send to Claude");
+  async function send() {
+    if (!need()) return;
+    if (tellFiles.reduce((n, f) => n + f.size, 0) > MAX_ATTACH) { out.textContent = "The attachments are too large: 25 MB together at most."; return; }
+    sendBtn.disabled = true; out.textContent = ""; tellPoll++;
+    const line = (t) => { status.dataset.state = "sending"; status.replaceChildren(h("div", { class: "t" }, h("span", { class: "dot", "aria-hidden": "true" }), t)); };
+    try {
+      const sentAt = Date.now(), id = await sendToClaude({ date, text: ta.value.trim(), files: tellFiles }, line);
+      tellFiles = []; drawFiles();
+      adminSave({ tellLast: { id, date, sentAt } });
+      follow(id, date, sentAt);
+    } catch (err) { status.dataset.state = "failed"; status.replaceChildren(h("div", { class: "t" }, "Not sent"), h("div", { class: "s" }, err.message)); }
+    sendBtn.disabled = false;
+  }
+
+  function draw(st, d, sentAt) {
+    const day = (x) => fmtDate(x, { weekday: "long", day: "numeric", month: "long" });
+    const wait = (t) => h("div", { class: "t" }, h("span", { class: "dot", "aria-hidden": "true" }), t);
+    status.dataset.state = st?.state || "waiting";
+    if (!st) status.replaceChildren(wait("Sent. Waiting for the PC to pick it up…"), Date.now() - sentAt > 90000 ? h("div", { class: "s" }, "The PC has not picked it up yet. It must be switched on and online; the request waits safely until it is.") : "");
+    else if (st.state === "working") status.replaceChildren(wait(STEP_TEXT[st.step] || "Claude is working on it…"), h("div", { class: "s" }, `For ${day(d)}. This usually takes two to six minutes. You can close this; Telegram tells you when it is live.`));
+    else if (st.state === "published") status.replaceChildren(h("div", { class: "t" }, icon("check", 18), `Published for ${day(st.date || d)}`), h("div", { class: "s" }, st.summary || "She sees it the next time she opens Today."));
+    else status.replaceChildren(h("div", { class: "t" }, `Not published for ${day(d)}`), h("div", { class: "s" }, `${st.error || "Something went wrong."}\nYour text is still here. Press Send to try again.`));
+  }
+  function follow(id, d, sentAt) {
+    const me = ++tellPoll; let delay = 2500;
+    draw(null, d, sentAt);
+    const tick = async () => {
+      if (me !== tellPoll || !status.isConnected) return;     // a newer request, or teacher mode moved on
+      let st; try { st = await claudeStatus(id); } catch { st = undefined; }
+      if (me !== tellPoll || !status.isConnected) return;
+      if (st !== undefined) draw(st, d, sentAt);
+      if (st && (st.state === "published" || st.state === "failed")) return;
+      if (Date.now() - sentAt > 60 * 60000) return;
+      delay = Math.min(delay * 1.25, 10000); setTimeout(tick, delay);
+    };
+    setTimeout(tick, 1500);
+  }
+  // coming back to this tab: show how the last request went (for half a day)
+  const last = a.tellLast;
+  if (last?.id && Date.now() - last.sentAt < 12 * 3600000) follow(last.id, last.date, last.sentAt);
+
   return h("div", null,
-    h("p", { class: "lead" }, "Say what the homework is, in your words. Claude builds it and publishes it."),
-    h("p", { class: "small muted" }, "Mention: the date, each task (speaking, writing, reading), the topics and questions, what she must read, watch, write, photograph or record, and any links. Attach PDFs to the same Telegram message."),
+    h("p", { class: "lead" }, "Say what the homework is, in your words, and press Send. Claude builds it, checks it and publishes it to her app."),
+    h("p", { class: "small muted" }, "Mention the date, each task (speaking, writing, reading), the topics and questions, what she must read, watch, write, photograph or record, and any links. Attach the PDFs or photos it needs. Telegram tells you when it is live."),
     h("div", { class: "field", style: { maxWidth: "260px" } }, h("label", null, "Homework for the day"), dateIn),
     h("div", { class: "field" }, h("label", null, "The homework, in detail"), ta),
+    fileIn, fileList,
     h("div", { class: "row-actions" },
-      h("a", { class: "btn primary", href: "#", onclick: (e) => { e.preventDefault(); if (!need()) return; window.open(`https://t.me/share/url?url=${encodeURIComponent(SITE)}&text=${encodeURIComponent(message())}`, "_blank", "noopener"); out.textContent = `Telegram opens: choose the chat with @${CLAUDE_BOT} and send. Claude publishes it when Claude Code is running on the PC.`; } }, icon("upload", 18), "Send to Claude on Telegram"),
-      h("button", { class: "btn", onclick: async () => { if (!need()) return; try { await navigator.clipboard.writeText(message()); out.textContent = "Copied. Paste it to Claude Code."; } catch { out.textContent = "Could not copy. Select the text and copy it by hand."; } } }, "Copy for Claude Code"),
-      h("button", { class: "btn", onclick: async (e) => { if (!need()) return; const b = e.currentTarget; b.disabled = true; out.textContent = "Saving…"; try { await putEncrypted(`requests/${date}-${sid().slice(1)}.json`, { date, text: ta.value.trim(), savedAt: new Date().toISOString() }, "Note for Claude"); out.textContent = "Saved. In Claude Code say: publish the homework I saved in teacher mode."; } catch (err) { out.textContent = err.message; } b.disabled = false; } }, "Save for Claude")),
-    out,
-    h("p", { class: "tiny faint", style: { marginTop: "16px" } }, "You can also paste the JSON Claude gives you into Homework, Raw JSON, then Publish."));
+      sendBtn,
+      h("button", { class: "btn", onclick: () => fileIn.click() }, icon("plus", 18), "Attach a PDF or photo"),
+      h("button", { class: "btn quiet", onclick: async () => { if (!need()) return; try { await navigator.clipboard.writeText(message()); out.textContent = "Copied. Paste it to Claude Code."; } catch { out.textContent = "Could not copy. Select the text and copy it by hand."; } } }, "Copy for Claude Code")),
+    out, status,
+    h("p", { class: "tiny faint", style: { marginTop: "16px" } }, "Send works while the PC is on: the watcher there hands your note to Claude Code. If the PC is off, the note waits and goes through when it is back."));
 }
 
 // ------------------------------------------------------------------ class settings
@@ -223,7 +284,7 @@ function classTab(ctx) {
       h("div", { class: "grid3 wide" }, field("Lesson start time", "lessonTime", "time"), field("Lesson link (Zoom, Meet, Telegram call)", "lessonLink", "text", null, { placeholder: "https://" })),
       h("div", { class: "row-actions" }, h("button", { class: "btn primary", onclick: () => publishConfig(out) }, icon("upload", 18), "Publish class settings")), out),
     h("section", { class: "section" }, h("div", { class: "shead" }, h("h2", null, "Telegram")),
-      h("p", { class: "small muted" }, `Her photos (as one PDF) and recordings arrive in your Telegram, in the chat with @${CLAUDE_BOT}. Each file is named with the date and the task.`),
+      h("p", { class: "small muted" }, "Her photos (as one PDF) and her recordings arrive in your Telegram from the 8.5 bot, and so does a message each time Claude publishes a day. Each file is named with the date and the task."),
       h("div", { class: "row-actions" }, h("button", { class: "btn small", onclick: async (e) => { const b = e.currentTarget; b.disabled = true; try { await sendTeacherNote("8.5: test message. Her work will arrive here."); toast("Sent. Check Telegram."); } catch (err) { toast(err.message); } b.disabled = false; } }, "Send a test message"))),
     h("section", { class: "section" }, h("div", { class: "shead" }, h("h2", null, "Password")),
       h("div", { class: "grid3 wide" }, h("div", { class: "field" }, h("label", null, "New password (4+ characters)"), p1), h("div", { class: "field" }, h("label", null, "Repeat it"), p2)),

@@ -330,6 +330,17 @@ ol.steps { list-style: none; margin: 0 0 14px 16px; padding: 0 0 0 20px; border-
 .hwstep.current .stepbody { animation: viewin .25s ease-out; }
 .qgroup h3 { margin: 14px 0 4px; font: 600 16px var(--f-display); } .qgroup ol { margin: 0; padding-left: 22px; } .qgroup li { margin: 5px 0; }
 .hwtext mark { background: var(--turq-soft); color: var(--text); padding: 0 2px; border-radius: 3px; }
+/* teacher mode, Tell Claude: where the request has got to */
+.tellstatus:empty { display: none; }
+.tellstatus { margin-top: 16px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.tellstatus .t { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.tellstatus .s { margin-top: 6px; font-size: 15px; line-height: 1.45; color: var(--text-2); white-space: pre-line; }
+.tellstatus[data-state="published"] { border-color: var(--ok); }
+.tellstatus[data-state="published"] .t { color: var(--ok); }
+.tellstatus[data-state="failed"] .t { color: var(--danger); }
+.tellstatus .dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: tellpulse 1.2s ease-in-out infinite; }
+@keyframes tellpulse { 50% { opacity: .25; } }
+@media (prefers-reduced-motion: reduce) { .tellstatus .dot { animation: none; } }
 .thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; margin-top: 10px; }
 .thumb { position: relative; aspect-ratio: 3 / 4; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); background: var(--surface-2); }
 .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }

@@ -1,9 +1,10 @@
 // The teacher's command-line tool (used by Claude when Dexter sends homework in chat, or by hand). Needs a logged-in `gh`.
 //   node tools/teacher/publish.mjs homework file.json     validate, scramble and publish one day's homework
+//   node tools/teacher/publish.mjs check file.json        validate only (what Claude runs before the watcher publishes)
 //   node tools/teacher/publish.mjs config file.json       publish class settings: { student, teacher, lessonTime, lessonLink, music: [{title, artist, url, note}] }
 //   node tools/teacher/publish.mjs password [new]         set or change the teacher password
 //   node tools/teacher/publish.mjs show 2026-10-15        print what is published for a day
-//   node tools/teacher/publish.mjs requests               print the notes the teacher saved in "Tell Claude", then clear them
+//   node tools/teacher/publish.mjs requests               list the "Send to Claude" requests waiting in the feed (the watcher handles them)
 //   node tools/teacher/publish.mjs remove 2026-10-15      unpublish a day
 //   node tools/teacher/publish.mjs list                   list the published days
 // Everything published is scrambled with the app's feed key (app/js/feedkey.js). The feed lives in iamdexterdude/8.5-feed.
@@ -42,9 +43,20 @@ function pepper() {
 const hashPassword = (password) => { const salt = randomBytes(16).toString("base64"), iter = 600000; return { alg: "pbkdf2-sha256", iter, salt, hash: pbkdf2Sync(pepper() + ":" + password, Buffer.from(salt, "base64"), iter, 32, "sha256").toString("base64") }; };
 
 const [cmd, arg] = process.argv.slice(2);
-if (cmd === "homework") {
-  const hw = JSON.parse(readFileSync(arg, "utf8")); hw.v ||= 1; hw.publishedAt = new Date().toISOString();
+// fill what the app needs but a person (or Claude) may leave out: ids, upload labels, deck names
+function prepare(hw) {
+  hw.v ||= 1;
   for (const t of hw.tasks || []) { t.id ||= "t" + Math.random().toString(36).slice(2, 8); for (const s of t.steps || []) { s.id ||= "s" + Math.random().toString(36).slice(2, 8); if ((s.type === "photos" || s.type === "record") && !s.label) s.label = s.title; if (s.type === "words" && !s.deck) s.deck = s.title; } }
+  return hw;
+}
+const readJson = (f) => { try { return JSON.parse(readFileSync(f, "utf8")); } catch (e) { console.error(`Cannot read ${f}: ${e.message}`); process.exit(1); } };
+
+if (cmd === "check") {
+  const errs = validateHomework(prepare(readJson(arg)));
+  if (errs.length) { console.error("Problems:\n - " + errs.join("\n - ")); process.exit(1); }
+  console.log("OK");
+} else if (cmd === "homework") {
+  const hw = prepare(readJson(arg)); hw.publishedAt = new Date().toISOString();
   const errs = validateHomework(hw); if (errs.length) { console.error("Not published:\n - " + errs.join("\n - ")); process.exit(1); }
   await put(`hw/${hw.date}.json`, hw, `Homework for ${hw.date}`);
   console.log(`published homework for ${hw.date}: ${hw.tasks.length} tasks, ${hw.tasks.reduce((a, t) => a + t.steps.length, 0)} steps`);
@@ -60,14 +72,10 @@ if (cmd === "homework") {
   let files = []; try { files = gh([`repos/${OWNER}/${REPO}/contents/hw?ref=${BRANCH}`]).map((f) => f.name.replace(/\.json$/, "")); } catch {}
   console.log(files.length ? files.sort().join("\n") : "nothing published yet");
 } else if (cmd === "requests") {
-  let files = []; try { files = gh([`repos/${OWNER}/${REPO}/contents/requests?ref=${BRANCH}`]); } catch {}
-  if (!files.length) console.log("no saved notes");
-  for (const f of files) {
-    const v = await fetchDec(`requests/${f.name}`); console.log(`\n=== ${f.name} (${v?.savedAt || ""}) for ${v?.date || "?"} ===\n${v?.text || ""}`);
-    if (process.argv.includes("--keep")) continue;
-    gh([`repos/${OWNER}/${REPO}/contents/requests/${f.name}`, "-X", "DELETE", "--input", "-"], JSON.stringify({ message: "Read " + f.name, sha: f.sha, branch: BRANCH }));
-  }
+  let files = []; try { files = gh([`repos/${OWNER}/${REPO}/git/trees/${BRANCH}?recursive=1`]).tree.map((f) => f.path).filter((p) => /^requests\/[^/]+\/request\.json$/.test(p)); } catch {}
+  if (!files.length) console.log("no requests waiting");
+  for (const f of files) { const v = await fetchDec(f); console.log(`\n=== ${f} (sent ${v?.sentAt || "?"}) for ${v?.date || "?"}, ${v?.files?.length || 0} files ===\n${v?.text || ""}`); }
 } else if (cmd === "remove") {
   const f = gh([`repos/${OWNER}/${REPO}/contents/hw/${arg}.json?ref=${BRANCH}`]);
   gh([`repos/${OWNER}/${REPO}/contents/hw/${arg}.json`, "-X", "DELETE", "--input", "-"], JSON.stringify({ message: "Remove " + arg, sha: f.sha, branch: BRANCH })); console.log("removed", arg);
-} else console.log("usage: homework <file> | config <file> | password [new] | show <date> | list | requests [--keep] | remove <date>");
+} else console.log("usage: homework <file> | check <file> | config <file> | password [new] | show <date> | list | requests | remove <date>");
