@@ -1,4 +1,5 @@
 // Boot, routing and the navigation shell.
+window.__booting = Date.now();   // the watchdog in index.html gives a slow first load more time once the modules have started arriving
 import * as store from "./store.js";
 import { h, icon, clear, todayISO } from "./util.js";
 import * as hwm from "./homework.js";

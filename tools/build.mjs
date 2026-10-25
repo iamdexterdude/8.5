@@ -22,6 +22,26 @@ if (priv) {
   writeFileSync(idx, readFileSync(idx, "utf8").replace("</head>", '  <meta name="eight-pack" content="course-pack.json">\n</head>'));
 }
 
+// preload the first screen's module chain, so a first visit over a slow connection fetches it in parallel instead of one level at a time
+{
+  const seen = new Set(), queue = ["js/main.js", "js/views/today.js", "js/srs.js", "js/views/welcome.js"];
+  while (queue.length) {
+    const f = queue.shift(); if (seen.has(f)) continue;
+    const p = join(out, f); if (!existsSync(p)) continue;
+    seen.add(f);
+    const src = readFileSync(p, "utf8");
+    for (const m of src.matchAll(/(?:^|\n)\s*import[^"'\n]*?from\s*["'](\.[^"']+)["']|(?:^|\n)\s*import\s*["'](\.[^"']+)["']/g)) {
+      const rel = m[1] || m[2]; const dir = f.split("/").slice(0, -1).join("/");
+      const parts = (dir ? dir + "/" : "").concat(rel).split("/"), outp = [];
+      for (const s of parts) { if (s === "..") outp.pop(); else if (s !== ".") outp.push(s); }
+      queue.push(outp.join("/"));
+    }
+  }
+  const links = [...seen].map((f) => `  <link rel="modulepreload" href="${f}">`).concat(['  <link rel="preload" href="data/config.json" as="fetch" crossorigin="anonymous">', '  <link rel="preload" href="data/daily.json" as="fetch" crossorigin="anonymous">']);
+  const idx = join(out, "index.html");
+  writeFileSync(idx, readFileSync(idx, "utf8").replace("</head>", links.join("\n") + "\n</head>"));
+}
+
 // list every file for the service worker to cache, then stamp the version
 const files = [];
 (function walk(d) { for (const f of readdirSync(d)) { const p = join(d, f); if (statSync(p).isDirectory()) walk(p); else files.push(relative(out, p).replaceAll("\\", "/")); } })(out);
