@@ -1,23 +1,22 @@
 // Boot, routing and the navigation shell.
 import * as store from "./store.js";
-import { h, icon, clear } from "./util.js";
+import { h, icon, clear, todayISO } from "./util.js";
 import * as hwm from "./homework.js";
 import * as dbm from "./db.js";
 
 const TABS = [
   { id: "today", label: "Today", href: "#/today", icon: "today" },
-  { id: "plan", label: "Plan", href: "#/plan", icon: "plan" },
-  { id: "practice", label: "Practice", href: "#/practice", icon: "practice" },
-  { id: "review", label: "Review", href: "#/review", icon: "review" },
+  { id: "homework", label: "Homework", href: "#/homework", icon: "homework" },
+  { id: "mock", label: "Mock", href: "#/mock", icon: "mock" },
+  { id: "anki", label: "Anki", href: "#/anki", icon: "anki" },
   { id: "progress", label: "Progress", href: "#/progress", icon: "progress" },
 ];
 // route head -> [module file, tab that stays highlighted]
 const ROUTES = {
-  today: ["today", "today"], plan: ["plan", "plan"], lesson: ["lesson", "plan"],
-  practice: ["practice", "practice"], write: ["write", "practice"], speak: ["speak", "practice"], read: ["readlog", "practice"], timer: ["timer", "practice"], session: ["session", "today"],
-  model: ["model", "today"], review: ["review", "review"], errors: ["errors", "review"],
-  progress: ["progress", "progress"], settings: ["settings", "today"], watch: ["watch", "today"], admin: ["admin", "today"],
+  today: ["today", "today"], homework: ["homework", "homework"], mock: ["mock", "mock"], exam: ["exam", "mock"],
+  anki: ["anki", "anki"], progress: ["progress", "progress"], settings: ["settings", "today"], admin: ["admin", "today"],
 };
+const FULLSCREEN = new Set(["exam"]);   // routes that take the whole screen, no tab bar
 
 const viewEl = document.getElementById("view");
 const nav = document.querySelector(".nav");
@@ -25,7 +24,7 @@ let current = { cleanup: [], key: "" };
 let renderToken = 0;
 
 function buildNav() {
-  for (const t of TABS) nav.append(h("a", { href: t.href, dataset: { tab: t.id } }, icon(t.icon), h("span", null, t.label)));
+  for (const t of TABS) nav.append(h("a", { href: t.href, dataset: { tab: t.id }, "aria-label": t.label }, h("span", { class: "ic" }, icon(t.icon)), h("span", { class: "lb" }, t.label)));
 }
 function setActiveTab(id) {
   nav.querySelectorAll("a").forEach((a) => (a.dataset.tab === id ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current")));
@@ -39,6 +38,7 @@ export function parseHash() {
 }
 export const go = (hash) => { location.hash = hash; };
 
+let lastRoute = "";
 async function render({ keepScroll = false } = {}) {
   const token = ++renderToken;
   const r = parseHash();
@@ -52,9 +52,23 @@ async function render({ keepScroll = false } = {}) {
     const ctx = { ...r, onLeave: (fn) => current.cleanup.push(fn), rerender: () => render({ keepScroll: true }) };
     const node = await mod.default(ctx);
     if (token !== renderToken) return;
-    clear(viewEl).append(node);
-    setActiveTab(tab);
-    window.scrollTo(0, y);
+    const swap = () => {
+      if (token !== renderToken) return;   // a newer render has already drawn the screen: never put an older one on top of it
+      document.body.classList.toggle("fullscreen-route", FULLSCREEN.has(r.name));
+      clear(viewEl).append(node);
+      setActiveTab(tab);
+      window.scrollTo(0, y);
+    };
+    // a smooth crossfade between screens where the browser supports it; a plain swap when she is only refreshing the same screen
+    if (!keepScroll && lastRoute !== r.name && document.startViewTransition && !document.hidden && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      viewEl.dataset.dir = TABS.findIndex((t) => t.id === tab) >= TABS.findIndex((t) => t.id === (ROUTES[lastRoute]?.[1] || "today")) ? "fwd" : "back";
+      // the crossfade needs the browser to paint; if it does not (a hidden tab, a page in the background), draw the screen anyway
+      let drawn = false;
+      const t = document.startViewTransition(() => { drawn = true; swap(); });
+      t.ready?.catch?.(() => {}); t.updateCallbackDone?.catch?.(() => {}); t.finished?.catch?.(() => {});
+      setTimeout(() => { if (!drawn) { drawn = true; swap(); try { t.skipTransition(); } catch {} } }, 400);
+    } else swap();
+    lastRoute = r.name;
     if (!keepScroll) { document.title = "8.5"; viewEl.focus({ preventScroll: true }); }
   } catch (e) {
     console.error(e);
@@ -65,8 +79,7 @@ async function render({ keepScroll = false } = {}) {
 let rerenderTimer;
 store.onChange(() => {
   if (!current.live) return;
-  // don't rebuild a view while she is typing or recording inside it
-  if (store.S.busy > 0) return;                    // she is recording: leave the screen alone
+  if (store.S.busy > 0) return;                    // she is recording or in an exam: leave the screen alone
   const a = document.activeElement;
   if (a && (a.tagName === "TEXTAREA" || (a.tagName === "INPUT" && a.type === "text"))) return;
   clearTimeout(rerenderTimer); rerenderTimer = setTimeout(() => render({ keepScroll: true }), 30);
@@ -79,17 +92,28 @@ function applyTheme() {
 }
 store.onChange(applyTheme);
 
+// the Homework tab gives a small nudge now and then while something is waiting for her
+function nudgeLoop() {
+  const a = nav.querySelector('a[data-tab="homework"]');
+  const tick = () => {
+    const t = todayISO(), hw = hwm.homeworkFor(t);
+    const pending = hw && !hwm.dayProgress(t, hw).complete && parseHash().name !== "homework";
+    a.classList.toggle("pending", !!pending);
+    if (pending && !document.hidden) { a.classList.remove("nudge"); void a.offsetWidth; a.classList.add("nudge"); }
+  };
+  tick(); setInterval(tick, 40000); store.onChange(tick);
+}
+
 window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); window.__installPrompt = e; });
 
 function serviceWorker() {
   if (!("serviceWorker" in navigator) || location.protocol === "file:") return;
   const hadController = !!navigator.serviceWorker.controller;
-  // when a new version takes over, reload once so the page and its scripts are all the same version
   navigator.serviceWorker.addEventListener("controllerchange", () => { if (hadController && !sessionStorage.getItem("eight-updated")) { sessionStorage.setItem("eight-updated", "1"); location.reload(); } });
   navigator.serviceWorker.register("sw.js", { updateViaCache: "none" }).then((r) => {
     const check = () => r.update().catch(() => {});
     check();
-    document.addEventListener("visibilitychange", () => { if (!document.hidden) check(); });   // a new deploy is picked up when she comes back to the app
+    document.addEventListener("visibilitychange", () => { if (!document.hidden) check(); });
   }).catch(() => {});
 }
 
@@ -97,15 +121,14 @@ async function boot() {
   buildNav();
   await store.load();
   await hwm.init();
-  // if a database opens late, read it again so nothing she did before is missing from the screen
   dbm.onReady(async () => { try { await store.load(); store.changed(); } catch {} });
   applyTheme();
   serviceWorker();
   window.addEventListener("hashchange", () => render());
   document.addEventListener("hw-rerender", () => render({ keepScroll: true }));
-  document.addEventListener("visibilitychange", () => { if (!document.hidden && parseHash().name === "today") hwm.refresh(undefined, { force: true }); });
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) hwm.refresh(undefined, { force: true }); });
+  nudgeLoop();
   if (!store.S.kv.welcomed && !new URLSearchParams(location.search).has("nowelcome")) {
-    // the first time only: learn her name from the class settings (quickly), so there is nothing to type
     if (!store.setting("name") && navigator.onLine) await hwm.refresh(undefined, { force: true, timeout: 4000 }).catch(() => {});
     const { runWelcome } = await import("./views/welcome.js");
     await render();
