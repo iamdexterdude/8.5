@@ -3,7 +3,7 @@
 //  - install: fetch every file of this version fresh (bypassing the browser's HTTP cache) into a cache named for the version
 //  - fetch: the saved copy first (instant, works offline); anything not in the list goes to the network
 //  - a new version installs in the background when the page checks for updates, takes over at once, and the page reloads once
-const VERSION = "202610251812";
+const VERSION = "202610251825";
 const ASSETS = ["./","css/app.css","data/config.json","data/daily.json","data/plan.json","data/speaking-bank.json","fonts/display.woff2","fonts/text.woff2","icons/apple-touch-icon.png","icons/favicon-32.png","icons/icon-192.png","icons/icon-512.png","icons/icon.svg","icons/maskable-512.png","index.html","js/bands.js","js/checkin.js","js/crypto.js","js/daily.js","js/db.js","js/feedkey.js","js/homework.js","js/main.js","js/mocks.js","js/pdf.js","js/publish.js","js/pulse.js","js/srs.js","js/store.js","js/ui.js","js/util.js","js/validate.js","js/views/admin.js","js/views/anki.js","js/views/daily.js","js/views/exam.js","js/views/finish.js","js/views/homework.js","js/views/hwsteps.js","js/views/hwview.js","js/views/mock.js","js/views/progress.js","js/views/settings.js","js/views/today.js","js/views/welcome.js","manifest.webmanifest","vendor/ts-fsrs.mjs"];
 const CACHE = "eight-" + VERSION;
 

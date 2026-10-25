@@ -136,12 +136,33 @@ async function boot() {
     if (!store.setting("name") && navigator.onLine) await hwm.refresh(undefined, { force: true, timeout: 4000 }).catch(() => {});
     const { runWelcome } = await import("./views/welcome.js");
     await render();
+    await hideSplash();
     await runWelcome({ name: hwm.studentName() });
     return;
   }
-  render();
+  await render();
+  hideSplash();
+}
+
+// the opening screen folds into the dot of 8.5 once the first screen is drawn and the mark has had its moment
+export function hideSplash() {
+  const s = document.getElementById("splash");
+  if (!s || s.dataset.gone) return Promise.resolve();
+  s.dataset.gone = "1";
+  const start = window.__splash?.start || Date.now(), min = matchMedia("(prefers-reduced-motion: reduce)").matches ? 600 : 2000;
+  return new Promise((res) => {
+    const go = () => {
+      const r = s.querySelector(".dot")?.getBoundingClientRect();
+      s.style.setProperty("--x", `${r ? r.left + r.width / 2 : innerWidth / 2}px`); s.style.setProperty("--y", `${r ? r.top + r.height / 2 : innerHeight / 2}px`);
+      void s.offsetWidth;   // settle the start of the fold before it begins (no animation frame needed: a hidden tab has none)
+      s.classList.add("out");
+      setTimeout(() => { if (s.isConnected) { s.remove(); res(); } }, 850);
+    };
+    const tick = setInterval(() => { if (window.__splash?.skip || Date.now() - start >= min) { clearInterval(tick); go(); } }, 50);
+  });
 }
 boot().catch((e) => {
+  document.getElementById("splash")?.remove();
   console.error(e);
   clear(viewEl).append(h("div", { class: "empty" }, h("h1", null, "8.5 could not start"), h("p", null, "Refresh the app. Everything you saved stays on this device."), h("pre", { class: "tiny faint" }, String(e && e.message)),
     h("button", { class: "btn primary", onclick: async () => { try { for (const k of await caches.keys()) await caches.delete(k); for (const r of await navigator.serviceWorker.getRegistrations()) await r.unregister(); } catch {} location.replace(location.pathname + "?r=" + Date.now() + "#/today"); } }, "Refresh the app")));

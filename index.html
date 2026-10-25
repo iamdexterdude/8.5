@@ -21,8 +21,95 @@
     // Apply the saved theme before first paint so there is no flash
     try { var t = localStorage.getItem("eight-theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}
   </script>
+  <style>
+    /* The opening: the 8.5 mark draws itself in light, a line of encouragement, then the screen folds into the dot.
+       Inline so it is the very first thing painted, before any module has loaded. */
+    #splash { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; background: #0B1120; color: #F4F1E8; overflow: hidden; -webkit-user-select: none; user-select: none; touch-action: manipulation;
+      clip-path: circle(150% at var(--x, 50%) var(--y, 50%)); transition: clip-path .75s cubic-bezier(.7, 0, .25, 1), opacity .5s; }
+    #splash.out { clip-path: circle(0% at var(--x, 50%) var(--y, 50%)); }
+    #splash .glow { position: absolute; inset: -30%; pointer-events: none; opacity: .9;
+      background: radial-gradient(42% 38% at 30% 35%, rgba(43, 79, 208, .55), transparent 65%), radial-gradient(38% 34% at 72% 62%, rgba(62, 207, 200, .40), transparent 65%), radial-gradient(30% 28% at 55% 20%, rgba(229, 180, 80, .22), transparent 65%);
+      animation: sp-aurora 9s ease-in-out infinite alternate; }
+    #splash .ikat { position: absolute; inset: -20%; width: 140%; height: 140%; opacity: .11; mix-blend-mode: screen; animation: sp-drift 40s linear infinite alternate; -webkit-mask-image: radial-gradient(60% 60% at 50% 50%, #000 20%, transparent 100%); mask-image: radial-gradient(60% 60% at 50% 50%, #000 20%, transparent 100%); }
+    #splash .stage { position: relative; z-index: 2; display: grid; justify-items: center; gap: 26px; padding: 24px; width: min(86vw, 440px); }
+    #splash svg.mark { width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 0 18px rgba(62, 207, 200, .35)) drop-shadow(0 0 2px rgba(255, 255, 255, .25)); animation: sp-breathe 3.6s ease-in-out 1.9s infinite; }
+    #splash .s { fill: none; stroke: url(#sp-g); stroke-width: 15; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: sp-draw .85s cubic-bezier(.55, 0, .15, 1) forwards; }
+    #splash .s1 { animation-delay: .12s; } #splash .s2 { animation-delay: .36s; } #splash .s3 { animation-delay: .62s; }
+    #splash .gl { fill: none; stroke: #fff; stroke-width: 15; stroke-linecap: round; stroke-dasharray: .07 1; stroke-dashoffset: 1.07; opacity: 0; animation: sp-glint 5.5s cubic-bezier(.4, 0, .2, 1) 1.35s infinite; }
+    #splash .dot { fill: #E5B450; filter: drop-shadow(0 0 10px rgba(229, 180, 80, .8)); }
+    #splash .dotg { transform-box: view-box; transform-origin: 135px 152px; transform: scale(0); animation: sp-pop .6s cubic-bezier(.3, 1.6, .4, 1) 1.12s forwards; }
+    #splash.out .dotg { animation: sp-flare .7s ease-in forwards; }
+    #splash .line { margin: 0; text-align: center; font: 500 clamp(17px, 4.6vw, 21px)/1.35 var(--f-display, system-ui, sans-serif); color: #C9D1E3; letter-spacing: -0.005em; opacity: 0; transform: translateY(10px); animation: sp-rise .9s cubic-bezier(.2, .7, .2, 1) 1.05s forwards; max-width: 34ch; }
+    #splash .line b { color: #fff; font-weight: 600; }
+    #splash .bar { position: absolute; bottom: max(34px, env(safe-area-inset-bottom)); left: 50%; width: 120px; height: 2px; margin-left: -60px; border-radius: 2px; background: rgba(255, 255, 255, .12); overflow: hidden; }
+    #splash .bar i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, #8FAEFF, #3ECFC8, #E5B450); transform: scaleX(0); transform-origin: left; animation: sp-fill 1.7s cubic-bezier(.3, .6, .3, 1) .2s forwards; }
+    #splash.out .bar i { transform: scaleX(1); transition: transform .25s; }
+    #splash .hint { position: absolute; bottom: max(14px, calc(env(safe-area-inset-bottom) - 2px)); left: 0; right: 0; text-align: center; font: 500 11px/1 var(--f-display, system-ui, sans-serif); letter-spacing: .14em; text-transform: uppercase; color: rgba(201, 209, 227, .45); opacity: 0; animation: sp-rise 1s ease 2.4s forwards; }
+    @keyframes sp-draw { to { stroke-dashoffset: 0; } }
+    @keyframes sp-glint { 0% { opacity: 0; stroke-dashoffset: 1.07; } 4% { opacity: .95; } 30% { opacity: .95; stroke-dashoffset: -.07; } 31%, 100% { opacity: 0; stroke-dashoffset: -.07; } }
+    @keyframes sp-pop { 0% { transform: scale(0); } 60% { transform: scale(1.35); } 100% { transform: scale(1); } }
+    @keyframes sp-flare { to { transform: scale(2.6); opacity: 0; } }
+    @keyframes sp-rise { to { opacity: 1; transform: none; } }
+    @keyframes sp-fill { to { transform: scaleX(.86); } }
+    @keyframes sp-breathe { 50% { transform: scale(1.025); filter: drop-shadow(0 0 26px rgba(62, 207, 200, .5)) drop-shadow(0 0 2px rgba(255, 255, 255, .35)); } }
+    @keyframes sp-aurora { to { transform: translate3d(4%, -3%, 0) rotate(3deg) scale(1.08); } }
+    @keyframes sp-drift { to { transform: translate3d(-4%, 3%, 0); } }
+    @media (prefers-reduced-motion: reduce) {
+      #splash .s { stroke-dashoffset: 0; animation: none; } #splash .gl, #splash .glow, #splash .ikat { animation: none; } #splash .gl { display: none; }
+      #splash .dotg { transform: none; animation: none; } #splash svg.mark { animation: none; } #splash .line, #splash .hint { animation: sp-rise .4s ease forwards; }
+      #splash { transition: opacity .4s; } #splash.out { clip-path: none; opacity: 0; }
+    }
+  </style>
 </head>
 <body>
+  <div id="splash" role="status" aria-label="8.5 is opening">
+    <div class="glow"></div>
+    <svg class="ikat" viewBox="0 0 720 720" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <defs><pattern id="sp-ik" width="80" height="80" patternUnits="userSpaceOnUse">
+        <g fill="#8FAEFF" opacity=".55"><rect x="36" y="8" width="8" height="8"/><rect x="28" y="16" width="24" height="8"/><rect x="20" y="24" width="40" height="8"/><rect x="12" y="32" width="56" height="8"/><rect x="4" y="40" width="72" height="8"/><rect x="12" y="48" width="56" height="8"/><rect x="20" y="56" width="40" height="8"/><rect x="28" y="64" width="24" height="8"/><rect x="36" y="72" width="8" height="8"/></g>
+        <g fill="#3ECFC8" opacity=".7"><rect x="36" y="24" width="8" height="8"/><rect x="28" y="32" width="24" height="8"/><rect x="20" y="40" width="40" height="8"/><rect x="28" y="48" width="24" height="8"/><rect x="36" y="56" width="8" height="8"/></g>
+        <rect x="36" y="40" width="8" height="8" fill="#F4F1E8" opacity=".8"/>
+        <g fill="#3ECFC8" opacity=".3"><rect x="-4" y="0" width="8" height="8"/><rect x="76" y="0" width="8" height="8"/><rect x="-4" y="72" width="8" height="8"/><rect x="76" y="72" width="8" height="8"/></g>
+      </pattern></defs>
+      <rect width="720" height="720" fill="url(#sp-ik)"/>
+    </svg>
+    <div class="stage">
+      <svg class="mark" viewBox="0 0 320 176" aria-hidden="true">
+        <defs><linearGradient id="sp-g" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8FAEFF"/><stop offset=".55" stop-color="#3ECFC8"/><stop offset="1" stop-color="#E5B450"/></linearGradient></defs>
+        <circle class="s s1" cx="72" cy="52" r="31" pathLength="1"/>
+        <circle class="s s2" cx="72" cy="119" r="39" pathLength="1"/>
+        <path class="s s3" d="M246 22 H178 L170 86 C 202 64, 264 72, 264 120 C 264 160, 208 170, 171 144" pathLength="1"/>
+        <circle class="gl" cx="72" cy="52" r="31" pathLength="1"/>
+        <circle class="gl" cx="72" cy="119" r="39" pathLength="1" style="animation-delay:1.55s"/>
+        <path class="gl" d="M246 22 H178 L170 86 C 202 64, 264 72, 264 120 C 264 160, 208 170, 171 144" pathLength="1" style="animation-delay:1.8s"/>
+        <g class="dotg"><circle class="dot" cx="135" cy="152" r="10"/></g>
+      </svg>
+      <p class="line" id="sp-line"></p>
+    </div>
+    <div class="bar"><i></i></div>
+    <div class="hint">Tap to continue</div>
+  </div>
+  <script>
+    // The opening's line of encouragement, chosen by the day and the time; the mark is CSS, the exit is in main.js.
+    (function () {
+      var S = window.__splash = { start: Date.now(), skip: false };
+      var name = ""; try { name = (JSON.parse(localStorage.getItem("eight-kv") || "{}").name || "").trim(); } catch (e) {}
+      var lines = [
+        "One more step to the goal.", "Every word you keep is a point.", "Band 8.5 is a habit, not a day.", "Small, daily, done.", "You are closer than yesterday.",
+        "Fluency is only familiarity.", "Read something. Say something. Keep something.", "The hard part was opening this. Done.", "Ten minutes now is an hour later.",
+        "Mistakes are the lesson, not the verdict.", "Listening is the cheapest band to raise.", "Speak before you feel ready.", "Your English is better than your nerves say.",
+        "One deck, one day, one band at a time.", "The test is 2 hours 45 minutes. Today is 15.", "Three good habits in a row make an 8.5.", "Nobody is watching. Practise anyway.",
+        "Accuracy is attention, and attention is free.", "The next word is the only one that matters.", "Back again. That is the whole secret."
+      ];
+      var d = new Date(), n = (d.getFullYear() * 366 + d.getMonth() * 31 + d.getDate()) + Math.floor(d.getHours() / 8);
+      var text = lines[n % lines.length];
+      var el = document.getElementById("sp-line");
+      if (name && n % 3 === 0) { el.innerHTML = ""; var b = document.createElement("b"); b.textContent = name + ", "; el.appendChild(b); el.appendChild(document.createTextNode(text.charAt(0).toLowerCase() + text.slice(1))); }
+      else el.textContent = text;
+      var sp = document.getElementById("splash");
+      sp.addEventListener("pointerdown", function () { if (Date.now() - S.start > 900) S.skip = true; });
+    })();
+  </script>
   <div id="app">
     <nav class="nav" aria-label="Main">
       <div class="brand" aria-hidden="true">8.5</div>
@@ -40,6 +127,7 @@
       setTimeout(function () {
         var v = document.getElementById("view");
         if (!v || v.children.length) return;
+        var sp = document.getElementById("splash"); if (sp) sp.remove();
         v.innerHTML = '<div class="empty"><h1>8.5 is taking too long</h1><p>Refresh the app. Everything you saved stays on this device.</p><p><button class="btn primary" id="wd-refresh">Refresh the app</button></p><p class="tiny faint" id="wd"></p></div>';
         document.getElementById("wd").textContent = last ? "Detail: " + last : "";
         document.getElementById("wd-refresh").onclick = async function () {
