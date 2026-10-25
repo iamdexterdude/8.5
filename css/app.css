@@ -210,6 +210,60 @@ button.plain { background: none; border: 0; text-align: left; padding: 0; color:
 .pulse .row-actions { flex-wrap: wrap; align-items: center; gap: 8px; }
 .pulse .chips { display: inline-flex; gap: 8px; flex-wrap: wrap; }
 @media (prefers-reduced-motion: reduce) { .sky .ikat { animation: none; } }
+/* the daily cards: a song (a film on Sundays) and a word */
+.daily { margin-top: 22px; }
+.daily-k { font: 600 12px var(--f-display); letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); margin: 0 4px 10px; }
+.dcards { display: grid; gap: 14px; }
+@media (min-width: 760px) { .dcards { grid-template-columns: 1.15fr 1fr; align-items: start; } }
+.dcard { position: relative; overflow: hidden; padding: 18px; border-radius: 20px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); animation: rise .55s var(--soft) both; animation-delay: calc(var(--i, 0) * 90ms); }
+.dcard.song::before, .dcard.film::before { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; background: radial-gradient(70% 60% at 100% 0%, var(--accent-soft), transparent 70%); }
+.dcard.word::before { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; background: radial-gradient(60% 50% at 0% 100%, var(--gold-soft), transparent 70%); }
+.dcard > * { position: relative; z-index: 1; }
+.dc-top { display: flex; gap: 14px; align-items: center; margin-bottom: 10px; }
+.dc-head { min-width: 0; }
+.dc-k { font: 600 12px var(--f-display); letter-spacing: .08em; text-transform: uppercase; color: var(--turq); margin-bottom: 4px; }
+.dcard.word .dc-k { color: var(--warn); }
+.dcard h3 { font-size: 22px; line-height: 1.15; margin: 0; letter-spacing: -0.01em; }
+.dc-sub { margin: 2px 0 0; color: var(--text-3); font-size: 14px; }
+.dc-why { margin: 0 0 12px; color: var(--text-2); }
+.dc-ask { margin: 12px 0 6px; font-size: 15px; color: var(--text-2); }
+.dc-ask b { color: var(--text); font-weight: 600; }
+.dc-m { margin: 8px 0 4px; font-size: 17px; }
+.dc-ex { margin: 0 0 10px; color: var(--text-2); font-style: italic; }
+.dcard .chips { margin-top: 6px; }
+.chip.static { pointer-events: none; color: var(--text-3); font-weight: 500; }
+/* the record: rings, a label, a slow spin */
+.vinyl { flex: none; width: 64px; height: 64px; border-radius: 50%; position: relative; background: repeating-radial-gradient(circle at 50% 50%, #151826 0 2px, #22263a 2px 4px); box-shadow: 0 6px 18px rgba(11, 17, 32, .28), inset 0 0 0 1px rgba(255, 255, 255, .06); animation: spin 14s linear infinite; }
+.vinyl::before { content: ""; position: absolute; inset: 22px; border-radius: 50%; background: conic-gradient(from 0deg, var(--accent), var(--turq), var(--gold), var(--accent)); }
+.vinyl::after { content: ""; position: absolute; inset: 29px; border-radius: 50%; background: #151826; }
+.vinyl i { position: absolute; inset: 6px; border-radius: 50%; background: linear-gradient(135deg, rgba(255, 255, 255, .14), transparent 40%, transparent 60%, rgba(255, 255, 255, .08)); }
+.dcard.song:hover .vinyl { animation-duration: 4s; }
+@keyframes spin { to { transform: rotate(360deg); } }
+/* the film: a reel of three windows */
+.reel { flex: none; width: 64px; height: 64px; border-radius: 14px; background: linear-gradient(160deg, var(--accent), var(--turq)); position: relative; box-shadow: var(--shadow); }
+.reel::before { content: ""; position: absolute; inset: 10px 8px; background: repeating-linear-gradient(90deg, rgba(255, 255, 255, .85) 0 11px, transparent 11px 16px); border-radius: 4px; opacity: .9; }
+/* the word, set large, arriving letter by letter */
+.dword { font: 600 clamp(34px, 9vw, 46px)/1 var(--f-display); letter-spacing: -0.02em; margin: 6px 0 2px; animation: wordin .9s var(--soft) both; }
+@keyframes wordin { from { letter-spacing: .18em; opacity: 0; filter: blur(3px); } to { letter-spacing: -0.02em; opacity: 1; filter: none; } }
+/* a phrase that opens to its meaning */
+.phrase { margin-top: 8px; }
+.ph-row { display: flex; align-items: center; gap: 8px; }
+.ph { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 42px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface-2); text-align: left; font-weight: 600; color: var(--text); transition: background .2s; }
+.ph.on { background: var(--accent-soft); border-color: transparent; color: var(--accent); }
+.ph-arrow { display: inline-flex; transition: transform .25s var(--ease); color: var(--text-3); }
+.ph.on .ph-arrow { transform: rotate(90deg); color: inherit; }
+.ph-m { margin: 6px 4px 0; color: var(--text-2); font-size: 15px; animation: rise .3s var(--soft); }
+/* a line of her own */
+.dwrite { margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line); }
+.dw-k { font-size: 14px; color: var(--text-2); margin-bottom: 6px; }
+.dw-k.sent { color: var(--turq); font-weight: 600; }
+.dwrite textarea { margin-bottom: 8px; }
+.dc-pick { margin-top: 12px; font-size: 14px; }
+.dc-pick.done { color: var(--text-2); }
+.dc-pick textarea { margin: 6px 0 8px; }
+.linkbtn { background: none; border: 0; padding: 0; color: var(--accent); font-weight: 600; font-size: 14px; min-height: 32px; }
+.linkbtn:hover { text-decoration: underline; }
+@media (prefers-reduced-motion: reduce) { .vinyl, .dword, .dcard { animation: none; } }
 .week-dots i.on { background: var(--turq); } .week-dots i.now { box-shadow: 0 0 0 3px var(--accent-soft); } .week-dots i.on.now { background: var(--accent); }
 .week-k { font-size: 14px; color: var(--text-2); }
 

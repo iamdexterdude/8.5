@@ -6,6 +6,7 @@ import * as hw from "../homework.js";
 import * as ci from "../checkin.js";
 import * as pulse from "../pulse.js";
 import { ikat } from "./welcome.js";
+import { dailyBlock } from "./daily.js";
 
 export default async function (ctx) {
   const today = todayISO(), name = hw.studentName();
@@ -34,6 +35,10 @@ export default async function (ctx) {
   // ---- the next small thing: what is waiting, or something small when nothing is
   const step = await pulse.nextStep();
   if (step) root.append(h("a", { class: "step " + step.kind, href: step.href }, ikat(), h("div", { class: "step-body" }, h("div", { class: "step-k" }, step.k), h("h2", null, step.title), h("p", null, step.why)), h("span", { class: "btn primary small" }, step.btn)));
+
+  // ---- a song (a film on Sundays) and a word, each ending in English
+  const daily = await dailyBlock(ctx);
+  if (daily) root.append(daily);
 
   // ---- one observation about her days
   const obs = await pulse.noticed({ lesson, step });
