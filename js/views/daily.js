@@ -16,6 +16,20 @@ export async function dailyBlock(ctx) {
 
 const open = (href, label, cls = "btn small") => h("a", { class: cls, href, target: "_blank", rel: "noopener" }, label);
 
+// the record: the album cover turning slowly on a disc; the drawn rings when there is no cover (or until it loads)
+function disc(s) {
+  const el = h("div", { class: "vinyl", "aria-hidden": "true" }, h("i"));
+  const show = (url) => { if (!url) return; const img = new Image(); img.alt = ""; img.onload = () => { el.append(img); el.classList.add("art"); }; img.src = url; };
+  if (s.art) show(s.art); else D.artFor(s).then(show).catch(() => {});
+  return el;
+}
+// the poster, with the reel behind it until it loads
+function poster(f) {
+  const el = h("div", { class: "reel", "aria-hidden": "true" });
+  if (f.poster) { const img = new Image(); img.alt = ""; img.onload = () => { el.append(img); el.classList.add("poster"); }; img.src = f.poster; }
+  return el;
+}
+
 // a phrase that opens to its meaning, with a way into Anki
 function phrase(p, source, done, onKeep) {
   const meaning = h("div", { class: "ph-m", hidden: true }, p.m);
@@ -43,7 +57,7 @@ function write({ prompt, ph, kind, done, toAnki = null, source = "" }) {
 function songCard(s, st, ctx) {
   const src = D.sourceOf(s);
   const card = h("article", { class: "dcard song", style: { "--i": 0 } },
-    h("div", { class: "dc-top" }, h("div", { class: "vinyl", "aria-hidden": "true" }, h("i")), h("div", { class: "dc-head" }, h("div", { class: "dc-k" }, s.teacher ? "Your teacher's pick" : "Song of the day"), h("h3", null, s.title), h("p", { class: "dc-sub" }, [s.artist, s.year].filter(Boolean).join(" · ")))),
+    h("div", { class: "dc-top" }, disc(s), h("div", { class: "dc-head" }, h("div", { class: "dc-k" }, s.teacher ? "Your teacher's pick" : "Song of the day"), h("h3", null, s.title), h("p", { class: "dc-sub" }, [s.artist, s.year].filter(Boolean).join(" · ")))),
     h("p", { class: "dc-why" }, s.why),
     h("div", { class: "row-actions" }, open(D.listenLink(s), [icon("volume", 16), "Listen"], "btn small primary"), s.teacher ? null : open(D.lyricsLink(s), "Lyrics")),
     s.ask ? h("p", { class: "dc-ask" }, h("b", null, "While you listen: "), s.ask) : null,
@@ -56,7 +70,7 @@ function songCard(s, st, ctx) {
 function filmCard(f, st, ctx) {
   const src = `“${f.title}” (${f.year})`;
   return h("article", { class: "dcard film", style: { "--i": 0 } },
-    h("div", { class: "dc-top" }, h("div", { class: "reel", "aria-hidden": "true" }), h("div", { class: "dc-head" }, h("div", { class: "dc-k" }, "Film for Sunday"), h("h3", null, f.title), h("p", { class: "dc-sub" }, `${f.year} · ${f.dir}`))),
+    h("div", { class: "dc-top" }, poster(f), h("div", { class: "dc-head" }, h("div", { class: "dc-k" }, "Film for Sunday"), h("h3", null, f.title), h("p", { class: "dc-sub" }, `${f.year} · ${f.dir}`))),
     h("p", { class: "dc-why" }, f.why),
     h("div", { class: "row-actions" }, open(D.trailerLink(f), [icon("volume", 16), "Trailer"], "btn small primary"), open(D.watchLink(f), "Where to watch")),
     f.listen ? h("div", null, h("p", { class: "dc-ask" }, h("b", null, "Listen for: ")), phrase(f.listen, src, st.filmPhrase, () => D.mark("filmPhrase", 1))) : null,

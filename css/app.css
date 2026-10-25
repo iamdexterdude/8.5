@@ -238,6 +238,19 @@ button.plain { background: none; border: 0; text-align: left; padding: 0; color:
 .vinyl::after { content: ""; position: absolute; inset: 29px; border-radius: 50%; background: #151826; }
 .vinyl i { position: absolute; inset: 6px; border-radius: 50%; background: linear-gradient(135deg, rgba(255, 255, 255, .14), transparent 40%, transparent 60%, rgba(255, 255, 255, .08)); }
 .dcard.song:hover .vinyl { animation-duration: 4s; }
+/* the album cover on the disc: the picture fills the record, a dark rim, a centre hole, a soft sheen */
+.vinyl img { position: absolute; inset: 3px; width: calc(100% - 6px); height: calc(100% - 6px); border-radius: 50%; object-fit: cover; animation: fadein .5s ease both; }
+.vinyl.art::before { inset: 26px; background: #151826; box-shadow: 0 0 0 2px rgba(255, 255, 255, .25); z-index: 2; }
+.vinyl.art::after { inset: 29px; background: #0B1120; z-index: 2; }
+.vinyl.art i { z-index: 2; background: linear-gradient(135deg, rgba(255, 255, 255, .22), transparent 38%, transparent 62%, rgba(255, 255, 255, .1)); inset: 3px; }
+.vinyl.art { width: 72px; height: 72px; }
+@keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+/* the poster: the official cover, standing in for the reel once it has loaded */
+.reel { overflow: hidden; }
+.reel img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; animation: fadein .5s ease both; }
+.reel.poster { width: 64px; height: 92px; border-radius: 10px; background: #151826; }
+.reel.poster::before { display: none; }
+.dcard.film:hover .reel.poster { transform: rotate(-2deg) scale(1.03); transition: transform .3s var(--soft); }
 @keyframes spin { to { transform: rotate(360deg); } }
 /* the film: a reel of three windows */
 .reel { flex: none; width: 64px; height: 64px; border-radius: 14px; background: linear-gradient(160deg, var(--accent), var(--turq)); position: relative; box-shadow: var(--shadow); }
