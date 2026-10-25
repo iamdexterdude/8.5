@@ -82,9 +82,6 @@ export function makeTimer(seconds, { onTick, onEnd } = {}) {
   };
 }
 
-const SK = { course: "Course homework", speak: "Speak", write: "Write", read: "Read", fix: "Fix", listen: "Listen", homework: "Homework", lesson: "Lesson", other: "Other" };
-export const skillName = (b) => SK[b] || b;
-
 // beeps from WebAudio, so a finished timer is heard even with the screen dim
 export function chime() {
   try {
@@ -93,19 +90,6 @@ export function chime() {
     o.frequency.value = 660; g.gain.setValueAtTime(.001, ac.currentTime); g.gain.exponentialRampToValueAtTime(.25, ac.currentTime + .02); g.gain.exponentialRampToValueAtTime(.001, ac.currentTime + .6);
     o.start(); o.stop(ac.currentTime + .65);
   } catch {}
-}
-
-// A task row: tick that draws itself, text, minutes, Start. `go` is the route that opens the right tool.
-export function taskRow(t, { onToggle, startHref, startLabel = "Start", sub, evidence }) {
-  const done = store.isDone(t.key);
-  const box = h("button", { class: "check" + (evidence && !done ? " locked" : ""), role: "checkbox", "aria-checked": String(done),
-    "aria-label": (done ? "Mark not done: " : "Mark done: ") + t.text, onclick: () => onToggle?.(t) },
-    h("span", { class: "box" }, (() => { const s = document.createElementNS("http://www.w3.org/2000/svg", "svg"); s.setAttribute("viewBox", "0 0 24 24"); const p = document.createElementNS("http://www.w3.org/2000/svg", "path"); p.setAttribute("d", "M5 12.5l4.5 4.5L19 7.5"); s.append(p); return s; })()));
-  return h("li", null, h("div", { class: "row" + (done ? " done" : "") }, box,
-    h("div", { class: "grow" }, h("div", { class: "title" }, t.text),
-      h("div", { class: "sub" }, [t.minutes ? h("span", null, `${t.minutes} min`) : null, sub ? h("span", { style: { marginLeft: "12px" } }, sub) : null,
-        evidence && !done ? h("span", { style: { marginLeft: "12px" } }, "Completes when you submit it") : null])),
-    startHref && !done ? h("a", { class: "btn small", href: startHref }, startLabel) : null));
 }
 
 // A row of links that look like a segmented control; the current one is marked for screen readers.

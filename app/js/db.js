@@ -27,6 +27,10 @@ const HW = { name: "eight-hw", stores: {
   hw: "date",           // her progress through each day's homework, step by step
   feed: "key",          // the last homework feed fetched (so Today works offline)
   outbox: "id",         // work waiting to be sent to the teacher
+  decks: "id",          // Anki decks (hers and the teacher's)
+  mocks: "id",          // mock exam results, with her writing and her recordings
+  checkins: "id",       // what she answered on Today
+  media: "key",         // downloaded mock audio, decoded once
 } };
 const DEFS = { main: MAIN, hw: HW };
 const STORES = { ...MAIN.stores, ...HW.stores };

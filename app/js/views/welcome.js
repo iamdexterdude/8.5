@@ -70,8 +70,8 @@ export function runWelcome({ name: known = "" } = {}) {
       };
       const seq = [
         [0, name ? `${name}.` : "Welcome.", "This was made for you."],
-        [2400, "28 days.", "Monday 12 October to Sunday 8 November."],
-        [4600, "12 lessons.", "Three a week, with the rest at your own pace."],
+        [2400, "Lessons, homework, mocks.", "All in one place, and nothing to type."],
+        [4600, "Your words, your cards.", "Anki, the way you want it."],
         [6800, "One target.", ""],
         [8400, "Band 8.5.", "Let's begin.", true],
       ];

@@ -9,9 +9,9 @@ const GH = process.env.GITHUB_TOKEN || "", TG = process.env.TG_BOT_TOKEN || "", 
 const PEPPER = process.env.TEACHER_PEPPER || "";
 const MIN_PW = 4;
 const ORIGINS = [/^https:\/\/iamdexterdude\.github\.io$/, /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/];
-const PATH_OK = /^(hw\/\d{4}-\d{2}-\d{2}\.json|config\.json|requests\/[a-z0-9-]{1,40}\/(request|part-\d{1,3})\.json)$/;
+const PATH_OK = /^(hw\/\d{4}-\d{2}-\d{2}\.json|config\.json|requests\/[a-z0-9-]{1,40}\/(request|part-\d{1,3})\.json|mocks\/index\.json|mocks\/[a-z0-9-]{2,40}\/mock\.json|results\/[a-z0-9-]{2,40}\.json|decks\/index\.json|decks\/[a-z0-9-]{2,40}\.json)$/;
 // "Send to Claude": the request and its attachments go to requests/<id>/; the watcher on the teacher's PC answers in status.json
-const READ_OK = /^requests\/[a-z0-9-]{1,40}\/status\.json$/;
+const READ_OK = /^(requests\/[a-z0-9-]{1,40}\/status\.json|students\/[a-z0-9-]{1,40}\.json)$/;
 const MAX_FILE = 3.5 * 1024 * 1024;
 
 // ---- password: salted PBKDF2 with a server-side pepper. The hash file is public (feed repo); without the pepper it is useless.
@@ -89,6 +89,12 @@ export default async function handler(req, res) {
     }
     if (op === "notify") {
       const fd = new FormData(); fd.append("chat_id", CHAT); fd.append("text", String(b.text || "").slice(0, 3000)); await tg("sendMessage", fd); return send(res, 200, { ok: true });
+    }
+    // a small picture of the student's work (Anki, mocks, homework) that Teacher mode reads back
+    if (op === "report") {
+      const id = String(b.id || "student").toLowerCase().replace(/[^a-z0-9-]+/g, "-").slice(0, 40) || "student";
+      const text = JSON.stringify(b.data || {}); if (text.length > 200000) return send(res, 413, { ok: false, error: "Report too large." });
+      await putFile(`students/${id}.json`, text, `Report: ${id}`); return send(res, 200, { ok: true });
     }
     // ---------- teacher
     if (!["login", "publish", "remove", "password", "list", "read"].includes(op)) return send(res, 400, { ok: false, error: "Unknown op." });

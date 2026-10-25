@@ -1,0 +1,72 @@
+@font-face { font-family: "Bricolage"; src: url("display.woff2") format("woff2"); font-weight: 200 800; }
+@font-face { font-family: "Instrument"; src: url("text.woff2") format("woff2"); font-weight: 400 700; }
+:root { --ink: #17202E; --ink-2: #465063; --ink-3: #6B7488; --line: #D8D4C8; --paper: #FFFFFF; --cream: #F5F3EE;
+  --cobalt: #1E3FA8; --cobalt-soft: #E1E8FB; --turq: #0A726E; --turq-soft: #D4EFEC; --amber: #8F5A00; --amber-soft: #FBEBD0;
+  --u: #1E3FA8; --d: #0A726E; --k: #8F5A00; }
+@page { size: A4; margin: 17mm 16mm 18mm 16mm; }
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { font: 10.6pt/1.5 "Instrument", "Segoe UI", sans-serif; color: var(--ink); background: var(--paper); }
+h1, h2, h3, h4 { font-family: "Bricolage", "Segoe UI", sans-serif; font-weight: 600; letter-spacing: -0.01em; line-height: 1.15; margin: 0; }
+p { margin: 0 0 6pt; orphans: 2; widows: 2; }
+b { font-weight: 700; }
+mark { padding: 0 2px; border-radius: 2px; color: inherit; }
+.hl-green { background: #CFF0C3; } .hl-orange { background: #FFE2B5; } .hl-cyan { background: #CBEFF6; } .hl-pink { background: #FFD9E6; }
+.hl-yellow { background: #FFF2A8; } .hl-chunk, .hl-red { background: #CFF0C3; } .hl-magenta { background: #F6CFEA; } .hl-blue { background: #D6E0FF; } .hl-red { background: #FFD3D0; } .hl-grey { background: #E6E6E6; }
+
+/* ---------- cover ---------- */
+.cover { height: 257mm; display: flex; flex-direction: column; justify-content: center; padding: 10mm 6mm; break-after: page; position: relative; }
+.cover-k { font: 600 22pt "Bricolage"; color: var(--ink); letter-spacing: .02em; margin: 0 0 20pt 4pt; }
+.cover h1.brand { font-size: 150pt; line-height: .9; letter-spacing: -0.06em; color: var(--cobalt); margin: 0 0 6pt; font-variant-numeric: tabular-nums; }
+.cover h1 { font-size: 46pt; line-height: 1; letter-spacing: -0.03em; color: var(--cobalt); margin-bottom: 18pt; }
+.cover-sub { font-size: 13pt; color: var(--ink-2); max-width: 120mm; line-height: 1.45; }
+.cover-weave { display: flex; gap: 6px; margin: 28pt 0 0; }
+.cover-weave i { width: 18px; height: 18px; background: var(--cobalt); transform: rotate(45deg); opacity: .9; }
+.cover-weave i:nth-child(3n) { background: var(--turq); } .cover-weave i:nth-child(5n) { background: #D9A441; }
+.cover-foot { position: absolute; bottom: 6mm; left: 6mm; font-size: 10pt; color: var(--ink-3); }
+
+/* ---------- how to, contents ---------- */
+.howto, .toc { break-after: page; }
+.howto h1, .toc h1 { font-size: 26pt; color: var(--cobalt); margin-bottom: 12pt; }
+.howto p, .howto li { font-size: 11pt; color: var(--ink-2); }
+.howto ul { padding-left: 18pt; } .howto li { margin-bottom: 5pt; }
+.toc-part { margin-bottom: 12pt; break-inside: avoid-column; }
+.toc-part h3 { font-size: 14pt; color: var(--turq); border-bottom: 1.5px solid var(--turq); padding-bottom: 3pt; margin-bottom: 4pt; display: flex; justify-content: space-between; }
+.toc ol { list-style: none; margin: 0; padding: 0; column-count: 2; column-gap: 24pt; }
+.toc li { font-size: 9.6pt; break-inside: avoid; }
+.toc li a { display: flex; align-items: baseline; gap: 4pt; color: var(--ink); text-decoration: none; padding: 1.5pt 0; }
+.toc .tt { flex: 0 1 auto; } .toc .dots { flex: 1; border-bottom: 1px dotted var(--line); min-width: 8pt; transform: translateY(-3pt); }
+.toc .pg { font-variant-numeric: tabular-nums; color: var(--ink-3); font-size: 9pt; }
+
+/* ---------- part dividers ---------- */
+.divider { break-before: page; break-after: page; height: 250mm; display: flex; flex-direction: column; justify-content: center; padding: 0 12mm; background: var(--cream); border-radius: 8pt; }
+.divider .dnum { font: 600 120pt/1 "Bricolage"; color: var(--cobalt); letter-spacing: -0.05em; }
+.divider h1 { font-size: 34pt; color: var(--ink); margin: 6pt 0 10pt; }
+.divider p { font-size: 12.5pt; color: var(--ink-2); max-width: 125mm; }
+
+/* ---------- topics ---------- */
+.topic { break-before: page; }
+.thead { display: flex; gap: 10pt; align-items: flex-start; border-bottom: 2px solid var(--cobalt); padding-bottom: 7pt; margin-bottom: 10pt; }
+.tnum { font: 600 22pt/1 "Bricolage"; color: var(--cobalt); font-variant-numeric: tabular-nums; padding-top: 3pt; }
+.thead h2 { font-size: 21pt; color: var(--ink); }
+.tsrc { font-size: 9pt; color: var(--ink-3); margin-top: 2pt; }
+.marker { font-size: 1pt; color: #fff; position: absolute; }
+.qbox { background: var(--cream); border-left: 3px solid var(--turq); padding: 7pt 10pt 4pt; margin: 0 0 12pt; break-inside: avoid; }
+.qbox-k { font: 600 8.5pt "Bricolage"; letter-spacing: .08em; text-transform: uppercase; color: var(--turq); margin-bottom: 3pt; }
+.qbox ol { margin: 0; padding-left: 16pt; column-count: 2; column-gap: 18pt; }
+.qbox li { font-size: 9.4pt; line-height: 1.35; margin-bottom: 2pt; break-inside: avoid; color: var(--ink-2); }
+
+/* ---------- units ---------- */
+.unit { margin: 0 0 14pt; padding-top: 2pt; }
+.uhead { display: flex; align-items: center; gap: 7pt; margin: 8pt 0 6pt; border-bottom: 1px solid var(--line); padding-bottom: 3pt; break-after: avoid; }
+.ufile { font: 600 9.5pt "Bricolage"; color: var(--ink-2); }
+.chip { display: inline-block; font: 600 7.5pt "Bricolage"; letter-spacing: .06em; text-transform: uppercase; padding: 1.5pt 6pt; border-radius: 99px; color: #fff; }
+.chip-U { background: var(--u); } .chip-D { background: var(--d); } .chip-K { background: var(--k); }
+.unit h4.uh { font-size: 12pt; color: var(--cobalt); margin: 9pt 0 4pt; break-after: avoid; }
+.unit p.q { font-weight: 700; color: var(--cobalt); margin: 8pt 0 3pt; break-after: avoid; }
+.unit p.q b { font-weight: 700; }
+.unit p.note { font-size: 9.6pt; color: var(--ink-2); margin: 0 0 2pt 10pt; padding-left: 7pt; border-left: 2px solid var(--turq-soft); }
+.unit p.note b { color: var(--turq); }
+.unit p.your { font-size: 9pt; color: var(--ink-3); font-style: italic; margin: 2pt 0 8pt; }
+.unit-K p { font-size: 10.3pt; }
+.howto .chip { vertical-align: middle; }

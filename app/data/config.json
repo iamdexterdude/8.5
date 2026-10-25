@@ -4,6 +4,7 @@
   "tz": "Asia/Tashkent",
   "defaults": {
     "lessonTime": "19:00",
+    "lessonDays": [1, 3, 5],
     "lessonMinutes": 90,
     "meetingLink": "",
     "newCardsPerDay": 0,
