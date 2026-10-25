@@ -25,8 +25,9 @@
   </script>
   <style>
     @font-face { font-family: "Bricolage"; src: url("fonts/display.woff2") format("woff2"); font-weight: 200 800; font-display: swap; }
-    /* The opening: the 8.5 mark draws itself in light, a line of encouragement, then the screen folds into the dot.
-       Inline so it is the very first thing painted, before any module has loaded. */
+    /* The opening, in four movements: one ring draws itself; a small ring is born inside it, pops, and rises to make the 8;
+       the 8 stands alone with a line that says it is not enough; the dot lands, the 5 draws, the line of encouragement
+       arrives; then the screen folds into the dot. Inline so it is the very first thing painted. */
     #splash { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; background: #0B1120; color: #F4F1E8; overflow: hidden; -webkit-user-select: none; user-select: none; touch-action: manipulation;
       clip-path: circle(150% at var(--x, 50%) var(--y, 50%)); transition: clip-path .75s cubic-bezier(.7, 0, .25, 1), opacity .5s; }
     #splash.out { clip-path: circle(0% at var(--x, 50%) var(--y, 50%)); }
@@ -35,31 +36,48 @@
       animation: sp-aurora 9s ease-in-out infinite alternate; }
     #splash .ikat { position: absolute; inset: -20%; width: 140%; height: 140%; opacity: .11; mix-blend-mode: screen; animation: sp-drift 40s linear infinite alternate; -webkit-mask-image: radial-gradient(60% 60% at 50% 50%, #000 20%, transparent 100%); mask-image: radial-gradient(60% 60% at 50% 50%, #000 20%, transparent 100%); }
     #splash .stage { position: relative; z-index: 2; display: grid; justify-items: center; gap: 26px; padding: 24px; width: min(86vw, 440px); }
-    #splash svg.mark { width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 0 18px rgba(62, 207, 200, .35)) drop-shadow(0 0 2px rgba(255, 255, 255, .25)); animation: sp-breathe 3.6s ease-in-out 1.9s infinite; }
-    #splash .s { fill: none; stroke: url(#sp-g); stroke-width: 15; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: sp-draw .85s cubic-bezier(.55, 0, .15, 1) forwards; }
-    #splash .s1 { animation-delay: .12s; } #splash .s2 { animation-delay: .36s; } #splash .s3 { animation-delay: .62s; }
-    #splash .gl { fill: none; stroke: #fff; stroke-width: 15; stroke-linecap: round; stroke-dasharray: .07 1; stroke-dashoffset: 1.07; opacity: 0; animation: sp-glint 5.5s cubic-bezier(.4, 0, .2, 1) 1.35s infinite; }
+    #splash svg.mark { width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 0 18px rgba(62, 207, 200, .35)) drop-shadow(0 0 2px rgba(255, 255, 255, .25)); animation: sp-breathe 3.6s ease-in-out 5.6s infinite; }
+    #splash .s, #splash .gl { fill: none; stroke-width: 15; stroke-linecap: round; stroke-linejoin: round; }
+    #splash .s { stroke: url(#sp-g); }
+    /* movement 1: the lower ring draws itself */
+    #splash .s2, #splash .s3 { stroke-dasharray: 1 1.3; stroke-dashoffset: 1.15; opacity: 0; }   /* parked just beyond the path's end, so not even a round cap shows before the draw */
+    #splash .s2 { animation: sp-draw .9s cubic-bezier(.55, 0, .15, 1) .15s forwards; }
+    /* movement 2: a small ring is born in the lower one, pops, and rises to become the top of the 8 */
+    #splash .topg { transform-box: view-box; transform-origin: 72px 52px; transform: translate(0, 67px) scale(0); opacity: 0; animation: sp-rise8 1.35s cubic-bezier(.5, 0, .2, 1) .95s forwards; }
+    /* the whole mark sits centred while it is only an 8, then slides left to make room for the .5 */
+    #splash .markg { transform-box: view-box; transform: translateX(88px); animation: sp-slide .8s cubic-bezier(.6, 0, .2, 1) 3.8s forwards; }
+    /* movement 4: the dot lands, the five draws, the glints run */
     #splash .dot { fill: #E5B450; filter: drop-shadow(0 0 10px rgba(229, 180, 80, .8)); }
-    #splash .dotg { transform-box: view-box; transform-origin: 135px 152px; transform: scale(0); animation: sp-pop .6s cubic-bezier(.3, 1.6, .4, 1) 1.12s forwards; }
+    #splash .dotg { transform-box: view-box; transform-origin: 135px 152px; transform: scale(0); animation: sp-pop .6s cubic-bezier(.3, 1.6, .4, 1) 4.2s forwards; }
+    #splash .s3 { animation: sp-draw .9s cubic-bezier(.55, 0, .15, 1) 4.4s forwards; }
+    #splash .gl { stroke: #fff; stroke-dasharray: .07 1; stroke-dashoffset: 1.07; opacity: 0; animation: sp-glint 6s cubic-bezier(.4, 0, .2, 1) 5.4s infinite; }
     #splash.out .dotg { animation: sp-flare .7s ease-in forwards; }
-    #splash .line { margin: 0; text-align: center; font: 500 clamp(17px, 4.6vw, 21px)/1.35 "Bricolage", "Segoe UI", system-ui, sans-serif; color: #C9D1E3; letter-spacing: -0.005em; opacity: 0; transform: translateY(10px); animation: sp-rise .9s cubic-bezier(.2, .7, .2, 1) 1.05s forwards; max-width: 34ch; }
-    #splash .line b { color: #fff; font-weight: 600; }
+    /* the words: first the line that says eight is not enough, then the line of encouragement, in the same place */
+    #splash .lines { display: grid; justify-items: center; width: 100%; }
+    #splash .lines > p { grid-area: 1 / 1; margin: 0; text-align: center; font: 500 clamp(17px, 4.6vw, 21px)/1.35 "Bricolage", "Segoe UI", system-ui, sans-serif; color: #C9D1E3; letter-spacing: -0.005em; opacity: 0; transform: translateY(10px); max-width: 34ch; }
+    #splash .lines b { color: #fff; font-weight: 600; }
+    #splash #sp-eight { animation: sp-rise .8s cubic-bezier(.2, .7, .2, 1) 2.25s forwards, sp-fade .45s ease 3.9s forwards; }
+    #splash #sp-line { animation: sp-rise .9s cubic-bezier(.2, .7, .2, 1) 4.8s forwards; }
     #splash .bar { position: absolute; bottom: max(34px, env(safe-area-inset-bottom)); left: 50%; width: 120px; height: 2px; margin-left: -60px; border-radius: 2px; background: rgba(255, 255, 255, .12); overflow: hidden; }
-    #splash .bar i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, #8FAEFF, #3ECFC8, #E5B450); transform: scaleX(0); transform-origin: left; animation: sp-fill 1.7s cubic-bezier(.3, .6, .3, 1) .2s forwards; }
+    #splash .bar i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, #8FAEFF, #3ECFC8, #E5B450); transform: scaleX(0); transform-origin: left; animation: sp-fill 6s cubic-bezier(.3, .6, .3, 1) .2s forwards; }
     #splash.out .bar i { transform: scaleX(1); transition: transform .25s; }
-    #splash .hint { position: absolute; bottom: max(14px, calc(env(safe-area-inset-bottom) - 2px)); left: 0; right: 0; text-align: center; font: 500 11px/1 "Bricolage", "Segoe UI", system-ui, sans-serif; letter-spacing: .14em; text-transform: uppercase; color: rgba(201, 209, 227, .45); opacity: 0; animation: sp-rise 1s ease 2.4s forwards; }
-    @keyframes sp-draw { to { stroke-dashoffset: 0; } }
+    #splash .hint { position: absolute; bottom: max(14px, calc(env(safe-area-inset-bottom) - 2px)); left: 0; right: 0; text-align: center; font: 500 11px/1 "Bricolage", "Segoe UI", system-ui, sans-serif; letter-spacing: .14em; text-transform: uppercase; color: rgba(201, 209, 227, .45); opacity: 0; animation: sp-rise 1s ease 3s forwards; }
+    @keyframes sp-draw { from { stroke-dashoffset: 1.15; opacity: 1; } to { stroke-dashoffset: 0; opacity: 1; } }
+    @keyframes sp-rise8 { 0% { transform: translate(0, 67px) scale(0); opacity: 0; } 18% { transform: translate(0, 67px) scale(.46); opacity: 1; } 34% { transform: translate(0, 67px) scale(.34); } 100% { transform: translate(0, 0) scale(1); opacity: 1; } }
+    @keyframes sp-slide { to { transform: translateX(0); } }
     @keyframes sp-glint { 0% { opacity: 0; stroke-dashoffset: 1.07; } 4% { opacity: .95; } 30% { opacity: .95; stroke-dashoffset: -.07; } 31%, 100% { opacity: 0; stroke-dashoffset: -.07; } }
     @keyframes sp-pop { 0% { transform: scale(0); } 60% { transform: scale(1.35); } 100% { transform: scale(1); } }
     @keyframes sp-flare { to { transform: scale(2.6); opacity: 0; } }
     @keyframes sp-rise { to { opacity: 1; transform: none; } }
+    @keyframes sp-fade { to { opacity: 0; transform: translateY(-8px); } }
     @keyframes sp-fill { to { transform: scaleX(.86); } }
     @keyframes sp-breathe { 50% { transform: scale(1.025); filter: drop-shadow(0 0 26px rgba(62, 207, 200, .5)) drop-shadow(0 0 2px rgba(255, 255, 255, .35)); } }
     @keyframes sp-aurora { to { transform: translate3d(4%, -3%, 0) rotate(3deg) scale(1.08); } }
     @keyframes sp-drift { to { transform: translate3d(-4%, 3%, 0); } }
     @media (prefers-reduced-motion: reduce) {
-      #splash .s { stroke-dashoffset: 0; animation: none; } #splash .gl, #splash .glow, #splash .ikat { animation: none; } #splash .gl { display: none; }
-      #splash .dotg { transform: none; animation: none; } #splash svg.mark { animation: none; } #splash .line, #splash .hint { animation: sp-rise .4s ease forwards; }
+      #splash .s2, #splash .s3 { stroke-dashoffset: 0; opacity: 1; animation: none; } #splash .gl { display: none; } #splash .glow, #splash .ikat { animation: none; }
+      #splash .topg, #splash .markg, #splash .dotg { transform: none; opacity: 1; animation: none; } #splash svg.mark { animation: none; }
+      #splash #sp-eight { display: none; } #splash #sp-line, #splash .hint { animation: sp-rise .4s ease forwards; }
       #splash { transition: opacity .4s; } #splash.out { clip-path: none; opacity: 0; }
     }
   </style>
@@ -79,24 +97,30 @@
     <div class="stage">
       <svg class="mark" viewBox="0 0 320 176" aria-hidden="true">
         <defs><linearGradient id="sp-g" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8FAEFF"/><stop offset=".55" stop-color="#3ECFC8"/><stop offset="1" stop-color="#E5B450"/></linearGradient></defs>
-        <circle class="s s1" cx="72" cy="52" r="31" pathLength="1"/>
-        <circle class="s s2" cx="72" cy="119" r="39" pathLength="1"/>
-        <path class="s s3" d="M246 22 H178 L170 86 C 202 64, 264 72, 264 120 C 264 160, 208 170, 171 144" pathLength="1"/>
-        <circle class="gl" cx="72" cy="52" r="31" pathLength="1"/>
-        <circle class="gl" cx="72" cy="119" r="39" pathLength="1" style="animation-delay:1.55s"/>
-        <path class="gl" d="M246 22 H178 L170 86 C 202 64, 264 72, 264 120 C 264 160, 208 170, 171 144" pathLength="1" style="animation-delay:1.8s"/>
-        <g class="dotg"><circle class="dot" cx="135" cy="152" r="10"/></g>
+        <g class="markg">
+          <circle class="s s2" cx="72" cy="119" r="39" pathLength="1"/>
+          <g class="topg"><circle class="s s1" cx="72" cy="52" r="31"/></g>
+          <path class="s s3" d="M246 22 H178 L170 86 C 202 64, 264 72, 264 120 C 264 160, 208 170, 171 144" pathLength="1"/>
+          <circle class="gl" cx="72" cy="52" r="31" pathLength="1"/>
+          <circle class="gl" cx="72" cy="119" r="39" pathLength="1" style="animation-delay:5.6s"/>
+          <path class="gl" d="M246 22 H178 L170 86 C 202 64, 264 72, 264 120 C 264 160, 208 170, 171 144" pathLength="1" style="animation-delay:5.8s"/>
+          <g class="dotg"><circle class="dot" cx="135" cy="152" r="10"/></g>
+        </g>
       </svg>
-      <p class="line" id="sp-line"></p>
+      <div class="lines"><p id="sp-eight"></p><p id="sp-line"></p></div>
     </div>
     <div class="bar"><i></i></div>
     <div class="hint">Tap to continue</div>
   </div>
   <script>
-    // The opening's line of encouragement, chosen by the day and the time; the mark is CSS, the exit is in main.js.
+    // The opening's two lines: one for the 8 alone (good, not the goal), one for the 8.5 (encouragement), chosen by the day and the hour.
     (function () {
       var S = window.__splash = { start: Date.now(), skip: false };
       var name = ""; try { name = (JSON.parse(localStorage.getItem("eight-kv") || "{}").name || "").trim(); } catch (e) {}
+      var eights = [
+        "Eight is good. It is not the goal.", "Most people stop at eight.", "Eight. Close. Not there.", "Eight is a fine number. It is not yours.",
+        "Eight opens the door. Eight point five walks in.", "Good enough is where it ends for most. Not here.", "Eight is the room. You want the window seat."
+      ];
       var lines = [
         "One more step to the goal.", "Every word you keep is a point.", "Band 8.5 is a habit, not a day.", "Small, daily, done.", "You are closer than yesterday.",
         "Fluency is only familiarity.", "Read something. Say something. Keep something.", "The hard part was opening this. Done.", "Ten minutes now is an hour later.",
@@ -105,12 +129,11 @@
         "Accuracy is attention, and attention is free.", "The next word is the only one that matters.", "Back again. That is the whole secret."
       ];
       var d = new Date(), n = (d.getFullYear() * 366 + d.getMonth() * 31 + d.getDate()) + Math.floor(d.getHours() / 8);
-      var text = lines[n % lines.length];
-      var el = document.getElementById("sp-line");
-      if (name && n % 3 === 0) { el.innerHTML = ""; var b = document.createElement("b"); b.textContent = name + ", "; el.appendChild(b); el.appendChild(document.createTextNode(text.charAt(0).toLowerCase() + text.slice(1))); }
+      document.getElementById("sp-eight").textContent = eights[n % eights.length];
+      var text = lines[n % lines.length], el = document.getElementById("sp-line");
+      if (name && n % 3 === 0) { var b = document.createElement("b"); b.textContent = name + ", "; el.appendChild(b); el.appendChild(document.createTextNode(text.charAt(0).toLowerCase() + text.slice(1))); }
       else el.textContent = text;
-      var sp = document.getElementById("splash");
-      sp.addEventListener("pointerdown", function () { if (Date.now() - S.start > 900) S.skip = true; });
+      document.getElementById("splash").addEventListener("pointerdown", function () { if (Date.now() - S.start > 900) S.skip = true; });
     })();
   </script>
   <div id="app">
