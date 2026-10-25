@@ -6,6 +6,8 @@
 
 ## What she sees (25 Oct layout)
 
+Every cold start opens on the **8.5 mark**: the two numerals draw themselves in light over the ikat, a glint runs along them, the dot lands, a line of encouragement appears (twenty of them, by the day and the hour, sometimes with her name), and after two seconds the whole screen folds into the dot and Today is there. A tap after the first second skips it. With "reduce motion" on, it is a plain fade.
+
 | Tab | What it is |
 | --- | --- |
 | **Today** | A greeting for the time of day over the ikat from the welcome, the lesson (countdown, Join), your short note if you set one, then **the next small thing** (today's or yesterday's homework, the unfinished mock, the cards due, or, when nothing is waiting, one small idea for the day, Sundays included), one **observation** about her own days (late nights, homework finished after midnight or days late, a chain about to break, days away, coming early, a steady week) with a one-tap reply that reaches you, and one or two check-in questions that change every day. The week line shows her active days, reviews, homework and mock parts. Below the next step come **a song of the day** (a film on Sundays) and **a word of the day**: the song with a reason, a Listen link, a Lyrics link, a listening question, one phrase from the title that opens to its meaning and goes into Anki, and a box for a line she liked (kept in Anki, sent to you); the film with a trailer link, a phrase to listen for, and a Part 3-style question for after; the word with meaning, example, collocations, one tap into Anki and a sentence of her own that reaches you. She can also share her own pick of the day with you. Every fourth day the song comes from your Music list. No homework steps here. |
