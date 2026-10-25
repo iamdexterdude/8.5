@@ -135,6 +135,16 @@ async function studentTab(ctx) {
   if (!rep) return h("div", null, h("p", { class: "muted" }, "Nothing reported yet. Her app sends a small report each time she studies, finishes homework or a mock."));
   const when = (iso) => new Date(iso).toLocaleString("en-GB", { timeZone: "Asia/Tashkent", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
   const box = h("div", null, h("p", { class: "small muted" }, `${rep.student}, reported ${when(rep.at)}. Streak ${rep.streak} ${rep.streak === 1 ? "day" : "days"}.`));
+  const hb = rep.habits;
+  if (hb) {
+    const bits = [];
+    bits.push(`${hb.activeDays7 ?? 0} of the last 7 days active`);
+    if (hb.usualHour != null) bits.push(`usually starts around ${String(hb.usualHour).padStart(2, "0")}:00`);
+    if (hb.lateDays7) bits.push(`${hb.lateDays7} ${hb.lateDays7 === 1 ? "night" : "nights"} after 23:00 this week`);
+    if (hb.hwDone14) bits.push(`homework: ${hb.hwDone14} done in 14 days${hb.hwLate14 ? `, ${hb.hwLate14} late by two days or more` : ""}${hb.hwNight14 ? `, ${hb.hwNight14} finished after 23:00` : ""}`);
+    if (hb.lastActive) bits.push(`last active ${fmtShort(hb.lastActive)}`);
+    box.append(h("section", { class: "section", style: { marginTop: "8px" } }, h("div", { class: "shead" }, h("h2", null, "Habits")), h("p", null, bits.join(" · ") + "."), h("p", { class: "tiny faint" }, "Her Today screen says these things to her too, gently, one at a time.")));
+  }
   const a = rep.anki || {};
   box.append(h("section", { class: "section", style: { marginTop: "8px" } }, h("div", { class: "shead" }, h("h2", null, "Anki")),
     h("div", { class: "stats" }, stat(a.cards ?? 0, "cards"), stat(a.due ?? 0, "due now"), stat(a.reviews14 ?? 0, "reviews, 14 days"), stat(a.days14 ?? 0, "days studied, of 14")),

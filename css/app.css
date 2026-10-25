@@ -190,6 +190,26 @@ button.plain { background: none; border: 0; text-align: left; padding: 0; color:
 .week { margin-top: 22px; display: flex; align-items: center; gap: 12px; padding: 8px 4px; }
 .week-dots { display: flex; gap: 8px; }
 .week-dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--line); transition: background .3s; }
+.week-n { margin-left: auto; color: var(--text-3); font-size: 13px; text-align: right; }
+/* the ikat from the welcome, drifting slowly behind the sky; a thin band of it on the next-step card */
+.sky .ikat { position: absolute; inset: -40% -20% -10%; width: 140%; height: 150%; z-index: -1; opacity: .3; mix-blend-mode: soft-light; pointer-events: none;
+  -webkit-mask-image: linear-gradient(180deg, #000 25%, transparent 100%); mask-image: linear-gradient(180deg, #000 25%, transparent 100%); animation: drift 90s ease-in-out infinite alternate; }
+.sky[data-slot="late"] .ikat, .sky[data-slot="night"] .ikat { opacity: .22; }
+@keyframes drift { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(-5%, 4%, 0) rotate(1.5deg); } }
+.step { position: relative; overflow: hidden; isolation: isolate; margin-top: 16px; padding: 16px 18px 16px 24px; border-radius: 18px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); display: flex; align-items: center; gap: 14px; color: inherit; text-decoration: none; transition: transform .25s var(--soft), box-shadow .25s; }
+.step:hover { transform: translateY(-1px); box-shadow: var(--shadow-lg, var(--shadow)); }
+.step .ikat { position: absolute; left: 0; top: 0; bottom: 0; width: 9px; height: 100%; z-index: 0; opacity: .9; }
+.step-body { flex: 1; min-width: 0; }
+.step-k { font: 600 12px var(--f-display); letter-spacing: .08em; text-transform: uppercase; color: var(--turq); margin-bottom: 4px; }
+.step h2 { font-size: 20px; line-height: 1.2; margin: 0 0 4px; }
+.step p { margin: 0; color: var(--text-2); font-size: 15px; }
+.step .btn { flex: none; }
+.pulse { margin-top: 16px; padding: 16px 18px; border-radius: 16px; background: var(--surface-2); border-left: 3px solid var(--turq); animation: rise .5s var(--soft); }
+.pulse-k { font: 600 12px var(--f-display); letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); margin-bottom: 6px; }
+.pulse-t { margin: 0 0 12px; font: 500 18px/1.35 var(--f-display); letter-spacing: -0.01em; }
+.pulse .row-actions { flex-wrap: wrap; align-items: center; gap: 8px; }
+.pulse .chips { display: inline-flex; gap: 8px; flex-wrap: wrap; }
+@media (prefers-reduced-motion: reduce) { .sky .ikat { animation: none; } }
 .week-dots i.on { background: var(--turq); } .week-dots i.now { box-shadow: 0 0 0 3px var(--accent-soft); } .week-dots i.on.now { background: var(--accent); }
 .week-k { font-size: 14px; color: var(--text-2); }
 

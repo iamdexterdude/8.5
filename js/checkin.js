@@ -64,8 +64,8 @@ function recent() { return store.S.kv[RECENT_KEY] || []; }
 async function remember(key) { const r = [key, ...recent().filter((k) => k !== key)].slice(0, 14); await store.setSetting(RECENT_KEY, r); }
 
 // a small deterministic random so a screen does not change under her hand within the same hour
-function seedRandom(seed) { let x = 0; for (const c of seed) x = (x * 31 + c.charCodeAt(0)) >>> 0; return () => { x = (x * 1664525 + 1013904223) >>> 0; return x / 4294967296; }; }
-const pick = (list, rnd) => list[Math.floor(rnd() * list.length)];
+export function seedRandom(seed) { let x = 0; for (const c of seed) x = (x * 31 + c.charCodeAt(0)) >>> 0; return () => { x = (x * 1664525 + 1013904223) >>> 0; return x / 4294967296; }; }
+export const pick = (list, rnd) => list[Math.floor(rnd() * list.length)];
 
 export function greeting({ name, lesson, streak, hwDone }) {
   const t = todayISO(), slot = slotOf(), rnd = seedRandom(t + slot);

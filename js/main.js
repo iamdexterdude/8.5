@@ -3,6 +3,7 @@ import * as store from "./store.js";
 import { h, icon, clear, todayISO } from "./util.js";
 import * as hwm from "./homework.js";
 import * as dbm from "./db.js";
+import * as pulse from "./pulse.js";
 
 const TABS = [
   { id: "today", label: "Today", href: "#/today", icon: "today" },
@@ -126,8 +127,9 @@ async function boot() {
   serviceWorker();
   window.addEventListener("hashchange", () => render());
   document.addEventListener("hw-rerender", () => render({ keepScroll: true }));
-  document.addEventListener("visibilitychange", () => { if (!document.hidden) hwm.refresh(undefined, { force: true }); });
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) { hwm.refresh(undefined, { force: true }); pulse.noteVisit(); } });
   nudgeLoop();
+  pulse.noteVisit();
   if (!store.S.kv.welcomed && !new URLSearchParams(location.search).has("nowelcome")) {
     if (!store.setting("name") && navigator.onLine) await hwm.refresh(undefined, { force: true, timeout: 4000 }).catch(() => {});
     const { runWelcome } = await import("./views/welcome.js");
