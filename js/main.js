@@ -110,6 +110,8 @@ window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); wind
 function serviceWorker() {
   if (!("serviceWorker" in navigator) || location.protocol === "file:") return;
   const hadController = !!navigator.serviceWorker.controller;
+  // a new version takes over and reloads the page once; the guard against a reload loop is lifted after a moment, so a later update in the same tab reloads too
+  setTimeout(() => { try { sessionStorage.removeItem("eight-updated"); } catch {} }, 20000);
   navigator.serviceWorker.addEventListener("controllerchange", () => { if (hadController && !sessionStorage.getItem("eight-updated")) { sessionStorage.setItem("eight-updated", "1"); location.reload(); } });
   navigator.serviceWorker.register("sw.js", { updateViaCache: "none" }).then((r) => {
     const check = () => r.update().catch(() => {});
