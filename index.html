@@ -81,6 +81,26 @@
       #splash { transition: opacity .4s; } #splash.out { clip-path: none; opacity: 0; }
     }
   </style>
+  <link rel="modulepreload" href="js/main.js">
+  <link rel="modulepreload" href="js/views/today.js">
+  <link rel="modulepreload" href="js/srs.js">
+  <link rel="modulepreload" href="js/views/welcome.js">
+  <link rel="modulepreload" href="js/store.js">
+  <link rel="modulepreload" href="js/util.js">
+  <link rel="modulepreload" href="js/homework.js">
+  <link rel="modulepreload" href="js/db.js">
+  <link rel="modulepreload" href="js/pulse.js">
+  <link rel="modulepreload" href="js/checkin.js">
+  <link rel="modulepreload" href="js/views/daily.js">
+  <link rel="modulepreload" href="vendor/ts-fsrs.mjs">
+  <link rel="modulepreload" href="js/crypto.js">
+  <link rel="modulepreload" href="js/feedkey.js">
+  <link rel="modulepreload" href="js/mocks.js">
+  <link rel="modulepreload" href="js/daily.js">
+  <link rel="modulepreload" href="js/ui.js">
+  <link rel="modulepreload" href="js/bands.js">
+  <link rel="preload" href="data/config.json" as="fetch" crossorigin="anonymous">
+  <link rel="preload" href="data/daily.json" as="fetch" crossorigin="anonymous">
 </head>
 <body>
   <div id="splash" role="status" aria-label="8.5 is opening">
@@ -145,14 +165,16 @@
   <noscript>8.5 needs JavaScript to run.</noscript>
   <script type="module" src="js/main.js"></script>
   <script>
-    // If nothing has appeared after 12 seconds, offer a refresh (clears the saved copy of the app, keeps her data).
+    // If nothing has appeared after 12 seconds (30 when the app's code has started arriving over a slow connection), offer a refresh (clears the saved copy of the app, keeps her data).
     (function () {
       var last = "";
       window.addEventListener("error", function (e) { last = (e.message || "") + (e.filename ? " (" + e.filename.split("/").slice(-2).join("/") + ":" + e.lineno + ")" : ""); });
       window.addEventListener("unhandledrejection", function (e) { last = String((e.reason && e.reason.message) || e.reason); });
-      setTimeout(function () {
+      var tries = 0;
+      setTimeout(function check() {
         var v = document.getElementById("view");
         if (!v || v.children.length) return;
+        if (window.__booting && tries++ < 3) { setTimeout(check, 6000); return; }
         var sp = document.getElementById("splash"); if (sp) sp.remove();
         v.innerHTML = '<div class="empty"><h1>8.5 is taking too long</h1><p>Refresh the app. Everything you saved stays on this device.</p><p><button class="btn primary" id="wd-refresh">Refresh the app</button></p><p class="tiny faint" id="wd"></p></div>';
         document.getElementById("wd").textContent = last ? "Detail: " + last : "";
