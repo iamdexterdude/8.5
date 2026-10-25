@@ -158,7 +158,9 @@ export function hideSplash() {
       s.classList.add("out");
       setTimeout(() => { if (s.isConnected) { s.remove(); res(); } }, 850);
     };
-    const tick = setInterval(() => { if (window.__splash?.skip || Date.now() - start >= min) { clearInterval(tick); go(); } }, 50);
+    // the stylesheet is loaded without blocking the first paint; the opening stays until it has arrived (or 8 s, if it never does)
+    const cssReady = () => window.__cssReady || [...document.styleSheets].some((s) => /app\.css/.test(s.href || "")) || Date.now() - start > 8000;
+    const tick = setInterval(() => { if ((window.__splash?.skip || Date.now() - start >= min) && cssReady()) { clearInterval(tick); go(); } }, 50);
   });
 }
 boot().catch((e) => {

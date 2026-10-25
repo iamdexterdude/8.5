@@ -16,12 +16,15 @@
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <link rel="preload" href="fonts/display.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="fonts/text.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="css/app.css">
+  <!-- the stylesheet does not block the first paint: the opening below is inline and shows at once; the app waits for the sheet before the opening folds away -->
+  <link rel="preload" href="css/app.css" as="style" onload="this.onload=null;this.rel='stylesheet';window.__cssReady=true">
+  <noscript><link rel="stylesheet" href="css/app.css"></noscript>
   <script>
     // Apply the saved theme before first paint so there is no flash
     try { var t = localStorage.getItem("eight-theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}
   </script>
   <style>
+    @font-face { font-family: "Bricolage"; src: url("fonts/display.woff2") format("woff2"); font-weight: 200 800; font-display: swap; }
     /* The opening: the 8.5 mark draws itself in light, a line of encouragement, then the screen folds into the dot.
        Inline so it is the very first thing painted, before any module has loaded. */
     #splash { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; background: #0B1120; color: #F4F1E8; overflow: hidden; -webkit-user-select: none; user-select: none; touch-action: manipulation;
@@ -39,12 +42,12 @@
     #splash .dot { fill: #E5B450; filter: drop-shadow(0 0 10px rgba(229, 180, 80, .8)); }
     #splash .dotg { transform-box: view-box; transform-origin: 135px 152px; transform: scale(0); animation: sp-pop .6s cubic-bezier(.3, 1.6, .4, 1) 1.12s forwards; }
     #splash.out .dotg { animation: sp-flare .7s ease-in forwards; }
-    #splash .line { margin: 0; text-align: center; font: 500 clamp(17px, 4.6vw, 21px)/1.35 var(--f-display, system-ui, sans-serif); color: #C9D1E3; letter-spacing: -0.005em; opacity: 0; transform: translateY(10px); animation: sp-rise .9s cubic-bezier(.2, .7, .2, 1) 1.05s forwards; max-width: 34ch; }
+    #splash .line { margin: 0; text-align: center; font: 500 clamp(17px, 4.6vw, 21px)/1.35 "Bricolage", "Segoe UI", system-ui, sans-serif; color: #C9D1E3; letter-spacing: -0.005em; opacity: 0; transform: translateY(10px); animation: sp-rise .9s cubic-bezier(.2, .7, .2, 1) 1.05s forwards; max-width: 34ch; }
     #splash .line b { color: #fff; font-weight: 600; }
     #splash .bar { position: absolute; bottom: max(34px, env(safe-area-inset-bottom)); left: 50%; width: 120px; height: 2px; margin-left: -60px; border-radius: 2px; background: rgba(255, 255, 255, .12); overflow: hidden; }
     #splash .bar i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, #8FAEFF, #3ECFC8, #E5B450); transform: scaleX(0); transform-origin: left; animation: sp-fill 1.7s cubic-bezier(.3, .6, .3, 1) .2s forwards; }
     #splash.out .bar i { transform: scaleX(1); transition: transform .25s; }
-    #splash .hint { position: absolute; bottom: max(14px, calc(env(safe-area-inset-bottom) - 2px)); left: 0; right: 0; text-align: center; font: 500 11px/1 var(--f-display, system-ui, sans-serif); letter-spacing: .14em; text-transform: uppercase; color: rgba(201, 209, 227, .45); opacity: 0; animation: sp-rise 1s ease 2.4s forwards; }
+    #splash .hint { position: absolute; bottom: max(14px, calc(env(safe-area-inset-bottom) - 2px)); left: 0; right: 0; text-align: center; font: 500 11px/1 "Bricolage", "Segoe UI", system-ui, sans-serif; letter-spacing: .14em; text-transform: uppercase; color: rgba(201, 209, 227, .45); opacity: 0; animation: sp-rise 1s ease 2.4s forwards; }
     @keyframes sp-draw { to { stroke-dashoffset: 0; } }
     @keyframes sp-glint { 0% { opacity: 0; stroke-dashoffset: 1.07; } 4% { opacity: .95; } 30% { opacity: .95; stroke-dashoffset: -.07; } 31%, 100% { opacity: 0; stroke-dashoffset: -.07; } }
     @keyframes sp-pop { 0% { transform: scale(0); } 60% { transform: scale(1.35); } 100% { transform: scale(1); } }
