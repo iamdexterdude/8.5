@@ -6,7 +6,7 @@
 
 ## What she sees (25 Oct layout)
 
-Every cold start opens on the **8.5 mark**, told in four movements: one ring draws itself in light; a small ring is born inside it, pops, and rises to make the 8; the 8 stands alone with a line that says eight is not the goal ("Most people stop at eight."); then the 8 slides over, the dot lands, the 5 draws itself and a line of encouragement arrives (twenty of them, by the day and the hour, sometimes with her name). After about six seconds the whole screen folds into the dot and Today is there. A tap after the first second skips it. With "reduce motion" on, it is the finished mark and a plain fade.
+Every cold start opens on the **8.5 mark**, told in four movements: one ring draws itself in light; a small ring drops like a ball, lands on it, squashes, bounces and settles on top to make the 8; the 8 stands alone with a line that says eight is not the goal ("Most people stop at eight.") while words rain down the screen (consistency, nuance, second drafts, built different, understood the assignment, and about ninety more); then the 8 slides over and every word flies to its place and becomes the .5, which is inked out of them and catches a mirror shine, and a line of encouragement arrives (twenty of them, by the day and the hour, sometimes with her name). After about seven seconds the whole screen folds into the dot and Today is there. A tap after the first second skips it. With "reduce motion" on, it is the finished mark and a plain fade.
 
 | Tab | What it is |
 | --- | --- |
