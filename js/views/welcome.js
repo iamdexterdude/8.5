@@ -72,12 +72,13 @@ export function runWelcome({ name: known = "" } = {}) {
         [0, name ? `${name}.` : "Welcome.", "This was made for you."],
         [2400, "Lessons, homework, mocks.", "All in one place, and nothing to type."],
         [4600, "Your words, your cards.", "Anki, the way you want it."],
-        [6800, "One target.", ""],
-        [8400, "Band 8.5.", "Let's begin.", true],
+        [6800, "Vocabulary is 95.77% of the work.", "Every word you keep moves the band. The rest follows."],
+        [9400, "One target.", ""],
+        [11000, "Band 8.5.", "Let's begin.", true],
       ];
       for (const [t, a, b, c] of seq) later(t, () => show(a, b, c));
-      later(10600, () => { sub.replaceChildren(); stage.append(h("div", { class: "row-actions", style: { justifyContent: "center", marginTop: "20px" } }, h("button", { class: "btn primary", onclick: () => finish(name) }, "Open today"))); });
-      later(13500, () => finish(name));
+      later(13200, () => { sub.replaceChildren(); stage.append(h("div", { class: "row-actions", style: { justifyContent: "center", marginTop: "20px" } }, h("button", { class: "btn primary", onclick: () => finish(name) }, "Open today"))); });
+      later(16100, () => finish(name));
     }
   });
 }
