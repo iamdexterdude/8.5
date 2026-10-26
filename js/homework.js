@@ -79,7 +79,7 @@ export async function primeConfig({ timeout = 15000 } = {}) {
 }
 
 export const homeworkFor = (date) => F.hw[date] || null;
-export const studentName = () => store.setting("name") || F.config?.student || "";
+export const studentName = () => store.setting("name") || "";   // the name she chose on her device; the class settings carry none
 const nameOf = () => studentName() || "Student";
 export const studentId = () => (studentName() || "student").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "student";
 

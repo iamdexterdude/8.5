@@ -144,8 +144,8 @@ async function boot() {
   nudgeLoop();
   pulse.noteVisit();
   if (!store.S.kv.welcomed && !new URLSearchParams(location.search).has("nowelcome")) {
-    if (!store.setting("name") && navigator.onLine) await hwm.primeConfig({ timeout: 15000 }).catch(() => {});
-    // the first open: the welcome is the opening. The quiet dark screen gives way to it the moment it is on the page.
+    if (navigator.onLine) hwm.primeConfig({ timeout: 15000 }).catch(() => {});   // the lesson settings, in the background; the welcome does not wait
+    // the first open: the welcome is the opening, and it asks for a name. The quiet dark screen gives way to it the moment it is on the page.
     const { runWelcome } = await import("./views/welcome.js");
     await render();
     const welcome = runWelcome({ name: hwm.studentName() });
