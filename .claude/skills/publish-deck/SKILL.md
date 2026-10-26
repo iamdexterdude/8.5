@@ -1,6 +1,6 @@
 ---
 name: publish-deck
-description: Turn the teacher's word list (after a lesson, in a note or a PDF) into an Anki deck in Muslima's 8.5 app, check it, and publish it. Use whenever Dexter sends vocabulary, phrases or "new words" for Anki.
+description: Turn the teacher's word list (after a lesson, in a note or a PDF) into an Anki deck in the 8.5 app, check it, and publish it. Use whenever Dexter sends vocabulary, phrases or "new words" for Anki.
 ---
 
 # Publish an Anki deck

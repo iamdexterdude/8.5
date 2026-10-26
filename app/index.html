@@ -25,11 +25,11 @@
   </script>
   <style>
     @font-face { font-family: "Bricolage"; src: url("fonts/display.woff2") format("woff2"); font-weight: 200 800; font-display: swap; }
-    /* The opening, in four movements. One: the lower ring draws itself in light. Two: a small ring drops from above like a
-       ball, lands on the ring, squashes, bounces, and settles on top as the upper half of the 8. Three: the 8 stands alone
-       with a line that says eight is not the goal, and words rain down the screen. Four: the words gather into the .5,
-       which lights up with a mirror shine; the line of encouragement arrives. Then the screen folds into the dot.
-       Inline so it is the very first thing painted, before any module has loaded. */
+    /* The opening, in four movements. One: the lower ring draws itself in light. Two: a small ring is born in the centre of
+       the big one and rises through it, smoothly, to become the upper half of the 8. Three: the 8 stands alone with a line
+       that says eight is not the goal, and words rain the whole height of the screen and pool at the bottom. Four: every
+       word flies to one place and becomes the .5, which is inked out of them and lights up with a mirror shine; the line of
+       encouragement arrives. Then the screen folds into the dot. Inline so it is the very first thing painted. */
     #splash { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; background: #0B1120; color: #F4F1E8; overflow: hidden; -webkit-user-select: none; user-select: none; touch-action: manipulation;
       clip-path: circle(150% at var(--x, 50%) var(--y, 50%)); transition: clip-path .75s cubic-bezier(.7, 0, .25, 1), opacity .5s; }
     #splash.out { clip-path: circle(0% at var(--x, 50%) var(--y, 50%)); }
@@ -41,44 +41,41 @@
     #splash .ikat { position: absolute; inset: -20%; width: 140%; height: 140%; opacity: .11; mix-blend-mode: screen; animation: sp-drift 40s linear infinite alternate; -webkit-mask-image: radial-gradient(60% 60% at 50% 50%, #000 20%, transparent 100%); mask-image: radial-gradient(60% 60% at 50% 50%, #000 20%, transparent 100%); }
     #splash canvas.rain { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 3; pointer-events: none; }
     #splash .stage { position: relative; z-index: 2; display: grid; justify-items: center; gap: 26px; padding: 24px; width: min(86vw, 440px); }
-    #splash svg.mark { width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 0 18px rgba(62, 207, 200, .35)) drop-shadow(0 0 2px rgba(255, 255, 255, .25)); animation: sp-breathe 3.6s ease-in-out 7.6s infinite; }
+    #splash svg.mark { width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 0 18px rgba(62, 207, 200, .35)) drop-shadow(0 0 2px rgba(255, 255, 255, .25)); animation: sp-breathe 3.6s ease-in-out 8.8s infinite; }
     #splash .s, #splash .gl, #splash .shine { fill: none; stroke-width: 15; stroke-linecap: round; stroke-linejoin: round; }
     #splash .s { stroke: url(#sp-g); }
     /* one: the lower ring draws itself; the stroke is parked beyond the path's end, so not even a round cap shows early */
     #splash .s2 { stroke-dasharray: 1 1.3; stroke-dashoffset: 1.15; opacity: 0; animation: sp-draw .9s cubic-bezier(.55, 0, .15, 1) .15s forwards; }
-    /* two: the small ring drops, lands, squashes, bounces, settles, and grows into the top of the 8 */
-    #splash .topg { transform-box: view-box; transform-origin: 72px 83px; transform: translateY(-170px) scale(.5); opacity: 0; animation: sp-drop 1.6s linear 1.05s forwards; }
+    /* two: the small ring is born at the heart of the big one, grows there, and rises through it into its place on top */
+    #splash .topg { transform-box: view-box; transform-origin: 72px 50px; transform: translateY(70px) scale(0); opacity: 0; animation: sp-birth 1.8s cubic-bezier(.2, .8, .2, 1) 1s forwards; }
     /* the whole mark sits centred while it is only an 8, then slides left to make room for the .5 */
-    #splash .markg { transform-box: view-box; transform: translateX(88px); animation: sp-slide .8s cubic-bezier(.6, 0, .2, 1) 4.15s forwards; }
+    #splash .markg { transform-box: view-box; transform: translateX(88px); animation: sp-slide .8s cubic-bezier(.6, 0, .2, 1) 5.35s forwards; }
     /* four: once the words have gathered, the dot and the five are inked out of them, then a mirror shine runs along the five */
     #splash .dot { fill: #E5B450; filter: drop-shadow(0 0 10px rgba(229, 180, 80, .8)); }
-    #splash .dotg { transform-box: view-box; transform-origin: 135px 152px; transform: scale(0); opacity: 0; animation: sp-ink .7s cubic-bezier(.2, .8, .3, 1) 6.3s forwards; }
-    #splash .s3 { opacity: 0; transform-box: view-box; transform-origin: 217px 90px; transform: scale(1.04); animation: sp-ink .8s cubic-bezier(.2, .8, .3, 1) 6.35s forwards; }
-    #splash .gl { stroke: #fff; stroke-dasharray: .07 1; stroke-dashoffset: 1.07; opacity: 0; animation: sp-glint 6.5s cubic-bezier(.4, 0, .2, 1) 7.6s infinite; }
-    #splash .shine { stroke: #fff; stroke-width: 13; stroke-dasharray: .34 1; stroke-dashoffset: 1.34; opacity: 0; animation: sp-shine 1.5s cubic-bezier(.3, 0, .2, 1) 6.95s forwards; }
+    #splash .dotg { transform-box: view-box; transform-origin: 135px 152px; transform: scale(0); opacity: 0; animation: sp-ink .7s cubic-bezier(.2, .8, .3, 1) 7.35s forwards; }
+    #splash .s3 { opacity: 0; transform-box: view-box; transform-origin: 217px 90px; transform: scale(1.04); animation: sp-ink .8s cubic-bezier(.2, .8, .3, 1) 7.4s forwards; }
+    #splash .gl { stroke: #fff; stroke-dasharray: .07 1; stroke-dashoffset: 1.07; opacity: 0; animation: sp-glint 6.5s cubic-bezier(.4, 0, .2, 1) 8.8s infinite; }
+    #splash .shine { stroke: #fff; stroke-width: 13; stroke-dasharray: .34 1; stroke-dashoffset: 1.34; opacity: 0; animation: sp-shine 1.5s cubic-bezier(.3, 0, .2, 1) 8.1s forwards; }
     #splash.out .dotg { animation: sp-flare .7s ease-in forwards; }
     /* the words: first the line that says eight is not enough, then the line of encouragement, in the same place */
     #splash .lines { display: grid; justify-items: center; width: 100%; }
     #splash .lines > p { grid-area: 1 / 1; margin: 0; text-align: center; font: 500 clamp(17px, 4.6vw, 21px)/1.35 "Bricolage", "Segoe UI", system-ui, sans-serif; color: #C9D1E3; letter-spacing: -0.005em; opacity: 0; transform: translateY(10px); max-width: 34ch; }
     #splash .lines b { color: #fff; font-weight: 600; }
-    #splash #sp-eight { animation: sp-rise .8s cubic-bezier(.2, .7, .2, 1) 2.7s forwards, sp-fade .5s ease 5.8s forwards; }
-    #splash #sp-line { animation: sp-rise .9s cubic-bezier(.2, .7, .2, 1) 6.9s forwards; }
+    #splash #sp-eight { animation: sp-rise .8s cubic-bezier(.2, .7, .2, 1) 2.9s forwards, sp-fade .5s ease 6.9s forwards; }
+    #splash #sp-line { animation: sp-rise .9s cubic-bezier(.2, .7, .2, 1) 8.1s forwards; }
     #splash .bar { position: absolute; bottom: max(34px, env(safe-area-inset-bottom)); left: 50%; width: 120px; height: 2px; margin-left: -60px; border-radius: 2px; background: rgba(255, 255, 255, .12); overflow: hidden; }
-    #splash .bar i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, #8FAEFF, #3ECFC8, #E5B450); transform: scaleX(0); transform-origin: left; animation: sp-fill 7.6s cubic-bezier(.3, .6, .3, 1) .2s forwards; }
+    #splash .bar i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, #8FAEFF, #3ECFC8, #E5B450); transform: scaleX(0); transform-origin: left; animation: sp-fill 8.8s cubic-bezier(.3, .6, .3, 1) .2s forwards; }
     #splash.out .bar i { transform: scaleX(1); transition: transform .25s; }
     #splash .hint { position: absolute; bottom: max(14px, calc(env(safe-area-inset-bottom) - 2px)); left: 0; right: 0; text-align: center; font: 500 11px/1 "Bricolage", "Segoe UI", system-ui, sans-serif; letter-spacing: .14em; text-transform: uppercase; color: rgba(201, 209, 227, .45); opacity: 0; animation: sp-rise 1s ease 3.2s forwards; }
     @keyframes sp-draw { from { stroke-dashoffset: 1.15; opacity: 1; } to { stroke-dashoffset: 0; opacity: 1; } }
-    /* the drop: gravity in, a squash on the ring, a bounce with a little stretch, a smaller second landing, then it settles and grows */
-    @keyframes sp-drop {
-      0% { transform: translateY(-170px) scale(.5); opacity: 0; animation-timing-function: cubic-bezier(.55, 0, 1, .55); }
-      6% { opacity: 1; }
-      34% { transform: translateY(0) scale(.5); animation-timing-function: ease-out; }
-      40% { transform: translateY(4px) scale(.64, .36); animation-timing-function: cubic-bezier(.2, .6, .4, 1); }
-      47% { transform: translateY(-6px) scale(.47, .6); animation-timing-function: cubic-bezier(.3, 0, .2, 1); }
-      62% { transform: translateY(-62px) scale(.52, .56); animation-timing-function: cubic-bezier(.6, 0, 1, .6); }
-      78% { transform: translateY(0) scale(.6, .5); animation-timing-function: cubic-bezier(.2, .6, .4, 1); }
-      84% { transform: translateY(2px) scale(.7, .46); animation-timing-function: cubic-bezier(.3, 0, .2, 1); }
-      91% { transform: translateY(-8px) scale(.82, .88); animation-timing-function: cubic-bezier(.3, 0, .3, 1); }
+    /* the birth: a point of light at the heart of the big ring swells into a small ring, breathes once, then rises through the
+       ring's wall and settles on top with the softest overshoot; every segment eases, nothing snaps */
+    @keyframes sp-birth {
+      0% { transform: translateY(70px) scale(0); opacity: 0; animation-timing-function: cubic-bezier(.2, .6, .3, 1); }
+      18% { transform: translateY(70px) scale(.5); opacity: 1; animation-timing-function: cubic-bezier(.4, 0, .6, 1); }
+      30% { transform: translateY(68px) scale(.44); animation-timing-function: cubic-bezier(.5, 0, .1, 1); }
+      76% { transform: translateY(-5px) scale(.98); animation-timing-function: cubic-bezier(.3, 0, .4, 1); }
+      90% { transform: translateY(2px) scale(1.01); animation-timing-function: cubic-bezier(.3, 0, .3, 1); }
       100% { transform: translateY(0) scale(1); opacity: 1; }
     }
     @keyframes sp-slide { to { transform: translateX(0); } }
@@ -117,12 +114,12 @@
       <svg class="mark" id="sp-mark" viewBox="0 0 320 176" aria-hidden="true">
         <defs><linearGradient id="sp-g" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8FAEFF"/><stop offset=".55" stop-color="#3ECFC8"/><stop offset="1" stop-color="#E5B450"/></linearGradient></defs>
         <g class="markg">
-          <circle class="s s2" cx="72" cy="119" r="39" pathLength="1"/>
-          <g class="topg"><circle class="s s1" cx="72" cy="52" r="31"/></g>
+          <circle class="s s2" cx="72" cy="120" r="39" pathLength="1"/>
+          <g class="topg"><circle class="s s1" cx="72" cy="50" r="31"/></g>
           <path class="s s3" id="sp-five" d="M246 22 H178 L170 86 C 202 64, 264 72, 264 120 C 264 160, 208 170, 171 144" pathLength="1"/>
-          <circle class="gl" cx="72" cy="52" r="31" pathLength="1"/>
-          <circle class="gl" cx="72" cy="119" r="39" pathLength="1" style="animation-delay:7.8s"/>
-          <path class="gl" d="M246 22 H178 L170 86 C 202 64, 264 72, 264 120 C 264 160, 208 170, 171 144" pathLength="1" style="animation-delay:8s"/>
+          <circle class="gl" cx="72" cy="50" r="31" pathLength="1"/>
+          <circle class="gl" cx="72" cy="120" r="39" pathLength="1" style="animation-delay:9s"/>
+          <path class="gl" d="M246 22 H178 L170 86 C 202 64, 264 72, 264 120 C 264 160, 208 170, 171 144" pathLength="1" style="animation-delay:9.2s"/>
           <path class="shine" d="M246 22 H178 L170 86 C 202 64, 264 72, 264 120 C 264 160, 208 170, 171 144" pathLength="1"/>
           <g class="dotg"><circle class="dot" id="sp-dot" cx="135" cy="152" r="10"/></g>
         </g>
@@ -174,7 +171,7 @@
       var cv = document.getElementById("sp-rain"), cx = cv.getContext("2d"), W = 0, H = 0, dpr = 1;
       function size() { dpr = Math.min(2, window.devicePixelRatio || 1); W = cv.clientWidth; H = cv.clientHeight; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); cx.setTransform(dpr, 0, 0, dpr, 0, 0); }
       size(); window.addEventListener("resize", size);
-      var RAIN = 2900, SPAWN_END = 4850, GATHER = 5000, FLY = 1000, SETTLE = 6300, END = 6850;
+      var RAIN = 2900, SPAWN_END = 5800, GATHER = 6300, FLY = 1000, SETTLE = 7550, END = 8100;
       var drops = [], lastSpawn = 0, targets = null, gatherAt = 0, seed = 7, deck = [];
       function rnd() { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; }
       function nextWord() { if (!deck.length) { deck = WORDS.slice(); for (var i = deck.length - 1; i > 0; i--) { var j = Math.floor(rnd() * (i + 1)), tmp = deck[i]; deck[i] = deck[j]; deck[j] = tmp; } } return deck.pop(); }   // every word once before any repeats
@@ -182,7 +179,7 @@
       function colourAt(t) { var i = t < .55 ? 0 : 1, f = t < .55 ? t / .55 : (t - .55) / .45, a = COLS[i], b = COLS[i + 1]; return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f]; }
       function spawn(t) {
         var depth = rnd();
-        drops.push({ text: nextWord(), x: 10 + rnd() * (W - 20), y: -16 - rnd() * 160, vy: 90 + depth * 150, sway: 5 + rnd() * 12, ph: rnd() * 6.283, size: 11 + depth * 7, a: .22 + depth * .55, rot: (rnd() - .5) * .14, born: t, col: colourAt(rnd()) });
+        drops.push({ text: nextWord(), x: 10 + rnd() * (W - 20), y: -16 - rnd() * 120, vy: 170 + depth * 190, floor: H - 16 - rnd() * 90, sway: 5 + rnd() * 12, ph: rnd() * 6.283, size: 11 + depth * 7, a: .22 + depth * .55, rot: (rnd() - .5) * .14, born: t, col: colourAt(rnd()) });
       }
       // where the words go: points along the five and around the dot, in screen pixels, read from the drawn mark itself
       function readTargets() {
@@ -202,15 +199,17 @@
       function draw(t) {
         cx.clearRect(0, 0, W, H);
         if (t < RAIN) return;
-        if (t < SPAWN_END && t - lastSpawn > 46 && drops.length < 96) { spawn(t); if (rnd() < .35) spawn(t); lastSpawn = t; }
+        if (t < SPAWN_END && t - lastSpawn > 46 && drops.length < 120) { spawn(t); if (rnd() < .35) spawn(t); lastSpawn = t; }
         if (t >= GATHER && !targets) { try { targets = readTargets(); } catch (e) { targets = []; } gatherAt = t; for (var j = 0; j < drops.length; j++) { var dr = drops[j], tg = targets[(j * 7) % Math.max(1, targets.length)] || [W / 2, H / 2, .5]; dr.tx = tg[0]; dr.ty = tg[1]; dr.tc = colourAt(tg[2]); dr.ta = tg[3] || 0; dr.sx = dr.x; dr.sy = dr.y; dr.delay = rnd() * 300; dr.bend = (rnd() - .5) * 140; } }
         cx.textAlign = "center"; cx.textBaseline = "middle";
         for (var i = drops.length - 1; i >= 0; i--) {
           var w = drops[i], x, y, a, size, col = w.col;
           if (!targets) {
+            // it falls the whole height and comes to rest near the bottom, so the screen fills from the floor up; nothing is lost
             var age = (t - w.born) / 1000;
-            y = w.y + w.vy * age; x = w.x + Math.sin(w.ph + age * 1.6) * w.sway; a = w.a * Math.min(1, age * 2.2); size = w.size;
-            if (y > H + 30) { drops.splice(i, 1); continue; }
+            y = w.y + w.vy * age;
+            if (y >= w.floor) { if (w.restAge == null) w.restAge = age; y = w.floor; age = w.restAge; }
+            x = w.x + Math.sin(w.ph + age * 1.6) * w.sway; a = w.a * Math.min(1, age * 2.2); size = w.size;
             w.x2 = x; w.y2 = y;
           } else {
             var f = ease((t - gatherAt - w.delay) / FLY);

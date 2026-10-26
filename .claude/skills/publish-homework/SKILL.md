@@ -1,11 +1,11 @@
 ---
 name: publish-homework
-description: Turn the teacher's homework note (from 8.5 Teacher mode, "Send to Claude", or pasted in chat) into one day's homework for Muslima's 8.5 app, check it, and publish it. Use whenever Dexter sends 8.5 homework in words.
+description: Turn the teacher's homework note (from 8.5 Teacher mode, "Send to Claude", or pasted in chat) into one day's homework for the 8.5 app, check it, and publish it. Use whenever Dexter sends 8.5 homework in words.
 ---
 
 # Publish a day of 8.5 homework
 
-Dexter (the teacher) writes the homework in his own words. You turn it into the JSON the 8.5 app shows Muslima, step by step, the way he would set it himself. `example.json` next to this file is a real published day: match its tone, structure and level of detail.
+Dexter (the teacher) writes the homework in his own words. You turn it into the JSON the 8.5 app shows the student, step by step, the way he would set it himself. `example.json` next to this file is a real published day: match its tone, structure and level of detail.
 
 ## How you were started
 

@@ -6,7 +6,7 @@
 
 ## What she sees (25 Oct layout)
 
-The very first time a device opens the app it gets the **welcome** once: the dark ikat, "This was made for you.", her name (from your Class settings, or a box to type it), then "Lessons, homework, mocks.", "Your words, your cards.", "One target.", "Band 8.5." After that, every cold start opens on the **8.5 mark**, told in four movements: one ring draws itself in light; a small ring drops like a ball, lands on it, squashes, bounces and settles on top to make the 8; the 8 stands alone with a line that says eight is not the goal ("Most people stop at eight.") while words rain down the screen (consistency, nuance, second drafts, built different, understood the assignment, and about ninety more); then the 8 slides over and every word flies to its place and becomes the .5, which is inked out of them and catches a mirror shine, and a line of encouragement arrives (twenty of them, by the day and the hour, sometimes with her name). After about seven seconds the whole screen folds into the dot and Today is there. A tap after the first second skips it. With "reduce motion" on, it is the finished mark and a plain fade.
+The very first time a device opens the app it gets the **welcome** once: the dark ikat, "This was made for you.", her name (from your Class settings, or a box to type it), then "Lessons, homework, mocks.", "Your words, your cards.", "One target.", "Band 8.5." After that, every cold start opens on the **8.5 mark**, told in four movements: one ring draws itself in light; a small ring is born at its heart and rises through it to make the 8; the 8 stands alone with a line that says eight is not the goal ("Most people stop at eight.") while words rain the whole height of the screen and pool at the bottom (consistency, nuance, second drafts, built different, understood the assignment, and about ninety more); then the 8 slides over and every word flies to one place and becomes the .5, which is inked out of them and catches a mirror shine, and a line of encouragement arrives (twenty of them, by the day and the hour, sometimes with her name). After about seven seconds the whole screen folds into the dot and Today is there. A tap after the first second skips it. With "reduce motion" on, it is the finished mark and a plain fade.
 
 | Tab | What it is |
 | --- | --- |
@@ -31,7 +31,7 @@ Open the app, Settings, the small **Teacher** link at the bottom (or go to `#/ad
 
 Everything arrives in your Telegram from the 8.5 bot, named so it sorts itself:
 - homework: `2026-10-14_speaking-written-answers.pdf`, `2026-10-14_speaking-recordings_Q1.webm`;
-- mocks: `mock-01_writing_task1.txt`, `mock-01_writing_task2.txt`, `mock-01_speaking_1_part1.webm` … plus one line per part ("Muslima finished Mock 1 Listening: band 7.5 (33/40), left the screen 1×");
+- mocks: `mock-01_writing_task1.txt`, `mock-01_writing_task2.txt`, `mock-01_speaking_1_part1.webm` … plus one line per part ("<name> finished Mock 1 Listening: band 7.5 (33/40), left the screen 1×");
 - her check-in answers, one line each.
 If she is offline, files wait on her phone and go when she is back.
 

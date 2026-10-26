@@ -1,6 +1,6 @@
 ---
 name: publish-mock
-description: Turn the teacher's mock exam materials (PDFs of the Listening, Reading, Writing and Speaking papers, the answer keys, the listening audio) into one mock for Muslima's 8.5 app, check it, and publish it. Use whenever Dexter sends a full mock, a practice test, or "Mock N" materials.
+description: Turn the teacher's mock exam materials (PDFs of the Listening, Reading, Writing and Speaking papers, the answer keys, the listening audio) into one mock for the 8.5 app, check it, and publish it. Use whenever Dexter sends a full mock, a practice test, or "Mock N" materials.
 ---
 
 # Publish a mock exam
