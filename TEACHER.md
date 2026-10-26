@@ -1,6 +1,6 @@
 # Teacher guide
 
-**Her link: https://iamdexterdude.github.io/8.5/** That is all she needs. Nothing to type, no code, no setup. She opens it, sees her name, and whatever you publish (homework, a mock, a deck, a note) appears the next time she opens the app.
+**The link: https://iamdexterdude.github.io/8.5/** That is all a student needs. No code, no setup. They open it, type the name they want to be called, and whatever you publish (homework, a mock, a deck, a note) appears the next time they open the app.
 
 **Your password** is the one you chose (it is never written in this repository). Change it in Teacher mode, Class, Password (4 characters or more). The hash in the feed repo is mixed with a secret kept on Vercel, so it cannot be cracked offline; online guesses are limited to 8 per 15 minutes.
 
@@ -21,10 +21,10 @@ The very first time a device opens the app it gets the **welcome** once: the dar
 Open the app, Settings, the small **Teacher** link at the bottom (or go to `#/admin`), type the password.
 
 - **Send to Claude**: pick what you are sending, **Homework**, **Mock** or **Deck**, write it in your own words, attach the files (up to 60 MB; for a mock: the PDFs of the Listening, Reading and Writing papers, the answer keys, the listening audio, the speaking questions), press **Send**. The screen shows where it has got to and Telegram tells you when it is live. It needs the PC on (the watcher runs there, hidden). To correct something, send a note for the same day or mock.
-- **Her work**: what she has done, from the small report her app sends: her habits (active days this week, the hour she usually starts, nights after 23:00, homework finished late or at night, last active day), Anki (decks, cards, due, reviews in the last 14 days), each mock part with band and leaves, homework days, her check-in and observation answers, her streak.
+- **Students**: one chip per student who has opened the app under a name; pick one to see their report: habits (active days this week, the hour she usually starts, nights after 23:00, homework finished late or at night, last active day), Anki (decks, cards, due, reviews in the last 14 days), each mock part with band and leaves, homework days, her check-in and observation answers, her streak.
 - **Mocks**: for each mock she has finished, type the Writing band, the Speaking band and a short note. The bands appear on her Mock and Progress screens and complete the overall.
 - **Anki**: a note for the Anki tab (the tab shows a "1" badge until it is read; Got it blows the note away like a deleted message) and a quick deck (one line per card, `front — back`), published straight away.
-- **Class**: her name, your Telegram username, lesson days, time and link, a note for Today, a Telegram test, the password.
+- **Class**: your Telegram username, lesson days, time and link, a note for Today, a Telegram test, the password. Students name themselves.
 - **Music**: the list the finish screen draws from.
 
 ## What she sends you

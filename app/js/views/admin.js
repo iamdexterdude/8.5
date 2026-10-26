@@ -3,12 +3,13 @@
 import { h, icon, todayISO, addDays, fmtDate, fmtShort } from "../util.js";
 import * as store from "../store.js";
 import * as hw from "../homework.js";
-import { adminLoad, adminSave, putEncrypted, fetchPublished, readPublished, sendTeacherNote, sendToClaude, claudeStatus, session, lock, unlock, changePassword } from "../publish.js";
+import { adminLoad, adminSave, putEncrypted, fetchPublished, readPublished, listPublished, sendTeacherNote, sendToClaude, claudeStatus, session, lock, unlock, changePassword } from "../publish.js";
 import { SITE } from "../feedkey.js";
 import { head, toast } from "../ui.js";
 
 export const live = false;
 let tab = "claude";
+let studentPick = null;   // which student's report is open under Students
 
 const defaultDate = () => { const t = todayISO(); const hour = Number(new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Tashkent", hour: "2-digit", hour12: false }).format(new Date())); return hour >= 17 ? addDays(t, 1) : t; };
 const lines = (t) => t.split("\n").map((x) => x.trim()).filter(Boolean);
@@ -17,7 +18,7 @@ export default async function (ctx) {
   const root = h("div");
   root.append(head("Teacher mode", { back: "#/today", actions: session() ? h("button", { class: "btn small quiet", onclick: () => { lock(); ctx.rerender(); } }, "Lock") : null }));
   if (!session()) { root.append(lockPanel(ctx)); return root; }
-  root.append(h("nav", { class: "seg", "aria-label": "Teacher mode", style: { marginBottom: "16px" } }, [["claude", "Send to Claude"], ["student", "Her work"], ["mocks", "Mocks"], ["anki", "Anki"], ["class", "Class"], ["music", "Music"]].map(([k, l]) => h("button", { class: "seglink", "aria-current": tab === k ? "page" : null, onclick: () => { tab = k; ctx.rerender(); } }, l))));
+  root.append(h("nav", { class: "seg", "aria-label": "Teacher mode", style: { marginBottom: "16px" } }, [["claude", "Send to Claude"], ["student", "Students"], ["mocks", "Mocks"], ["anki", "Anki"], ["class", "Class"], ["music", "Music"]].map(([k, l]) => h("button", { class: "seglink", "aria-current": tab === k ? "page" : null, onclick: () => { tab = k; ctx.rerender(); } }, l))));
   root.append(tab === "claude" ? claudeTab(ctx) : tab === "student" ? await studentTab(ctx) : tab === "mocks" ? mocksTab(ctx) : tab === "anki" ? ankiTab(ctx) : tab === "class" ? classTab(ctx) : musicTab(ctx));
   return root;
 }
@@ -130,11 +131,19 @@ function claudeTab(ctx) {
 
 // ------------------------------------------------------------------ her work
 async function studentTab(ctx) {
+  // every student who has opened the app under a name has a report in the feed; pick one
+  let ids = [];
+  try { ids = (await listPublished("students")).filter((f) => f.endsWith(".json")).map((f) => f.replace(/\.json$/, "")).sort(); } catch {}
+  if (!ids.length) return h("div", null, h("p", { class: "muted" }, "Nothing reported yet. A student's app sends a small report each time they study, finish homework or a mock."));
+  if (!ids.includes(studentPick)) studentPick = ids[0];
+  const pretty = (id) => id.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  const box = h("div", null);
+  if (ids.length > 1) box.append(h("div", { class: "chips", style: { marginBottom: "12px" } }, ids.map((id) => h("button", { class: "chip" + (id === studentPick ? " on" : ""), onclick: () => { studentPick = id; ctx.rerender(); } }, pretty(id)))));
   let rep = null;
-  try { const t = await readPublished(`students/${hw.studentId()}.json`); rep = t ? JSON.parse(t) : null; } catch {}
-  if (!rep) return h("div", null, h("p", { class: "muted" }, "Nothing reported yet. Her app sends a small report each time she studies, finishes homework or a mock."));
+  try { const t = await readPublished(`students/${studentPick}.json`); rep = t ? JSON.parse(t) : null; } catch {}
+  if (!rep) { box.append(h("p", { class: "muted" }, "This report could not be read.")); return box; }
   const when = (iso) => new Date(iso).toLocaleString("en-GB", { timeZone: "Asia/Tashkent", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
-  const box = h("div", null, h("p", { class: "small muted" }, `${rep.student}, reported ${when(rep.at)}. Streak ${rep.streak} ${rep.streak === 1 ? "day" : "days"}.`));
+  box.append(h("p", { class: "small muted" }, `${rep.student}, reported ${when(rep.at)}. Streak ${rep.streak} ${rep.streak === 1 ? "day" : "days"}.`));
   const hb = rep.habits;
   if (hb) {
     const bits = [];
@@ -194,7 +203,7 @@ function ankiTab(ctx) {
   const out2 = h("div", { class: "small muted", "aria-live": "polite" });
   return h("div", null,
     h("section", { class: "section", style: { marginTop: 0 } }, h("div", { class: "shead" }, h("h2", null, "A note on her Anki screen")),
-      h("p", { class: "small muted" }, "Shows once, at the top of her Anki, until she taps Got it. Her numbers are under Her work."),
+      h("p", { class: "small muted" }, "Shows once, at the top of the Anki tab, until Got it is tapped. The numbers are under Students."),
       h("div", { class: "field" }, ta),
       h("div", { class: "row-actions" }, h("button", { class: "btn primary small", onclick: () => publishConfig({ ankiNote: ta.value.trim() ? { text: ta.value.trim(), at: new Date().toISOString() } : null }, out, "Published. She sees it the next time she opens Anki.") }, "Publish the note"), c.ankiNote?.text ? h("button", { class: "btn small quiet", onclick: () => { ta.value = ""; publishConfig({ ankiNote: null }, out, "Removed."); } }, "Remove") : null), out),
     h("section", { class: "section" }, h("div", { class: "shead" }, h("h2", null, "A deck, quickly")),
@@ -228,11 +237,11 @@ function classTab(ctx) {
     h("section", { class: "section", style: { marginTop: 0 } }, h("div", { class: "shead" }, h("h2", null, "Her link")),
       h("div", { class: "row-actions" }, h("input", { type: "text", readOnly: true, value: SITE, "aria-label": "Student link", style: { maxWidth: "360px" }, onfocus: (e) => e.target.select() }), h("button", { class: "btn small", onclick: () => { navigator.clipboard?.writeText(SITE); toast("Copied."); } }, "Copy"))),
     h("section", { class: "section" }, h("div", { class: "shead" }, h("h2", null, "The class")),
-      field("Student's name", "student", "text", null, { placeholder: "First name" }),
-      field("Your Telegram username", "teacher", "text", "Gives her a Message your teacher button.", { placeholder: "@username" }),
+      h("p", { class: "small muted" }, "Students choose their own name the first time they open the app, and can change it in Settings."),
+      field("Your Telegram username", "teacher", "text", "Gives the student a Message your teacher button.", { placeholder: "@username" }),
       h("div", { class: "field" }, h("div", { class: "lbl" }, "Lesson days"), dayChips),
       h("div", { class: "grid3 wide" }, field("Lesson time", "lessonTime", "time"), field("Lesson link (Zoom, Meet, Telegram)", "lessonLink", "text", null, { placeholder: "https://" })),
-      h("div", { class: "row-actions" }, h("button", { class: "btn primary", onclick: () => publishConfig({ student: c.student, teacher: c.teacher, lessonDays: [...days].sort(), lessonTime: c.lessonTime, lessonLink: c.lessonLink }, out, "Published. Her app picks it up the next time it opens.") }, icon("upload", 18), "Publish class settings")), out),
+      h("div", { class: "row-actions" }, h("button", { class: "btn primary", onclick: () => publishConfig({ student: null, teacher: c.teacher, lessonDays: [...days].sort(), lessonTime: c.lessonTime, lessonLink: c.lessonLink }, out, "Published. The app picks it up the next time it opens.") }, icon("upload", 18), "Publish class settings")), out),
     h("section", { class: "section" }, h("div", { class: "shead" }, h("h2", null, "A note on her Today")),
       h("div", { class: "field" }, tnote),
       h("div", { class: "row-actions" }, h("button", { class: "btn small primary", onclick: () => publishConfig({ todayNote: tnote.value.trim() ? { text: tnote.value.trim(), at: new Date().toISOString() } : null }, nout, "Published.") }, "Publish the note"), c.todayNote?.text ? h("button", { class: "btn small quiet", onclick: () => { tnote.value = ""; publishConfig({ todayNote: null }, nout, "Removed."); } }, "Remove") : null), nout),

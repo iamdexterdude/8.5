@@ -16,7 +16,7 @@ export default async function (ctx) {
     return h("div", { class: "field" }, h("label", null, label), el);
   };
   root.append(h("section", { class: "section", style: { marginTop: 0 } }, h("div", { class: "shead" }, h("h2", null, "You")),
-    text("name", "Your name", { autocomplete: "given-name", maxLength: 40, placeholder: hw.F.config?.student || "" }),
+    text("name", "Your name", { autocomplete: "given-name", maxLength: 40, placeholder: "Your first name" }),
     h("div", { class: "field" }, h("div", { class: "lbl" }, "Theme"), h("div", { class: "seg", role: "group", "aria-label": "Theme" }, [["system", "System"], ["light", "Light"], ["dark", "Dark"]].map(([k, l]) => h("button", { "aria-pressed": String(store.setting("theme") === k), onclick: async (e) => { const me = e.currentTarget, group = me.parentElement; await store.setSetting("theme", k); group.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b === me))); } }, l))))));
 
   const time = h("input", { type: "time", value: store.lessonTime(), "aria-label": "Lesson start time" }); time.addEventListener("change", () => store.setSetting("lessonTime", time.value || "19:00"));
