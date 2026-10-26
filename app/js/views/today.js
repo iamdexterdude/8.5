@@ -7,6 +7,7 @@ import * as ci from "../checkin.js";
 import * as pulse from "../pulse.js";
 import { ikat } from "./welcome.js";
 import { dailyBlock } from "./daily.js";
+import { dissolve } from "../fx.js";
 
 export default async function (ctx) {
   const today = todayISO(), name = hw.studentName();
@@ -30,7 +31,7 @@ export default async function (ctx) {
   // ---- a word from the teacher
   const note = hw.F.config?.todayNote;
   if (note?.text && note.at !== store.S.kv["note-seen"]) root.append(h("section", { class: "tnote" }, h("div", { class: "tnote-k" }, "From your teacher"), h("p", null, note.text),
-    h("button", { class: "btn small quiet", onclick: () => { store.setSetting("note-seen", note.at); } }, "Got it")));
+    h("button", { class: "btn small quiet", onclick: async (e) => { const box = e.currentTarget.closest(".tnote"); e.currentTarget.disabled = true; await dissolve(box); store.setSetting("note-seen", note.at); } }, "Got it")));
 
   // ---- the next small thing: what is waiting, or something small when nothing is
   const step = await pulse.nextStep();

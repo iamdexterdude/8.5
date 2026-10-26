@@ -4,6 +4,7 @@ import * as store from "../store.js";
 import * as srs from "../srs.js";
 import * as hw from "../homework.js";
 import { head, toast, sheet, confirmSheet } from "../ui.js";
+import { dissolve } from "../fx.js";
 
 export const live = false;
 
@@ -25,7 +26,7 @@ function hub(ctx) {
   // a word from the teacher about her Anki, shown once, quietly
   const note = hw.F.config?.ankiNote;
   if (note?.text && note.at !== S.kv["anki-note-seen"]) root.append(h("section", { class: "tnote" }, h("div", { class: "tnote-k" }, "From your teacher"), h("p", null, note.text),
-    h("button", { class: "btn small quiet", onclick: () => store.setSetting("anki-note-seen", note.at) }, "Got it")));
+    h("button", { class: "btn small quiet", onclick: async (e) => { const box = e.currentTarget.closest(".tnote"); e.currentTarget.disabled = true; await dissolve(box); store.setSetting("anki-note-seen", note.at); } }, "Got it")));
 
   const list = h("ul", { class: "rows decks" });
   for (const d of [...S.decks].sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""))) {

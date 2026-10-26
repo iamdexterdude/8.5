@@ -94,16 +94,26 @@ function applyTheme() {
 }
 store.onChange(applyTheme);
 
-// the Homework tab gives a small nudge now and then while something is waiting for her
+// the tab bar keeps her informed: the Homework tab carries a dot and hops now and then while homework is unsubmitted;
+// the Anki tab shows a new-message badge, with a little ring, when the teacher has written a note she has not read
 function nudgeLoop() {
-  const a = nav.querySelector('a[data-tab="homework"]');
+  const hwA = nav.querySelector('a[data-tab="homework"]'), ankiA = nav.querySelector('a[data-tab="anki"]');
+  const replay = (a, cls) => { a.classList.remove(cls); void a.offsetWidth; a.classList.add(cls); };
+  let wasUnread = null, timer = 0;
   const tick = () => {
-    const t = todayISO(), hw = hwm.homeworkFor(t);
-    const pending = hw && !hwm.dayProgress(t, hw).complete && parseHash().name !== "homework";
-    a.classList.toggle("pending", !!pending);
-    if (pending && !document.hidden) { a.classList.remove("nudge"); void a.offsetWidth; a.classList.add("nudge"); }
+    const t = todayISO(), hw = hwm.homeworkFor(t), here = parseHash().name;
+    const pending = !!(hw && !hwm.dayProgress(t, hw).complete && here !== "homework");
+    hwA.classList.toggle("pending", pending);
+    const note = hwm.F.config?.ankiNote;
+    const unread = !!(note?.text && note.at !== store.S.kv["anki-note-seen"] && here !== "anki");
+    ankiA.classList.toggle("unread", unread);
+    if (unread && wasUnread === false && !document.hidden) replay(ankiA, "ping");
+    wasUnread = unread;
+    return pending;
   };
-  tick(); setInterval(tick, 40000); store.onChange(tick);
+  const hop = () => { if (tick() && !document.hidden) replay(hwA, "nudge"); clearTimeout(timer); timer = setTimeout(hop, 25000 + Math.random() * 20000); };
+  tick(); store.onChange(tick); window.addEventListener("hashchange", tick);
+  timer = setTimeout(hop, 2500);
 }
 
 window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); window.__installPrompt = e; });
