@@ -135,10 +135,12 @@ async function boot() {
   pulse.noteVisit();
   if (!store.S.kv.welcomed && !new URLSearchParams(location.search).has("nowelcome")) {
     if (!store.setting("name") && navigator.onLine) await hwm.refresh(undefined, { force: true, timeout: 4000 }).catch(() => {});
+    // the first open: the welcome is the opening. The quiet dark screen gives way to it the moment it is on the page.
     const { runWelcome } = await import("./views/welcome.js");
     await render();
-    await hideSplash();
-    await runWelcome({ name: hwm.studentName() });
+    const welcome = runWelcome({ name: hwm.studentName() });
+    const sp = document.getElementById("splash"); if (sp) { sp.dataset.gone = "1"; sp.style.transition = "opacity .4s"; sp.style.opacity = "0"; setTimeout(() => sp.remove(), 450); }
+    await welcome;
     return;
   }
   await render();
