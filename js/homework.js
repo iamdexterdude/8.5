@@ -68,6 +68,16 @@ export function refresh(date = todayISO(), { force = false, timeout } = {}) {
   return inflight;
 }
 
+// the first open on a device: her name and the lesson settings alone, before anything else is fetched, with time to arrive
+export async function primeConfig({ timeout = 15000 } = {}) {
+  const cv = await fetchDec("config.json", { timeout });
+  if (!cv) return null;
+  F.config = cv;
+  await store.setSetting("classConfig", { lessonDays: cv.lessonDays, lessonTime: cv.lessonTime, lessonLink: cv.lessonLink });
+  await persist();
+  return cv;
+}
+
 export const homeworkFor = (date) => F.hw[date] || null;
 export const studentName = () => store.setting("name") || F.config?.student || "";
 const nameOf = () => studentName() || "Student";

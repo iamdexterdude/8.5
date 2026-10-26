@@ -269,11 +269,14 @@
       var last = "";
       window.addEventListener("error", function (e) { last = (e.message || "") + (e.filename ? " (" + e.filename.split("/").slice(-2).join("/") + ":" + e.lineno + ")" : ""); });
       window.addEventListener("unhandledrejection", function (e) { last = String((e.reason && e.reason.message) || e.reason); });
-      var tries = 0;
+      var began = Date.now();
       setTimeout(function check() {
         var v = document.getElementById("view");
         if (!v || v.children.length) return;
-        if (window.__booting && tries++ < 3) { setTimeout(check, 6000); return; }
+        // still downloading (a file arrived in the last 8 s) or still booting: keep waiting, up to 90 s, before calling it stuck
+        var waited = Date.now() - began, arriving = false;
+        try { var rs = performance.getEntriesByType("resource"); for (var i = 0; i < rs.length; i++) if (rs[i].responseEnd && performance.now() - rs[i].responseEnd < 8000) { arriving = true; break; } } catch (e) {}
+        if ((arriving && waited < 90000) || (window.__booting && waited < 40000)) { setTimeout(check, 4000); return; }
         var sp = document.getElementById("splash"); if (sp) sp.remove();
         v.innerHTML = '<div class="empty"><h1>8.5 is taking too long</h1><p>Refresh the app. Everything you saved stays on this device.</p><p><button class="btn primary" id="wd-refresh">Refresh the app</button></p><p class="tiny faint" id="wd"></p></div>';
         document.getElementById("wd").textContent = last ? "Detail: " + last : "";
