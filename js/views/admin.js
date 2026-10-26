@@ -228,7 +228,7 @@ function classTab(ctx) {
     h("section", { class: "section", style: { marginTop: 0 } }, h("div", { class: "shead" }, h("h2", null, "Her link")),
       h("div", { class: "row-actions" }, h("input", { type: "text", readOnly: true, value: SITE, "aria-label": "Student link", style: { maxWidth: "360px" }, onfocus: (e) => e.target.select() }), h("button", { class: "btn small", onclick: () => { navigator.clipboard?.writeText(SITE); toast("Copied."); } }, "Copy"))),
     h("section", { class: "section" }, h("div", { class: "shead" }, h("h2", null, "The class")),
-      field("Her name", "student", "text", null, { placeholder: "Muslima" }),
+      field("Student's name", "student", "text", null, { placeholder: "First name" }),
       field("Your Telegram username", "teacher", "text", "Gives her a Message your teacher button.", { placeholder: "@username" }),
       h("div", { class: "field" }, h("div", { class: "lbl" }, "Lesson days"), dayChips),
       h("div", { class: "grid3 wide" }, field("Lesson time", "lessonTime", "time"), field("Lesson link (Zoom, Meet, Telegram)", "lessonLink", "text", null, { placeholder: "https://" })),
