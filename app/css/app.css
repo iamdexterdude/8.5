@@ -580,3 +580,15 @@ body.roomed { overflow: hidden; }
 .selbar button { border: 0; background: none; color: var(--bg); font: 600 13.5px var(--f-display); padding: 7px 11px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
 .selbar button:hover { background: rgba(255, 255, 255, .12); }
 @media (prefers-reduced-motion: reduce) { .room, .sp-card, .sp-model, .mic-ring { animation: none !important; } }
+
+/* ---------- the speaking sphere */
+.sp-rec { flex-direction: column; gap: 4px; padding: 0; }
+.sp-rec .sp-state { text-align: center; }
+.orb { position: relative; width: min(340px, 82vw); aspect-ratio: 1; margin: -18px auto -22px; cursor: pointer; border-radius: 50%; outline: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent; transition: width .55s var(--soft), margin .55s var(--soft); }
+.orb.small { width: 150px; margin: -10px auto -12px; }
+.orb canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.orb:focus-visible { box-shadow: 0 0 0 3px var(--accent-soft); }
+.orb-ic { position: absolute; inset: 0; margin: auto; width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: var(--accent-ink); opacity: .94; pointer-events: none; transition: transform .35s var(--ease), opacity .35s, background .35s; }
+.orb:hover .orb-ic { transform: scale(1.08); }
+.orb.live .orb-ic { background: var(--danger); opacity: .78; transform: scale(.72); }
+.orb.small .orb-ic { width: 36px; height: 36px; }
