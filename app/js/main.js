@@ -27,10 +27,24 @@ let current = { cleanup: [], key: "" };
 let renderToken = 0;
 
 function buildNav() {
+  nav.append(h("span", { class: "lens still", "aria-hidden": "true" }));
   for (const t of TABS) nav.append(h("a", { href: t.href, dataset: { tab: t.id }, "aria-label": t.label }, h("span", { class: "ic" }, icon(t.icon)), h("span", { class: "lb" }, t.label)));
+  addEventListener("resize", () => placeLens(false));
 }
 function setActiveTab(id) {
+  const before = nav.querySelector('a[aria-current="page"]')?.dataset.tab;
   nav.querySelectorAll("a").forEach((a) => (a.dataset.tab === id ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current")));
+  placeLens(!!before && before !== id);
+}
+// the lens: a drop of tinted glass under the current tab; it squashes while it travels and settles with a little spring
+function placeLens(travel) {
+  const lens = nav.querySelector(".lens"), a = nav.querySelector('a[aria-current="page"]');
+  if (!lens) return;
+  if (!a || !a.offsetWidth) { lens.style.opacity = "0"; return; }
+  const n = nav.getBoundingClientRect(), r = a.getBoundingClientRect(), pad = 5;
+  Object.assign(lens.style, { opacity: "1", left: `${r.left - n.left + pad}px`, top: `${r.top - n.top + pad}px`, width: `${r.width - pad * 2}px`, height: `${r.height - pad * 2}px` });
+  if (travel) { lens.classList.add("squash"); setTimeout(() => lens.classList.remove("squash"), 280); }
+  requestAnimationFrame(() => lens.classList.remove("still"));
 }
 
 export function parseHash() {
