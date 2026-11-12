@@ -10,12 +10,13 @@ export function validateHomework(hw) {
     for (const s of t.steps || []) {
       if (!s.id) errs.push(`A step in "${t.title}" has no id.`);
       else if (ids.has(s.id)) errs.push(`Step id "${s.id}" is used twice.`); else ids.add(s.id);
-      if (!["questions", "read", "words", "watch", "photos", "record", "check", "text", "link"].includes(s.type)) errs.push(`"${s.title}": unknown step type "${s.type}".`);
+      if (!["questions", "read", "words", "watch", "photos", "record", "check", "text", "link", "speaking", "reading"].includes(s.type)) errs.push(`"${s.title}": unknown step type "${s.type}".`);
       if (s.type === "questions" && !(s.groups || []).some((g) => g.questions?.length)) errs.push(`"${s.title}": add questions.`);
       if (s.type === "read" && !(s.paragraphs || []).length) errs.push(`"${s.title}": add the text.`);
       if (s.type === "words" && !(s.cards || []).length) errs.push(`"${s.title}": add words.`);
       if (s.type === "watch" && !s.url) errs.push(`"${s.title}": add the video link.`);
       if (s.type === "record" && !(s.questions || []).length) errs.push(`"${s.title}": add questions to record.`);
+      if (s.type === "speaking" && !(s.topics || []).some((t) => t.questions?.length)) errs.push(`"${s.title}": add topics with questions.`);
     }
   }
   return errs;

@@ -1,0 +1,249 @@
+// Two homework steps that open a room of their own:
+//   speaking  topics, then one question at a time: record, send, then the model answer with the book's highlights;
+//             a highlighted phrase taps into the Speaking deck.
+//   reading   a Part 3 passage and its questions, split like the computer test; highlight, or keep a word in the Reading deck;
+//             check the answers at the end.
+// Every recording is sent the moment she presses Send. Offline, it waits in the outbox and goes when she is back online.
+import { h, icon, mmss } from "../util.js";
+import * as store from "../store.js";
+import * as hw from "../homework.js";
+import { toast } from "../ui.js";
+
+const DECKS = {
+  speaking: { id: "deck-speaking", name: "Speaking phrases", note: "Phrases you kept from model answers." },
+  reading: { id: "deck-reading", name: "Reading words", note: "Words you caught in reading passages." },
+};
+async function keep(kind, front, back) {
+  const d = DECKS[kind];
+  if (!store.deckById(d.id)) await store.saveDeck({ id: d.id, name: d.name, kind: "mine", note: d.note, createdAt: new Date().toISOString() });
+  const key = front.trim().toLowerCase(), have = store.S.cards.find((c) => c.deck === d.id && c.front.trim().toLowerCase() === key);
+  if (have) return { card: have, added: false };
+  const card = await store.addCard({ deck: d.id, front: front.trim(), back, tag: kind });
+  store.changed(); return { card, added: true };
+}
+async function unkeep(kind, front) {
+  const d = DECKS[kind], key = front.trim().toLowerCase(), c = store.S.cards.find((x) => x.deck === d.id && x.front.trim().toLowerCase() === key);
+  if (c) await store.removeCard(c.id);
+}
+const kept = (kind, front) => store.S.cards.some((c) => c.deck === DECKS[kind].id && c.front.trim().toLowerCase() === front.trim().toLowerCase());
+const slug = (s) => String(s || "x").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 30);
+const sentenceAround = (text, at) => { const s = text.lastIndexOf(".", at) + 1, e = text.indexOf(".", at); return text.slice(s, e < 0 ? undefined : e + 1).replace(/==/g, "").trim(); };
+
+// a full-screen room that slides up over the app
+function room(title, sub, onClose) {
+  const body = h("div", { class: "room-body" });
+  const el = h("div", { class: "room", role: "dialog", "aria-modal": "true", "aria-label": title },
+    h("header", { class: "room-top" },
+      h("button", { class: "iconbtn", "aria-label": "Close", onclick: () => close() }, icon("close", 22)),
+      h("div", { class: "grow" }, h("div", { class: "room-k" }, sub || ""), h("div", { class: "room-t" }, title))),
+    body);
+  const close = () => { el.classList.add("out"); setTimeout(() => { el.remove(); document.body.classList.remove("roomed"); onClose?.(); }, 260); };
+  document.body.append(el); document.body.classList.add("roomed");
+  return { el, body, close, setTitle(t, s) { el.querySelector(".room-t").textContent = t; el.querySelector(".room-k").textContent = s || ""; } };
+}
+
+/* ============================================================ speaking */
+const qkey = (ti, qi) => `t${ti}q${qi}`;
+const sentOf = (c) => hw.stateOf(c.date).steps[c.step.id]?.sent || {};
+
+export function speaking(c) {
+  const s = c.step, topics = s.topics || [];
+  const total = topics.reduce((n, t) => n + t.questions.length, 0);
+  const wrap = h("div", { class: "sp" });
+  const draw = () => {
+    const sent = sentOf(c), done = Object.keys(sent).length;
+    wrap.replaceChildren(
+      s.intro ? h("p", { class: "muted" }, s.intro) : null,
+      h("div", { class: "sp-grid" }, topics.map((t, ti) => {
+        const n = t.questions.filter((_, qi) => sent[qkey(ti, qi)]).length, all = t.questions.length;
+        return h("button", { class: "sp-topic" + (n === all ? " full" : ""), onclick: () => openSpeaking(c, ti, draw) },
+          h("span", { class: "sp-num num" }, t.num || String(ti + 1)),
+          h("span", { class: "sp-name" }, t.name),
+          h("span", { class: "sp-meta num" }, n === all ? "All sent" : n ? `${n} of ${all} sent` : `${all} questions`),
+          h("span", { class: "sp-bar" }, h("i", { style: { width: `${(n / all) * 100}%` } })));
+      })),
+      h("p", { class: "tiny faint num", style: { marginTop: "10px" } }, `${done} of ${total} answers sent. Each one reaches your teacher the moment you send it.`));
+  };
+  draw();
+  return wrap;
+}
+
+function openSpeaking(c, ti0, redraw) {
+  const s = c.step, topics = s.topics;
+  let ti = ti0, qi = Math.max(0, topics[ti].questions.findIndex((_, i) => !sentOf(c)[qkey(ti, i)]));
+  const R = room(topics[ti].name, "Speaking, Part 1", () => { stopAll(); redraw(); });
+  let rec = null, stream = null, timer = null, take = null, secs = 0, showModel = false, ans = 0;
+
+  function stopAll() { try { if (rec && rec.state !== "inactive") rec.stop(); } catch {} stream?.getTracks().forEach((t) => t.stop()); clearInterval(timer); }
+  const pickMime = () => { for (const m of ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg;codecs=opus"]) if (window.MediaRecorder?.isTypeSupported?.(m)) return m; return ""; };
+  const extOf = (t) => (/mp4/.test(t) ? "m4a" : /ogg/.test(t) ? "ogg" : "webm");
+
+  async function start() {
+    try { stream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } }); }
+    catch { toast("The microphone is blocked. Allow it in your browser settings."); return; }
+    const mime = pickMime(), parts = [];
+    try { rec = new MediaRecorder(stream, mime ? { mimeType: mime, audioBitsPerSecond: 40000 } : { audioBitsPerSecond: 40000 }); } catch { rec = new MediaRecorder(stream); }
+    rec.ondataavailable = (e) => e.data.size && parts.push(e.data);
+    rec.onstop = () => { stream.getTracks().forEach((t) => t.stop()); clearInterval(timer); take = new Blob(parts, { type: rec.mimeType || mime || "audio/webm" }); take.url = URL.createObjectURL(take); rec = null; store.S.busy = Math.max(0, (store.S.busy || 1) - 1); draw(); };
+    store.S.busy = (store.S.busy || 0) + 1; rec.start(1000); secs = 0;
+    timer = setInterval(() => { secs++; const t = R.el.querySelector(".mic-t"); if (t) t.textContent = mmss(secs); if (secs >= (s.max || 120)) rec?.stop(); }, 1000);
+    draw();
+  }
+  async function send(btn) {
+    btn.disabled = true; btn.lastChild.textContent = "Sending…";
+    const t = topics[ti], q = t.questions[qi];
+    const r = await hw.sendFiles({ date: c.date, label: `Speaking · ${t.name} · Q${qi + 1}`, note: q.q, files: [{ blob: take, name: `${c.date}_${slug(t.name)}_Q${qi + 1}.${extOf(take.type)}` }] });
+    const sent = { ...sentOf(c), [qkey(ti, qi)]: new Date().toISOString() };
+    await hw.setStep(c.date, s.id, { sent });
+    const total = topics.reduce((n, x) => n + x.questions.length, 0);
+    if (Object.keys(sent).length >= total && !hw.stepDone(c.date, s.id)) { await hw.setStep(c.date, s.id, { done: true, doneAt: new Date().toISOString() }); await hw.noteCompletion(c.date, c.hw); }
+    toast(r === "sent" ? "Sent to your teacher." : "Saved. It sends when you're back online.");
+    take = null; showModel = true; ans = 0; draw();
+  }
+  function go(d) {
+    stopAll(); take = null; showModel = false; ans = 0;
+    qi += d;
+    if (qi >= topics[ti].questions.length) { if (ti < topics.length - 1) { ti++; qi = 0; } else { qi = topics[ti].questions.length - 1; } }
+    if (qi < 0) { if (ti > 0) { ti--; qi = topics[ti].questions.length - 1; } else qi = 0; }
+    R.setTitle(topics[ti].name, "Speaking, Part 1"); draw(d);
+  }
+
+  function modelView(q) {
+    const answers = q.answers || [];
+    if (!answers.length) return null;
+    const a = answers[Math.min(ans, answers.length - 1)], text = a.text;
+    const p = h("p", { class: "sp-answer" }); let last = 0; const rx = /==(.+?)==/g; let m; const phrases = [];
+    while ((m = rx.exec(text))) {
+      p.append(text.slice(last, m.index).replace(/==/g, ""));
+      const phrase = m[1].replace(/[.,;:!]+$/, ""), sentence = sentenceAround(text, m.index);
+      phrases.push([phrase, sentence]);
+      const mk = h("button", { class: "chunk" + (kept("speaking", phrase) ? " kept" : ""), title: "Keep this phrase", onclick: async () => {
+        if (kept("speaking", phrase)) { await unkeep("speaking", phrase); mk.classList.remove("kept"); toast("Taken out of Speaking phrases."); }
+        else { await keep("speaking", phrase, sentence); mk.classList.add("kept"); toast(`"${phrase}" is in Speaking phrases.`); }
+        upd();
+      } }, m[1]);
+      p.append(mk); last = m.index + m[0].length;
+    }
+    p.append(text.slice(last));
+    const all = h("button", { class: "btn small" }), upd = () => { const left = phrases.filter(([f]) => !kept("speaking", f)).length; all.textContent = left ? `Keep all ${left}` : "All kept"; all.disabled = !left; };
+    all.onclick = async () => { for (const [f, snt] of phrases) await keep("speaking", f, snt); p.querySelectorAll(".chunk").forEach((x) => x.classList.add("kept")); upd(); toast("Kept in Speaking phrases."); };
+    upd();
+    return h("section", { class: "sp-model" },
+      h("div", { class: "sp-model-h" }, h("b", null, "Model answer"),
+        answers.length > 1 ? h("span", { class: "seg" }, answers.map((_, i) => h("button", { class: i === ans ? "on" : "", onclick: () => { ans = i; draw(); } }, String(i + 1)))) : null,
+        a.written ? h("span", { class: "tiny faint" }, "written for 8.5") : null),
+      p,
+      phrases.length ? h("div", { class: "sp-keep" }, h("span", { class: "tiny muted grow" }, "Tap a highlighted phrase to keep it in Speaking phrases."), all) : null);
+  }
+
+  function draw(dir = 0) {
+    const t = topics[ti], q = t.questions[qi], sent = sentOf(c)[qkey(ti, qi)], recording = !!rec;
+    const dots = h("div", { class: "sp-dots" }, t.questions.map((_, i) => h("button", { class: (i === qi ? "on " : "") + (sentOf(c)[qkey(ti, i)] ? "sent" : ""), "aria-label": `Question ${i + 1}`, onclick: () => { if (rec) return; stopAll(); take = null; showModel = false; qi = i; draw(); } })));
+    const mic = recording
+      ? h("button", { class: "mic live", "aria-label": "Stop recording", onclick: () => rec?.stop() }, h("span", { class: "mic-ring" }), icon("stop", 30))
+      : h("button", { class: "mic", "aria-label": take ? "Record again" : "Record your answer", onclick: start }, icon("mic", 30));
+    const card = h("article", { class: "sp-card" + (dir > 0 ? " in-r" : dir < 0 ? " in-l" : "") },
+      h("div", { class: "sp-qk num" }, `Question ${qi + 1} of ${t.questions.length}`),
+      h("h2", { class: "sp-q" }, q.q),
+      h("div", { class: "sp-rec" },
+        mic,
+        h("div", { class: "sp-state" },
+          recording ? h("span", null, h("b", { class: "mic-t num" }, mmss(secs)), " Recording. Tap to stop.")
+            : take ? h("span", null, "Listen back, then send.")
+            : sent ? h("span", { class: "ok-t" }, icon("check", 16), " Sent. You can record a better one if you like.")
+            : h("span", { class: "muted" }, "Tap the microphone and answer as you would in the exam."))),
+      take && !recording ? h("div", { class: "sp-take" }, h("audio", { controls: true, src: take.url }),
+        h("div", { class: "row-actions" }, h("button", { class: "btn", onclick: () => { take = null; draw(); } }, "Discard"), h("button", { class: "btn primary", onclick: (e) => send(e.currentTarget) }, icon("upload", 18), "Send"))) : null,
+      sent && !take && !recording && !showModel && q.answers?.length ? h("button", { class: "btn quiet", onclick: () => { showModel = true; draw(); } }, icon("eye", 18), "See the model answer") : null,
+      showModel && !recording ? modelView(q) : null);
+    R.body.replaceChildren(
+      dots, card,
+      h("nav", { class: "sp-nav" },
+        h("button", { class: "btn", disabled: (ti === 0 && qi === 0) || recording, onclick: () => go(-1) }, icon("back", 18), "Back"),
+        h("button", { class: "btn primary", disabled: recording || (ti === topics.length - 1 && qi === t.questions.length - 1), onclick: () => go(1) }, qi === t.questions.length - 1 && ti < topics.length - 1 ? `Next: ${topics[ti + 1].name}` : "Next", icon("chevron", 18))));
+  }
+  draw();
+}
+
+/* ============================================================ reading */
+export function reading(c) {
+  const s = c.step, ps = s.passages || [];
+  const res = hw.stateOf(c.date).steps[s.id]?.results || {};
+  return h("div", { class: "rd" },
+    s.intro ? h("p", { class: "muted" }, s.intro) : null,
+    ps.length ? h("div", { class: "rd-list" }, ps.map((p, i) => h("button", { class: "rd-item", onclick: () => openReading(c, i) },
+      h("span", { class: "rd-k num" }, `Passage ${i + 1}`), h("span", { class: "rd-t" }, p.title),
+      h("span", { class: "rd-m num" }, res[i] ? `${res[i].score} of ${res[i].of}` : `${countQs(p)} questions${p.minutes ? `, ${p.minutes} min` : ""}`)))) : h("p", { class: "muted" }, "The passages arrive here soon."),
+    h("p", { class: "tiny faint" }, "Select any word in the passage to highlight it or keep it in Reading words."));
+}
+const countQs = (p) => (p.groups || []).reduce((n, g) => n + (g.items || []).length, 0);
+
+function openReading(c, pi) {
+  const s = c.step, p = s.passages[pi];
+  const R = room(p.title, `Reading, passage ${pi + 1}`);
+  const answers = {}; let checked = false;
+  const passage = h("article", { class: "rd-pass" }, h("h2", null, p.title), (p.paragraphs || []).map((t) => h("p", null, t)));
+  const qs = h("section", { class: "rd-qs" });
+  const tabs = h("div", { class: "rd-tabs seg" }, h("button", { class: "on", onclick: (e) => tab("pass", e.currentTarget) }, "Passage"), h("button", { onclick: (e) => tab("qs", e.currentTarget) }, "Questions"));
+  const split = h("div", { class: "rd-split show-pass" }, passage, qs);
+  function tab(which, btn) { split.className = "rd-split show-" + which; tabs.querySelectorAll("button").forEach((b) => b.classList.toggle("on", b === btn)); }
+
+  function drawQs() {
+    const key = p.answers || {};
+    const groups = (p.groups || []).map((g) => h("div", { class: "rd-g" },
+      g.title ? h("h3", null, g.title) : null, g.instructions ? h("p", { class: "muted small" }, g.instructions) : null,
+      (g.items || []).map((it) => {
+        const right = checked ? String(answers[it.n] || "").trim().toLowerCase() === String(key[it.n] || "").trim().toLowerCase() : null;
+        const opts = it.options || g.options;
+        return h("div", { class: "rd-q" + (checked ? (right ? " right" : " wrong") : "") },
+          h("div", { class: "rd-qrow" }, h("b", { class: "num" }, String(it.n)), h("span", null, it.text)),
+          opts ? h("div", { class: "rd-opts" }, opts.map((o) => { const v = typeof o === "string" ? o : o.v, label = typeof o === "string" ? o : `${o.v}  ${o.t}`; return h("button", { class: "opt" + (answers[it.n] === v ? " pick" : ""), disabled: checked, onclick: () => { answers[it.n] = v; drawQs(); } }, label); }))
+            : h("input", { value: answers[it.n] || "", disabled: checked, "aria-label": "Answer " + it.n, oninput: (e) => { answers[it.n] = e.target.value; } }),
+          checked && !right ? h("div", { class: "rd-key small" }, `Answer: ${key[it.n]}`) : null);
+      })));
+    const all = (p.groups || []).flatMap((g) => g.items || []);
+    const score = all.filter((it) => String(answers[it.n] || "").trim().toLowerCase() === String(key[it.n] || "").trim().toLowerCase()).length;
+    qs.replaceChildren(...groups, h("div", { class: "row-actions", style: { margin: "14px 0 40px" } },
+      checked ? h("div", { class: "rd-score" }, h("b", { class: "num" }, `${score} of ${all.length}`), " right")
+        : h("button", { class: "btn primary", onclick: async () => {
+          checked = true; drawQs();
+          const res = { ...(hw.stateOf(c.date).steps[s.id]?.results || {}), [pi]: { score, of: all.length, at: new Date().toISOString() } };
+          await hw.setStep(c.date, s.id, { results: res });
+          hw.sendText(`${hw.studentName() || "Student"} | Reading: ${p.title}: ${score} of ${all.length}`);
+          if (Object.keys(res).length >= s.passages.length) { await hw.setStep(c.date, s.id, { done: true, doneAt: new Date().toISOString() }); await hw.noteCompletion(c.date, c.hw); }
+        } }, "Check my answers")));
+  }
+  drawQs();
+  R.body.append(tabs, split);
+
+  // select text: highlight it, or keep it
+  const bar = h("div", { class: "selbar", hidden: true },
+    h("button", { onclick: () => mark() }, "Highlight"),
+    h("button", { onclick: () => keepSel() }, icon("plus", 16), "Reading words"));
+  R.el.append(bar);
+  let range = null;
+  const onSel = () => setTimeout(() => {
+    const sel = getSelection();
+    if (!sel.rangeCount || sel.isCollapsed || !passage.contains(sel.anchorNode)) { bar.hidden = true; return; }
+    range = sel.getRangeAt(0); const r = range.getBoundingClientRect();
+    bar.style.left = Math.max(8, Math.min(innerWidth - 230, r.left + r.width / 2 - 110)) + "px"; bar.style.top = Math.max(60, r.top - 50) + "px"; bar.hidden = false;
+  }, 10);
+  passage.addEventListener("mouseup", onSel); passage.addEventListener("touchend", onSel);
+  document.addEventListener("selectionchange", () => { if (getSelection().isCollapsed) setTimeout(() => { if (getSelection().isCollapsed) bar.hidden = true; }, 200); });
+  function mark() {
+    if (!range) return;
+    const w = document.createTreeWalker(passage, NodeFilter.SHOW_TEXT), nodes = [];
+    while (w.nextNode()) if (range.intersectsNode(w.currentNode)) nodes.push(w.currentNode);
+    nodes.forEach((n) => { const a = n === range.startContainer ? range.startOffset : 0, b = n === range.endContainer ? range.endOffset : n.length; if (b <= a) return; const mid = n.splitText(a); mid.splitText(b - a); const m = document.createElement("mark"); m.className = "hl"; mid.parentNode.insertBefore(m, mid); m.append(mid); });
+    getSelection().removeAllRanges(); bar.hidden = true;
+  }
+  async function keepSel() {
+    if (!range) return;
+    const word = range.toString().trim().replace(/\s+/g, " ");
+    if (!word || word.length > 80) { toast("Select a word or a short phrase."); return; }
+    const para = range.startContainer.parentElement.closest("p")?.textContent || "", at = para.indexOf(word);
+    const r = await keep("reading", word, sentenceAround(para, Math.max(0, at)));
+    mark(); toast(r.added ? `"${word}" is in Reading words.` : "Already in Reading words.");
+  }
+  passage.addEventListener("click", (e) => { const m = e.target.closest("mark.hl"); if (m && getSelection().isCollapsed) m.replaceWith(...m.childNodes); });
+}

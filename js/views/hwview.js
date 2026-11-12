@@ -27,9 +27,10 @@ export function homeworkSection(date, homework) {
       const list = h("ol", { class: "steps" });
       task.steps.forEach((step, i) => {
         const done = hw.stepDone(date, step.id), isCur = isCurrentTask && cur.step.id === step.id;
-        const showBody = isCur || (done && peek.has(step.id));
+        const roomy = step.type === "speaking" || step.type === "reading";   // these open any time, in any order
+        const showBody = isCur || roomy || (done && peek.has(step.id));
         const li = h("li", { class: "hwstep" + (done ? " done" : "") + (isCur ? " current" : ""), id: "step-" + step.id },
-          h("button", { class: "steptitle", "aria-expanded": String(showBody), disabled: !done && !isCur, onclick: () => { if (!done) return; peek.has(step.id) ? peek.delete(step.id) : peek.add(step.id); document.dispatchEvent(new CustomEvent("hw-rerender")); } },
+          h("button", { class: "steptitle", "aria-expanded": String(showBody), disabled: !done && !isCur && !roomy, onclick: () => { if (!done) return; peek.has(step.id) ? peek.delete(step.id) : peek.add(step.id); document.dispatchEvent(new CustomEvent("hw-rerender")); } },
             h("span", { class: "smark" }, done ? icon("check", 16) : String(i + 1)), h("span", { class: "grow" }, step.title || STEP_LABEL[step.type]), done ? h("span", { class: "tiny faint" }, hw.stateOf(date).steps[step.id]?.data?.sent === "queued" ? "Saved, sends when online" : "Done") : null),
           showBody ? h("div", { class: "stepbody" }, stepBody({ date, hw: homework, task, step, advance })) : null);
         list.append(li);
