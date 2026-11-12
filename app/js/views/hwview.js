@@ -6,12 +6,13 @@ import { stepBody, STEP_LABEL } from "./hwsteps.js";
 let openTask = null;          // task opened by hand
 const peek = new Set();       // finished steps she reopened to look at
 let scrollNext = false;
+export const dur = (m) => (m >= 60 ? `${Math.floor(m / 60)} h${m % 60 ? ` ${m % 60} min` : ""}` : `${m} min`);
 
 export function homeworkSection(date, homework) {
   const cur = hw.currentStep(date, homework);
   const p = hw.dayProgress(date, homework);
   const sec = h("section", { class: "section hw", "aria-label": "Today's homework" },
-    h("div", { class: "shead" }, h("h2", null, "Homework"), h("span", { class: "kicker num" }, p.complete ? "All done" : `${p.tasksDone} of ${p.tasks} tasks`)));
+    );
   const advance = () => { scrollNext = true; openTask = null; };
 
   for (const task of homework.tasks) {
@@ -20,10 +21,12 @@ export function homeworkSection(date, homework) {
     const open = openTask ? openTask === task.id : isCurrentTask;
     const head = h("button", { class: "hwhead", "aria-expanded": String(open), onclick: () => { openTask = open ? "__none__" : task.id; document.dispatchEvent(new CustomEvent("hw-rerender")); } },
       h("span", { class: "hwmark" + (tp.complete ? " done" : "") }, tp.complete ? icon("check", 18) : String(homework.tasks.indexOf(task) + 1)),
-      h("span", { class: "grow" }, h("b", null, task.title), h("span", { class: "sub" }, [task.summary, task.minutes ? `about ${task.minutes >= 90 ? (task.minutes / 60).toFixed(1).replace(".0", "") + " h" : task.minutes + " min"}` : null].filter(Boolean).join(", "))),
-      h("span", { class: "hwcount num" }, `${tp.done}/${tp.total}`));
+      h("span", { class: "grow" }, h("b", null, task.title), task.summary ? h("span", { class: "sub" }, task.summary) : null),
+      h("span", { class: "hwcount num" }, tp.total > 1 ? `${tp.done}/${tp.total}` : task.minutes ? dur(task.minutes) : ""));
     const card = h("div", { class: "hwtask" + (open ? " open" : "") + (tp.complete ? " complete" : "") }, head);
-    if (open) {
+    const solo = task.steps.length === 1 && (task.steps[0].type === "speaking" || task.steps[0].type === "reading");
+    if (open && solo) card.append(h("div", { class: "hwsolo" }, stepBody({ date, hw: homework, task, step: task.steps[0], advance })));
+    else if (open) {
       const list = h("ol", { class: "steps" });
       task.steps.forEach((step, i) => {
         const done = hw.stepDone(date, step.id), isCur = isCurrentTask && cur.step.id === step.id;

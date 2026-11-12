@@ -3,7 +3,7 @@ import { h, icon, fmtDate, todayISO, addDays } from "../util.js";
 import * as store from "../store.js";
 import * as hw from "../homework.js";
 import { toast } from "../ui.js";
-import { homeworkSection } from "./hwview.js";
+import { homeworkSection, dur } from "./hwview.js";
 import { openFinish } from "./finish.js";
 
 const tashkentTime = (iso) => new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Tashkent", hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date(iso));
@@ -22,7 +22,7 @@ export default async function (ctx) {
     h("div", null,
       h("div", { class: "kicker" }, isToday ? "Today" : fmtDate(date, { weekday: "long" })),
       h("h1", null, isToday ? "Homework" : fmtDate(date, { day: "numeric", month: "long" })),
-      homework ? h("div", { class: "hwmeta num" }, p.complete ? "Everything is in" : `${p.tasks} ${p.tasks === 1 ? "task" : "tasks"}${minutes ? ` · about ${minutes >= 90 ? (minutes / 60).toFixed(1).replace(".0", "") + " h" : minutes + " min"}` : ""}${p.stepsDone ? ` · ${p.stepsDone} of ${p.steps} steps done` : ""}`) : null),
+      homework ? h("div", { class: "hwmeta num" }, p.complete ? "Everything is in" : `${p.tasksDone} of ${p.tasks} done${minutes ? ` · ${dur(minutes)}` : ""}`) : null),
     !isToday ? h("a", { class: "btn small quiet", href: "#/homework" }, "Today") : null));
 
   if (!homework) root.append(noHomework(date, isToday));
