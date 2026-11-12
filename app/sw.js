@@ -43,3 +43,18 @@ self.addEventListener("fetch", (e) => {
   if (url.pathname.endsWith("course-pack.json")) return; // private, never cached here
   e.respondWith(respond(req));
 });
+
+// nudges: a note planned by the app on her phone, sent by the relay when its time comes
+self.addEventListener("push", (e) => {
+  let d = {}; try { d = e.data ? e.data.json() : {}; } catch {}
+  e.waitUntil(self.registration.showNotification(d.title || "8.5", { body: d.body || "", tag: d.tag || "eight", renotify: false, icon: "icons/icon-192.png", badge: "icons/favicon-32.png", data: { url: d.url || "#/today", tag: d.tag || "" } }));
+});
+self.addEventListener("notificationclick", (e) => {
+  e.notification.close();
+  const { url = "#/today", tag = "" } = e.notification.data || {};
+  e.waitUntil((async () => {
+    const wins = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+    for (const c of wins) if (c.url.startsWith(self.registration.scope)) { await c.focus(); c.postMessage({ nudge: tag, url }); return; }
+    await self.clients.openWindow(self.registration.scope + (tag ? "?n=" + encodeURIComponent(tag) : "") + url);
+  })());
+});

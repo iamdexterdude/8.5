@@ -1,5 +1,6 @@
 // Today: a greeting for the moment, the lesson, the next small thing, one observation about her days, one small
 // question, and a word from the teacher when there is one. The ikat from the welcome lives in the sky.
+import * as nudge from "../nudge.js";
 import { h, icon, fmtDate, todayISO, countdownText } from "../util.js";
 import * as store from "../store.js";
 import * as hw from "../homework.js";
@@ -60,6 +61,7 @@ export default async function (ctx) {
     h("div", { class: "week-dots", "aria-label": "The last seven days" }, w.days.map((d) => h("i", { class: (d.on ? "on" : "") + (d.today ? " now" : ""), title: d.iso }))),
     h("span", { class: "week-k" }, streak ? `${streak} ${streak === 1 ? "day" : "days"} in a row` : w.active ? `${w.active} of 7 days` : "A quiet week so far"),
     nums.length ? h("span", { class: "week-n num" }, nums.join(" · ")) : null));
+  setTimeout(() => nudge.maybeAsk(), 1800);
   return root;
 }
 

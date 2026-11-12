@@ -1,7 +1,9 @@
 // The 8.5 relay. POST JSON { op, ... }.
 //   teacher (password checked against teacher.json in the feed repo): login, publish, remove, password, list, read
 //   student (no password):                                             upload (a file to the teacher's Telegram), notify (a line of text)
+//   nudges (no password):  push-sub, push-off, nudges (the phone's own plan of short notes);  tick (secret): send what is due
 import { pbkdf2Sync, timingSafeEqual, randomBytes } from "node:crypto";
+import webpush from "web-push";
 
 const REPO = process.env.FEED_REPO || "iamdexterdude/8.5-feed", BRANCH = process.env.FEED_BRANCH || "main";
 const GH = process.env.GITHUB_TOKEN || "", TG = process.env.TG_BOT_TOKEN || "", CHAT = process.env.TG_CHAT_ID || "";
@@ -61,6 +63,57 @@ async function tg(method, form) {
   const j = await r.json().catch(() => ({})); if (!j.ok) throw new Error(j.description || "Telegram " + r.status); return j.result;
 }
 
+// ---- nudges. Each phone plans its own notes from what its owner does (the app's nudge.js) and hands the plan over;
+// this side only keeps the plan and sends each note when its time comes. Redis (Upstash REST) holds:
+//   n85:ids            the phones that turned notes on
+//   n85:sub:<id>       the push subscription, and the phone's quiet hours (UTC minutes)
+//   n85:q:<id>         the planned notes            n85:log:<id>   the last notes sent (tag, time)
+//   n85:bc             notes for everyone (new homework), each sent to a phone outside its quiet hours, once
+const KV = process.env.KV_REST_API_URL || "", KVT = process.env.KV_REST_API_TOKEN || "";
+const VAPID_PUB = process.env.VAPID_PUBLIC || "", VAPID_KEY = process.env.VAPID_PRIVATE || "", NUDGE_SECRET = process.env.NUDGE_SECRET || "";
+if (VAPID_PUB && VAPID_KEY) webpush.setVapidDetails("https://iamdexterdude.github.io/8.5/", VAPID_PUB, VAPID_KEY);
+async function kv(...cmd) {
+  if (!KV) throw new Error("The relay has no database.");
+  const r = await fetch(KV, { method: "POST", headers: { Authorization: `Bearer ${KVT}` }, body: JSON.stringify(cmd) });
+  const j = await r.json().catch(() => ({})); if (j.error) throw new Error("KV " + j.error); return j.result;
+}
+const kvJson = async (key) => { const v = await kv("GET", key); try { return v ? JSON.parse(v) : null; } catch { return null; } };
+const devId = (s) => String(s || "").replace(/[^a-z0-9-]/gi, "").slice(0, 40);
+const clip = (s, n) => String(s ?? "").replace(/\s+/g, " ").trim().slice(0, n);
+const inQuiet = (q, now = new Date()) => { if (!q || q.from == null) return false; const m = now.getUTCHours() * 60 + now.getUTCMinutes(); return q.from <= q.to ? m >= q.from && m < q.to : m >= q.from || m < q.to; };
+async function pushTo(id, sub, note) {
+  try {
+    await webpush.sendNotification(sub, JSON.stringify(note), { TTL: 3 * 3600, urgency: note.urgent ? "high" : "normal", topic: clip(note.tag, 32).replace(/[^\w-]/g, "") || undefined });
+    await kv("LPUSH", `n85:log:${id}`, JSON.stringify({ tag: note.tag, at: Date.now() })); await kv("LTRIM", `n85:log:${id}`, 0, 39);
+    return "sent";
+  } catch (e) {
+    if (e.statusCode === 404 || e.statusCode === 410) { await kv("DEL", `n85:sub:${id}`, `n85:q:${id}`); await kv("SREM", "n85:ids", id); return "gone"; }
+    return "failed";
+  }
+}
+async function tick() {
+  const now = Date.now(), ids = (await kv("SMEMBERS", "n85:ids")) || [], bc = ((await kvJson("n85:bc")) || []).filter((b) => now - b.at < 20 * 3600000);
+  const out = { phones: ids.length, sent: 0, dropped: 0 };
+  for (const id of ids) {
+    const rec = await kvJson(`n85:sub:${id}`); if (!rec?.sub) { await kv("SREM", "n85:ids", id); continue; }
+    const q = (await kvJson(`n85:q:${id}`)) || [], keep = [];
+    let n = 0;
+    for (const it of q.sort((a, b) => a.at - b.at)) {
+      if (it.at > now) { keep.push(it); continue; }
+      if (now - it.at > 3 * 3600000) { out.dropped++; continue; }      // too late to mean anything now
+      if (n >= 1) { keep.push(it); continue; }                          // one note per phone per tick, at most
+      const r = await pushTo(id, rec.sub, it); if (r === "gone") break; if (r === "sent") { n++; out.sent++; }
+    }
+    await kv("SET", `n85:q:${id}`, JSON.stringify(keep), "EX", 8 * 86400);
+    if (!n && !inQuiet(rec.quiet)) for (const b of bc) {
+      if (await kv("SISMEMBER", `n85:seen:${id}`, b.tag)) continue;
+      const r = await pushTo(id, rec.sub, b); await kv("SADD", `n85:seen:${id}`, b.tag); await kv("EXPIRE", `n85:seen:${id}`, 30 * 86400);
+      if (r === "sent") { out.sent++; break; }
+    }
+  }
+  return out;
+}
+
 const send = (res, status, body) => { res.statusCode = status; res.setHeader("Content-Type", "application/json; charset=utf-8"); res.end(JSON.stringify(body)); };
 
 export default async function handler(req, res) {
@@ -70,7 +123,7 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS"); res.setHeader("Access-Control-Allow-Headers", "Content-Type"); res.setHeader("Access-Control-Max-Age", "86400");
   res.setHeader("Cache-Control", "no-store");
   if (req.method === "OPTIONS") { res.statusCode = 204; return res.end(); }
-  if (req.method === "GET") return send(res, 200, { ok: true, relay: "8.5", github: !!GH, telegram: !!(TG && CHAT), pepper: !!PEPPER, password: !!(await teacherRecord().catch(() => null)) });
+  if (req.method === "GET") return send(res, 200, { ok: true, relay: "8.5", github: !!GH, telegram: !!(TG && CHAT), pepper: !!PEPPER, password: !!(await teacherRecord().catch(() => null)), nudges: !!(KV && VAPID_PUB && VAPID_KEY && NUDGE_SECRET) });
   if (req.method !== "POST") return send(res, 405, { ok: false, error: "POST only" });
   if (!allowed) return send(res, 403, { ok: false, error: "origin" });
   const ip = String(req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "").split(",")[0].trim();
@@ -96,6 +149,30 @@ export default async function handler(req, res) {
       const text = JSON.stringify(b.data || {}); if (text.length > 200000) return send(res, 413, { ok: false, error: "Report too large." });
       await putFile(`students/${id}.json`, text, `Report: ${id}`); return send(res, 200, { ok: true });
     }
+    // ---------- nudges
+    if (op === "push-sub") {
+      const id = devId(b.id), sub = b.sub;
+      if (!id || !sub || typeof sub.endpoint !== "string" || !/^https:\/\//.test(sub.endpoint) || !sub.keys?.p256dh || !sub.keys?.auth) return send(res, 400, { ok: false, error: "Bad subscription." });
+      await kv("SET", `n85:sub:${id}`, JSON.stringify({ sub: { endpoint: sub.endpoint, keys: { p256dh: String(sub.keys.p256dh), auth: String(sub.keys.auth) } }, at: Date.now() }));
+      await kv("SADD", "n85:ids", id); return send(res, 200, { ok: true, key: VAPID_PUB });
+    }
+    if (op === "push-off") { const id = devId(b.id); if (id) { await kv("DEL", `n85:sub:${id}`, `n85:q:${id}`); await kv("SREM", "n85:ids", id); } return send(res, 200, { ok: true }); }
+    if (op === "nudges") {
+      const id = devId(b.id); if (!id) return send(res, 400, { ok: false, error: "No id." });
+      const rec = await kvJson(`n85:sub:${id}`); if (!rec) return send(res, 200, { ok: true, off: true });
+      const now = Date.now();
+      const items = (Array.isArray(b.items) ? b.items : []).slice(0, 12).map((it) => ({ at: Number(it.at), tag: clip(it.tag, 40), title: clip(it.title, 70), body: clip(it.body, 180), url: /^#\/[\w/?=&.-]*$/.test(String(it.url || "")) ? it.url : "#/today", urgent: !!it.urgent }))
+        .filter((it) => it.title && it.at > now - 5 * 60000 && it.at < now + 8 * 86400000);
+      const q = b.quiet && Number.isFinite(b.quiet.from) && Number.isFinite(b.quiet.to) ? { from: ((b.quiet.from % 1440) + 1440) % 1440, to: ((b.quiet.to % 1440) + 1440) % 1440 } : null;
+      await kv("SET", `n85:q:${id}`, JSON.stringify(items), "EX", 8 * 86400);
+      if (q) await kv("SET", `n85:sub:${id}`, JSON.stringify({ ...rec, quiet: q }));
+      const log = ((await kv("LRANGE", `n85:log:${id}`, 0, 39)) || []).map((x) => { try { return JSON.parse(x); } catch { return null; } }).filter(Boolean);
+      return send(res, 200, { ok: true, sent: log });
+    }
+    if (op === "tick") {
+      if (!NUDGE_SECRET || b.secret !== NUDGE_SECRET) return send(res, 403, { ok: false, error: "secret" });
+      return send(res, 200, { ok: true, ...(await tick()) });
+    }
     // ---------- teacher
     if (!["login", "publish", "remove", "password", "list", "read"].includes(op)) return send(res, 400, { ok: false, error: "Unknown op." });
     if (blocked(ip)) return send(res, 429, { ok: false, error: "Too many wrong passwords. Wait fifteen minutes." });
@@ -111,7 +188,19 @@ export default async function handler(req, res) {
     if (op === "publish") {
       if (!PATH_OK.test(String(b.path || ""))) return send(res, 400, { ok: false, error: "Bad path." });
       if (typeof b.content !== "string" || b.content.length > (b.path.startsWith("requests/") ? 3200000 : 2000000)) return send(res, 400, { ok: false, error: "Bad content." });
-      const sha = await putFile(b.path, b.content, String(b.message || "Publish " + b.path).slice(0, 200)); return send(res, 200, { ok: true, sha });
+      const sha = await putFile(b.path, b.content, String(b.message || "Publish " + b.path).slice(0, 200));
+      const m = /^hw\/(\d{4}-\d{2}-\d{2})\.json$/.exec(b.path);
+      if (m && KV && Date.parse(m[1]) > Date.now() - 2 * 86400000) {
+        try {
+          if (await kv("SET", `n85:hwnote:${m[1]}`, "1", "NX", "EX", 14 * 86400)) {
+            const day = new Intl.DateTimeFormat("en-GB", { weekday: "long", timeZone: "Asia/Tashkent" }).format(new Date(m[1] + "T12:00:00Z"));
+            const bc = ((await kvJson("n85:bc")) || []).filter((x) => Date.now() - x.at < 20 * 3600000);
+            bc.push({ tag: `hw-${m[1]}`, title: "New homework", body: `From ${day}'s lesson.`, url: "#/homework", at: Date.now() });
+            await kv("SET", "n85:bc", JSON.stringify(bc.slice(-5)));
+          }
+        } catch {}
+      }
+      return send(res, 200, { ok: true, sha });
     }
     if (op === "remove") {
       if (!PATH_OK.test(String(b.path || ""))) return send(res, 400, { ok: false, error: "Bad path." });

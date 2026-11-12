@@ -4,6 +4,7 @@ import * as store from "../store.js";
 import * as db from "../db.js";
 import { head, toast, confirmSheet } from "../ui.js";
 import * as hw from "../homework.js";
+import * as nudge from "../nudge.js";
 
 export const live = false;
 
@@ -25,6 +26,7 @@ export default async function (ctx) {
     h("div", { class: "field" }, h("label", null, "Lesson start time (Tashkent)"), time),
     text("meetingLink", "Lesson link", { type: "url", inputMode: "url", placeholder: "https://" })));
 
+  root.append(notesSection());
   root.append(installSection());
 
   const importIn = h("input", { type: "file", accept: "application/json,.json", "aria-label": "Choose a backup file", onchange: async (e) => {
@@ -39,7 +41,7 @@ export default async function (ctx) {
     h("div", { class: "row-actions" }, h("button", { class: "btn primary", onclick: async () => { const data = await store.exportAll(); download(`8.5-backup-${todayISO()}.json`, JSON.stringify(data)); toast("Backup saved to your downloads."); } }, icon("download", 18), "Export my data")),
     h("div", { class: "field", style: { marginTop: "14px" } }, h("label", null, "Import a backup"), importIn),
     h("div", { style: { marginTop: "12px" } }, h("button", { class: "btn danger", onclick: () => confirmSheet("Start again?", "This deletes your cards, results and recordings on this device.", "Delete and start again", async () => { await store.resetAll(); toast("Reset."); location.hash = "#/today"; }, { danger: true }) }, "Delete my data"))));
-  root.append(h("p", { class: "footer-note" }, "8.5 is private. No accounts, no tracking, and nothing leaves your device unless you send it. ", h("a", { href: "#/admin", class: "faint" }, "Teacher")));
+  root.append(h("p", { class: "footer-note" }, "8.5 is private. No accounts, and nothing leaves your device unless you send it. With notifications on, only the short notes themselves go to the server that delivers them. ", h("a", { href: "#/admin", class: "faint" }, "Teacher")));
   return root;
 }
 
@@ -55,4 +57,16 @@ function installSection() {
   else if (ios) sec.append(h("p", null, "On iPhone: open this page in Safari, tap Share, then Add to Home Screen."));
   else sec.append(h("p", null, "On Chrome or Edge: open the browser menu and choose Install 8.5. On Android: menu, then Add to Home screen."));
   return sec;
+}
+function notesSection() {
+  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent), standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+  const sec = h("section", { class: "section" }, h("div", { class: "shead" }, h("h2", null, "Notifications")));
+  if (!nudge.pushable()) { sec.append(h("p", { class: "muted" }, ios && !standalone ? "On iPhone: add 8.5 to your Home Screen first (Share, then Add to Home Screen), then open it from there." : "This browser can't show notifications.")); return sec; }
+  const draw = () => {
+    const on = nudge.isOn(), blocked = Notification.permission === "denied";
+    sec.replaceChildren(h("div", { class: "shead" }, h("h2", null, "Notifications")),
+      h("p", { class: "small muted" }, blocked ? "Notifications are blocked for 8.5 in your browser settings." : "Short notes about what's waiting: an answer not sent, cards due, the lesson close. They learn your hours and stay quiet at night."),
+      blocked ? null : h("div", { class: "row-actions" }, h("button", { class: "btn" + (on ? "" : " primary"), onclick: async (e) => { e.currentTarget.disabled = true; if (on) { await nudge.disable(); toast("Notifications off."); } else { const r = await nudge.enable(); toast(r === "on" ? "Notifications on." : "Notifications weren't allowed."); } draw(); } }, on ? "Turn off" : "Turn on")));
+  };
+  draw(); return sec;
 }
