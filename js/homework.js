@@ -8,17 +8,17 @@ import { RAW, RELAY, FEED_KEY } from "./feedkey.js";
 export { RAW, RELAY };
 
 // in memory: { config, hw: { date: homework | null }, decks: index, mocks: index, results: { mockId: estimate } }
-export const F = { config: null, hw: {}, decks: [], mocks: [], results: {}, status: "idle", checkedAt: 0 };
+export const F = { config: null, hw: {}, decks: [], mocks: [], results: {}, history: null, status: "idle", checkedAt: 0, historyAt: 0 };
 const SECTION_NAMES = ["listening", "reading", "writing", "speaking"];
 let inflight = null;
 
 export async function init() {
   const row = await db.get("feed", "feed");
-  if (row?.value) { F.config = row.value.config || null; F.hw = row.value.hw || {}; F.decks = row.value.decks || []; F.mocks = row.value.mocks || []; F.results = row.value.results || {}; }
+  if (row?.value) { F.config = row.value.config || null; F.hw = row.value.hw || {}; F.decks = row.value.decks || []; F.mocks = row.value.mocks || []; F.results = row.value.results || {}; F.history = row.value.history || null; }
   window.addEventListener("online", () => { flushOutbox(); refresh(todayISO(), { force: true }); });
   flushOutbox();
 }
-const persist = () => db.put("feed", { key: "feed", value: { config: F.config, hw: F.hw, decks: F.decks, mocks: F.mocks, results: F.results } });
+const persist = () => db.put("feed", { key: "feed", value: { config: F.config, hw: F.hw, decks: F.decks, mocks: F.mocks, results: F.results, history: F.history } });
 
 export async function fetchEnc(path, { timeout = 12000 } = {}) {
   const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), timeout);
@@ -58,6 +58,12 @@ export function refresh(date = todayISO(), { force = false, timeout } = {}) {
       for (const m of mocks) if (store.mockRow(m.id)?.finishedAt || store.S.mocks.some((r) => r.mock === m.id)) {
         const est = await fetchDec(`results/${m.id}.json`, { timeout });
         if (!same(F.results[m.id], est)) { F.results[m.id] = est; changed = true; }
+      }
+      // mocks she sat before the app, published for her alone; looked for every ten minutes at most
+      if (force || Date.now() - F.historyAt > 10 * 60000) {
+        F.historyAt = Date.now();
+        const hist = studentName() ? await fetchDec(`history/${studentId()}.json`, { timeout }).catch(() => null) : null;
+        if (!same(F.history, hist)) { F.history = hist; changed = true; }
       }
       F.status = "ok";
     } catch (e) {

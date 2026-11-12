@@ -4,18 +4,21 @@ import * as store from "../store.js";
 import * as hw from "../homework.js";
 import * as M from "../mocks.js";
 import { head, sheet } from "../ui.js";
+import { pastMockCard } from "./pastmock.js";
 
 export default async function (ctx) {
+  hw.refresh();   // her own earlier mocks may arrive from the feed; the page redraws when they do
   const mocks = [...(hw.F.mocks || [])].filter((m) => M.SECTIONS.some((s) => M.attempt(m.id, s)?.status === "done")).sort((a, b) => (a.date || "").localeCompare(b.date || ""));
   const root = h("div", { class: "progv" });
   const done = mocks.map((m) => ({ m, sum: M.summary(m.id) }));
   const overalls = done.filter((d) => d.sum.overall != null);
-  const latest = overalls.at(-1), first = overalls[0];
-  root.append(h("header", { class: "hwhead-top" }, h("div", null, h("div", { class: "kicker" }, "Progress"), h("h1", null, done.length ? `${done.length} ${done.length === 1 ? "mock" : "mocks"}` : "Nothing yet"),
-    h("div", { class: "hwmeta num" }, latest ? `Latest overall ${latest.sum.overall.toFixed(1)}${first && first !== latest ? `, from ${first.sum.overall.toFixed(1)}` : ""}` : "Your mock results and recordings collect here."))));
+  const latest = overalls.at(-1), first = overalls[0], past = hw.F.history?.mocks || [], n = done.length + past.length;
+  root.append(h("header", { class: "hwhead-top" }, h("div", null, h("div", { class: "kicker" }, "Progress"), h("h1", null, n ? `${n} ${n === 1 ? "mock" : "mocks"}` : "Nothing yet"),
+    h("div", { class: "hwmeta num" }, latest ? `Latest overall ${latest.sum.overall.toFixed(1)}${first && first !== latest ? `, from ${first.sum.overall.toFixed(1)}` : ""}` : past.length ? "Where you started. Every mock from here joins it." : "Your mock results and recordings collect here."))));
 
   if (done.length) root.append(trend(done));
   for (const { m, sum } of [...done].reverse()) root.append(mockBlock(ctx, m, sum));
+  for (const m of [...past].reverse()) root.append(pastMockCard(m));
   return root;
 }
 
