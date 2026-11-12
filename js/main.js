@@ -1,5 +1,6 @@
 // Boot, routing and the navigation shell.
 window.__booting = Date.now();   // the watchdog in index.html gives a slow first load more time once the modules have started arriving
+import * as nudge from "./nudge.js";
 import * as store from "./store.js";
 import { h, icon, clear, todayISO } from "./util.js";
 import * as hwm from "./homework.js";
@@ -143,6 +144,7 @@ async function boot() {
   document.addEventListener("visibilitychange", () => { if (!document.hidden) { hwm.refresh(undefined, { force: true }); pulse.noteVisit(); } });
   nudgeLoop();
   pulse.noteVisit();
+  try { nudge.start(); } catch {}
   if (!store.S.kv.welcomed && !new URLSearchParams(location.search).has("nowelcome")) {
     if (navigator.onLine) hwm.primeConfig({ timeout: 15000 }).catch(() => {});   // the lesson settings, in the background; the welcome does not wait
     // the first open: the welcome is the opening, and it asks for a name. The quiet dark screen gives way to it the moment it is on the page.

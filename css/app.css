@@ -622,3 +622,36 @@ body.roomed { overflow: hidden; }
 .sp-topic.ghost .sp-name { color: var(--text-3); }
 .sp-topic.ghost:hover { transform: none; }
 @media (min-width: 700px) { .sp-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } .sp-grid.rd-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 75%; } }
+
+/* ---------- unsent answers and the treat */
+.unsent { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; color: var(--gold); }
+.unsent::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--gold); animation: beat 1.4s ease-in-out infinite; }
+@keyframes beat { 50% { transform: scale(1.6); opacity: .4; } }
+.send-nudge { animation: nudge 2.8s ease-in-out 1.2s infinite; }
+@keyframes nudge { 0%, 82%, 100% { transform: none; } 87% { transform: translateX(-3px); } 93% { transform: translateX(3px); } }
+.moment { position: fixed; inset: 0; z-index: 200; background: #03050B; color: #EEF2FF; opacity: 0; transition: opacity .6s; touch-action: none; user-select: none; -webkit-user-select: none; }
+.moment.on { opacity: 1; }
+.moment canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: pointer; }
+.tr-foot { position: absolute; left: 0; right: 0; bottom: 0; padding: 0 24px calc(48px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 14px; justify-items: center; text-align: center; pointer-events: none; }
+.tr-hold { font-size: 13px; font-weight: 600; letter-spacing: .02em; color: rgba(238,242,255,.55); transition: opacity .4s; animation: breathe 2.4s ease-in-out infinite; }
+.tr-hold.gone { opacity: 0; animation: none; }
+@keyframes breathe { 50% { opacity: .25; } }
+.tr-line { font: 650 clamp(22px, 5vw, 30px)/1.2 var(--f-display); letter-spacing: -.02em; opacity: 0; transform: translateY(8px); transition: opacity .8s, transform .8s var(--soft); }
+.tr-sub { font-size: 15px; color: rgba(238,242,255,.62); opacity: 0; transition: opacity .8s; }
+.tr-line.on, .tr-sub.on { opacity: 1; transform: none; }
+.moment .tr-close { pointer-events: auto; background: rgba(255,255,255,.12); color: #fff; border: 0; box-shadow: inset 0 1px 0 rgba(255,255,255,.2); opacity: 0; transition: opacity .6s; }
+.moment .tr-close.on { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .unsent::before, .send-nudge, .tr-hold { animation: none; } }
+
+/* ---------- the small questions and the notifications offer: a card that floats above the tab bar */
+.ask { position: fixed; z-index: 150; left: 50%; bottom: calc(var(--nav-h) + 18px + env(safe-area-inset-bottom, 0px)); translate: -50% 0; width: min(420px, calc(100vw - 32px));
+  padding: 14px 40px 14px 16px; border-radius: 22px; background: var(--glass); -webkit-backdrop-filter: blur(24px) saturate(170%); backdrop-filter: blur(24px) saturate(170%);
+  border: 1px solid var(--line); box-shadow: var(--shadow); display: grid; gap: 10px; animation: askin .45s var(--soft); }
+.ask.wide { padding-right: 16px; }
+.ask p { margin: 0; font-size: 15px; line-height: 1.4; } .ask .row-actions { justify-content: flex-end; }
+.ask-x { position: absolute; top: 8px; right: 10px; width: 28px; height: 28px; border: 0; border-radius: 50%; background: transparent; color: var(--text-3); font-size: 20px; line-height: 1; cursor: pointer; }
+.ask.out { opacity: 0; transform: translateY(10px); transition: opacity .3s, transform .3s; }
+@keyframes askin { from { opacity: 0; transform: translateY(14px) scale(.98); } }
+@media (min-width: 900px) { .ask { bottom: 24px; } }
+/* sheets and toasts sit above the full-screen rooms */
+.scrim { z-index: 120; } .toast { z-index: 130; }

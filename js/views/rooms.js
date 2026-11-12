@@ -7,7 +7,10 @@
 import { h, icon, mmss } from "../util.js";
 import * as store from "../store.js";
 import * as hw from "../homework.js";
-import { toast } from "../ui.js";
+import { toast, sheet } from "../ui.js";
+import * as db from "../db.js";
+import { treat } from "./treat.js";
+import * as nudge from "../nudge.js";
 import { orb } from "./orb.js";
 
 const DECKS = {
@@ -31,11 +34,11 @@ const slug = (s) => String(s || "x").toLowerCase().replace(/[^a-z0-9]+/g, "-").r
 const sentenceAround = (text, at) => { const s = text.lastIndexOf(".", at) + 1, e = text.indexOf(".", at); return text.slice(s, e < 0 ? undefined : e + 1).replace(/==/g, "").trim(); };
 
 // a full-screen room that slides up over the app
-function room(title, sub, onClose) {
+function room(title, sub, onClose, beforeClose) {
   const body = h("div", { class: "room-body" });
   const el = h("div", { class: "room", role: "dialog", "aria-modal": "true", "aria-label": title },
     h("header", { class: "room-top" },
-      h("button", { class: "iconbtn", "aria-label": "Close", onclick: () => close() }, icon("close", 22)),
+      h("button", { class: "iconbtn", "aria-label": "Close", onclick: () => (beforeClose ? beforeClose(close) : close()) }, icon("close", 22)),
       h("div", { class: "grow" }, h("div", { class: "room-k" }, sub || ""), h("div", { class: "room-t" }, title))),
     body);
   const close = () => { el.classList.add("out"); setTimeout(() => { el.remove(); document.body.classList.remove("roomed"); onClose?.(); }, 260); };
@@ -69,8 +72,29 @@ function openSpeaking(c, ti0, redraw) {
   const s = c.step, topics = s.topics;
   let ti = ti0, qi = Math.max(0, topics[ti].questions.findIndex((_, i) => !sentOf(c)[qkey(ti, i)]));
   const O = orb();
-  const R = room(topics[ti].name, "Speaking, Part 1", () => { stopAll(); O.destroy(); redraw(); });
+  let spoke = false; const opened = Date.now(); nudge.track("room", "speaking");
+  const R = room(topics[ti].name, "Speaking, Part 1", () => { stopAll(); O.destroy(); redraw(); if (!spoke && Date.now() - opened < 4 * 60000) { nudge.track("mute"); setTimeout(() => nudge.maybeAsk(), 700); } nudge.sync(true); }, (close) => guard(close));
   let rec = null, stream = null, timer = null, take = null, secs = 0, showModel = false, ans = 0;
+
+  // an answer that is recorded but not sent is kept on the phone until it is sent or thrown away
+  const draftKey = () => `draft:${c.date}:${s.id}:${qkey(ti, qi)}`;
+  const saveDraft = () => db.put("media", { key: draftKey(), blob: take, secs, at: new Date().toISOString(), q: topics[ti].questions[qi].q, topic: ti, n: qi }).catch(() => {});
+  const dropDraft = (k = draftKey()) => db.del("media", k).catch(() => {});
+  async function loadDraft() {
+    const k = draftKey(), d = await db.get("media", k).catch(() => null);
+    if (!d?.blob || k !== draftKey() || take || rec) return;
+    take = d.blob; take.url = URL.createObjectURL(take); secs = d.secs || 0; showModel = false; draw();
+  }
+  // leaving with an unsent answer: say so, offer to send it
+  function guard(then) {
+    if (!take || rec) return then();
+    sheet((close) => h("div", null,
+      h("h2", null, "Not sent yet"),
+      h("p", { class: "muted", style: { marginTop: "8px" } }, "Your teacher hasn't got this answer. It stays here until you send it."),
+      h("div", { class: "row-actions", style: { marginTop: "16px", justifyContent: "flex-end" } },
+        h("button", { class: "btn", onclick: () => { close(); take = null; then(); } }, "Later"),
+        h("button", { class: "btn primary", onclick: async (e) => { close(); await send(null); then(); } }, "Send it"))));
+  }
 
   function stopAll() { try { if (rec && rec.state !== "inactive") rec.stop(); } catch {} stream?.getTracks().forEach((t) => t.stop()); clearInterval(timer); O.quiet(); }
   const pickMime = () => { for (const m of ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg;codecs=opus"]) if (window.MediaRecorder?.isTypeSupported?.(m)) return m; return ""; };
@@ -82,28 +106,40 @@ function openSpeaking(c, ti0, redraw) {
     const mime = pickMime(), parts = [];
     try { rec = new MediaRecorder(stream, mime ? { mimeType: mime, audioBitsPerSecond: 40000 } : { audioBitsPerSecond: 40000 }); } catch { rec = new MediaRecorder(stream); }
     rec.ondataavailable = (e) => e.data.size && parts.push(e.data);
-    rec.onstop = () => { O.quiet(); stream.getTracks().forEach((t) => t.stop()); clearInterval(timer); take = new Blob(parts, { type: rec.mimeType || mime || "audio/webm" }); take.url = URL.createObjectURL(take); rec = null; store.S.busy = Math.max(0, (store.S.busy || 1) - 1); draw(); };
-    store.S.busy = (store.S.busy || 0) + 1; rec.start(1000); secs = 0; O.listen(stream);
+    rec.onstop = () => { O.quiet(); stream.getTracks().forEach((t) => t.stop()); clearInterval(timer); take = new Blob(parts, { type: rec.mimeType || mime || "audio/webm" }); take.url = URL.createObjectURL(take); rec = null; store.S.busy = Math.max(0, (store.S.busy || 1) - 1); saveDraft(); draw(); };
+    store.S.busy = (store.S.busy || 0) + 1; rec.start(1000); secs = 0; O.listen(stream); spoke = true; nudge.track("rec");
     timer = setInterval(() => { secs++; const t = R.el.querySelector(".mic-t"); if (t) t.textContent = mmss(secs); if (secs >= (s.max || 120)) rec?.stop(); }, 1000);
     draw();
   }
   async function send(btn) {
-    btn.disabled = true; btn.lastChild.textContent = "Sending…";
-    const t = topics[ti], q = t.questions[qi];
+    if (btn) { btn.disabled = true; btn.lastChild.textContent = "Sending…"; }
+    const t = topics[ti], q = t.questions[qi], k = draftKey();
     const r = await hw.sendFiles({ date: c.date, label: `Speaking · ${t.name} · Q${qi + 1}`, note: q.q, files: [{ blob: take, name: `${c.date}_${slug(t.name)}_Q${qi + 1}.${extOf(take.type)}` }] });
-    const sent = { ...sentOf(c), [qkey(ti, qi)]: new Date().toISOString() };
-    await hw.setStep(c.date, s.id, { sent });
+    const st = hw.stateOf(c.date).steps[s.id] || {};
+    const sent = { ...sentOf(c), [qkey(ti, qi)]: new Date().toISOString() }, took = { ...(st.secs || {}), [qkey(ti, qi)]: secs };
+    await hw.setStep(c.date, s.id, { sent, secs: took });
+    dropDraft(k); nudge.track("sent", qkey(ti, qi));
     const total = topics.reduce((n, x) => n + x.questions.length, 0);
-    if (Object.keys(sent).length >= total && !hw.stepDone(c.date, s.id)) { await hw.setStep(c.date, s.id, { done: true, doneAt: new Date().toISOString() }); await hw.noteCompletion(c.date, c.hw); }
+    const finished = Object.keys(sent).length >= total && !hw.stepDone(c.date, s.id);
+    if (finished) { await hw.setStep(c.date, s.id, { done: true, doneAt: new Date().toISOString() }); await hw.noteCompletion(c.date, c.hw); }
     toast(r === "sent" ? "Sent to your teacher." : "Saved. It sends when you're back online.");
     take = null; showModel = true; ans = 0; draw();
+    if (finished) setTimeout(() => celebrate(total, took), 900);
+    else setTimeout(() => nudge.offer(), 2500);
+  }
+  // the last answer: the treat, with what she actually did
+  function celebrate(total, took) {
+    const mins = Math.round(Object.values(took).reduce((a, b) => a + (b || 0), 0) / 60);
+    const phrases = store.S.cards.filter((x) => x.deck === DECKS.speaking.id).length;
+    treat({ line: `Part 1. All ${total}.`, sub: [mins ? `${mins} minutes of you, in English` : "", phrases ? `${phrases} phrases kept` : ""].filter(Boolean).join(" · ") });
   }
   function go(d) {
+    if (take && !rec) return guard(() => go(d));
     stopAll(); take = null; showModel = false; ans = 0;
     qi += d;
     if (qi >= topics[ti].questions.length) { if (ti < topics.length - 1) { ti++; qi = 0; } else { qi = topics[ti].questions.length - 1; } }
     if (qi < 0) { if (ti > 0) { ti--; qi = topics[ti].questions.length - 1; } else qi = 0; }
-    R.setTitle(topics[ti].name, "Speaking, Part 1"); draw(d);
+    R.setTitle(topics[ti].name, "Speaking, Part 1"); draw(d); loadDraft();
   }
 
   function modelView(q) {
@@ -136,7 +172,7 @@ function openSpeaking(c, ti0, redraw) {
 
   function draw(dir = 0) {
     const t = topics[ti], q = t.questions[qi], sent = sentOf(c)[qkey(ti, qi)], recording = !!rec;
-    const dots = h("div", { class: "sp-dots" }, t.questions.map((_, i) => h("button", { class: (i === qi ? "on " : "") + (sentOf(c)[qkey(ti, i)] ? "sent" : ""), "aria-label": `Question ${i + 1}`, onclick: () => { if (rec) return; stopAll(); take = null; showModel = false; qi = i; draw(); } })));
+    const dots = h("div", { class: "sp-dots" }, t.questions.map((_, i) => h("button", { class: (i === qi ? "on " : "") + (sentOf(c)[qkey(ti, i)] ? "sent" : ""), "aria-label": `Question ${i + 1}`, onclick: () => { if (rec) return; const jump = () => { stopAll(); take = null; showModel = false; qi = i; draw(); loadDraft(); }; take ? guard(jump) : jump(); } })));
     const mic = O.el;
     mic.setAttribute("aria-label", recording ? "Stop recording" : take ? "Record again" : "Record your answer");
     mic.onclick = () => (rec ? rec.stop() : start());
@@ -149,11 +185,11 @@ function openSpeaking(c, ti0, redraw) {
         mic,
         h("div", { class: "sp-state" },
           recording ? h("span", null, h("b", { class: "mic-t num" }, mmss(secs)), " Recording. Tap the sphere to stop.")
-            : take ? h("span", null, "Listen back, then send.")
+            : take ? h("span", { class: "unsent" }, "Recorded, not sent yet. Press Send.")
             : sent ? h("span", { class: "ok-t" }, icon("check", 16), " Sent. Tap the sphere to record a better one.")
             : h("span", { class: "muted" }, "Tap the sphere and answer as you would in the exam."))),
       take && !recording ? h("div", { class: "sp-take" }, h("audio", { controls: true, src: take.url }),
-        h("div", { class: "row-actions" }, h("button", { class: "btn", onclick: () => { take = null; draw(); } }, "Discard"), h("button", { class: "btn primary", onclick: (e) => send(e.currentTarget) }, icon("upload", 18), "Send"))) : null,
+        h("div", { class: "row-actions" }, h("button", { class: "btn", onclick: () => { take = null; dropDraft(); draw(); } }, "Discard"), h("button", { class: "btn primary send-nudge", onclick: (e) => send(e.currentTarget) }, icon("upload", 18), "Send"))) : null,
       sent && !take && !recording && !showModel && q.answers?.length ? h("button", { class: "btn quiet", onclick: () => { showModel = true; draw(); } }, icon("eye", 18), "See the model answer") : null,
       showModel && !recording ? modelView(q) : null);
     R.body.replaceChildren(
@@ -162,7 +198,7 @@ function openSpeaking(c, ti0, redraw) {
         h("button", { class: "btn", disabled: (ti === 0 && qi === 0) || recording, onclick: () => go(-1) }, icon("back", 18), "Back"),
         h("button", { class: "btn primary", disabled: recording || (ti === topics.length - 1 && qi === t.questions.length - 1), onclick: () => go(1) }, qi === t.questions.length - 1 && ti < topics.length - 1 ? `Next: ${topics[ti + 1].name}` : "Next", icon("chevron", 18))));
   }
-  draw();
+  draw(); loadDraft();
 }
 
 /* ============================================================ reading */

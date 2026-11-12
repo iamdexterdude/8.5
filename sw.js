@@ -3,8 +3,8 @@
 //  - install: fetch every file of this version fresh (bypassing the browser's HTTP cache) into a cache named for the version
 //  - fetch: the saved copy first (instant, works offline); anything not in the list goes to the network
 //  - a new version installs in the background when the page checks for updates, takes over at once, and the page reloads once
-const VERSION = "202611121847";
-const ASSETS = ["./","css/app.css","data/config.json","data/daily.json","data/plan.json","data/speaking-bank.json","fonts/display.woff2","fonts/text.woff2","icons/apple-touch-icon.png","icons/favicon-32.png","icons/icon-192.png","icons/icon-512.png","icons/icon.svg","icons/maskable-512.png","index.html","js/bands.js","js/checkin.js","js/crypto.js","js/daily.js","js/db.js","js/feedkey.js","js/fx.js","js/homework.js","js/main.js","js/mocks.js","js/pdf.js","js/publish.js","js/pulse.js","js/srs.js","js/store.js","js/ui.js","js/util.js","js/validate.js","js/views/admin.js","js/views/anki.js","js/views/daily.js","js/views/exam.js","js/views/finish.js","js/views/homework.js","js/views/hwsteps.js","js/views/hwview.js","js/views/mock.js","js/views/orb.js","js/views/progress.js","js/views/rooms.js","js/views/settings.js","js/views/today.js","js/views/welcome.js","manifest.webmanifest","vendor/ts-fsrs.mjs"];
+const VERSION = "202611121912";
+const ASSETS = ["./","css/app.css","data/config.json","data/daily.json","data/plan.json","data/speaking-bank.json","fonts/display.woff2","fonts/text.woff2","icons/apple-touch-icon.png","icons/favicon-32.png","icons/icon-192.png","icons/icon-512.png","icons/icon.svg","icons/maskable-512.png","index.html","js/bands.js","js/checkin.js","js/crypto.js","js/daily.js","js/db.js","js/feedkey.js","js/fx.js","js/homework.js","js/main.js","js/mocks.js","js/nudge.js","js/pdf.js","js/publish.js","js/pulse.js","js/srs.js","js/store.js","js/ui.js","js/util.js","js/validate.js","js/views/admin.js","js/views/anki.js","js/views/daily.js","js/views/exam.js","js/views/finish.js","js/views/homework.js","js/views/hwsteps.js","js/views/hwview.js","js/views/mock.js","js/views/orb.js","js/views/progress.js","js/views/rooms.js","js/views/settings.js","js/views/today.js","js/views/treat.js","js/views/welcome.js","manifest.webmanifest","vendor/ts-fsrs.mjs"];
 const CACHE = "eight-" + VERSION;
 
 self.addEventListener("install", (e) => {
@@ -42,4 +42,19 @@ self.addEventListener("fetch", (e) => {
   if (req.method !== "GET" || url.origin !== location.origin) return;
   if (url.pathname.endsWith("course-pack.json")) return; // private, never cached here
   e.respondWith(respond(req));
+});
+
+// nudges: a note planned by the app on her phone, sent by the relay when its time comes
+self.addEventListener("push", (e) => {
+  let d = {}; try { d = e.data ? e.data.json() : {}; } catch {}
+  e.waitUntil(self.registration.showNotification(d.title || "8.5", { body: d.body || "", tag: d.tag || "eight", renotify: false, icon: "icons/icon-192.png", badge: "icons/favicon-32.png", data: { url: d.url || "#/today", tag: d.tag || "" } }));
+});
+self.addEventListener("notificationclick", (e) => {
+  e.notification.close();
+  const { url = "#/today", tag = "" } = e.notification.data || {};
+  e.waitUntil((async () => {
+    const wins = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+    for (const c of wins) if (c.url.startsWith(self.registration.scope)) { await c.focus(); c.postMessage({ nudge: tag, url }); return; }
+    await self.clients.openWindow(self.registration.scope + (tag ? "?n=" + encodeURIComponent(tag) : "") + url);
+  })());
 });
