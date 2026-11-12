@@ -7,6 +7,7 @@
 //   node tools/teacher/publish.mjs estimate mock-01 file.json   the teacher's bands for a mock { writing: {band, note}, speaking: {band, note}, note }
 //   node tools/teacher/publish.mjs config file.json       class settings { student, teacher, lessonTime, lessonDays, lessonLink, music, todayNote, ankiNote }
 //   node tools/teacher/publish.mjs note anki|today "text" a short note to her (shows once on Anki or Today)
+//   node tools/teacher/publish.mjs history muslima file.json   mocks one student sat before the app, shown on her Progress only { mocks: [...] }
 //   node tools/teacher/publish.mjs student                print her latest report (Anki, mocks, homework, check-ins)
 //   node tools/teacher/publish.mjs password [new]         set or change the teacher password
 //   node tools/teacher/publish.mjs show 2026-10-15        print what is published for a day
@@ -122,6 +123,10 @@ if (cmd === "check") {
 } else if (cmd === "config") {
   const cfg = readJson(arg); writeFileSync(join(here, "config.json"), JSON.stringify(cfg, null, 2));
   await put("config.json", { ...cfg, updatedAt: new Date().toISOString() }, "Class settings"); console.log("published class settings");
+} else if (cmd === "history") {
+  const id = String(arg || "").toLowerCase().replace(/[^a-z0-9-]+/g, "-"), data = JSON.parse(readFileSync(arg2, "utf8"));
+  if (!id || !Array.isArray(data.mocks)) { console.error("usage: history <student id> file.json  (file: { mocks: [...] })"); process.exit(1); }
+  await put(`history/${id}.json`, data, `History: ${id}`); console.log(`Published history for ${id}: ${data.mocks.length} mock(s).`);
 } else if (cmd === "note") {
   const cfg = (await fetchDec("config.json")) || {};
   cfg[arg === "anki" ? "ankiNote" : "todayNote"] = { text: arg2, at: new Date().toISOString() };

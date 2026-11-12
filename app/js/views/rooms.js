@@ -16,8 +16,9 @@ import { orb } from "./orb.js";
 const DECKS = {
   speaking: { id: "deck-speaking", name: "Speaking phrases", note: "Phrases you kept from model answers." },
   reading: { id: "deck-reading", name: "Reading words", note: "Words you caught in reading passages." },
+  writing: { id: "deck-writing", name: "Writing phrases", note: "Phrases you kept from improved versions of your writing." },
 };
-async function keep(kind, front, back) {
+export async function keep(kind, front, back) {
   const d = DECKS[kind];
   if (!store.deckById(d.id)) await store.saveDeck({ id: d.id, name: d.name, kind: "mine", note: d.note, createdAt: new Date().toISOString() });
   const key = front.trim().toLowerCase(), have = store.S.cards.find((c) => c.deck === d.id && c.front.trim().toLowerCase() === key);
@@ -25,16 +26,16 @@ async function keep(kind, front, back) {
   const card = await store.addCard({ deck: d.id, front: front.trim(), back, tag: kind });
   store.changed(); return { card, added: true };
 }
-async function unkeep(kind, front) {
+export async function unkeep(kind, front) {
   const d = DECKS[kind], key = front.trim().toLowerCase(), c = store.S.cards.find((x) => x.deck === d.id && x.front.trim().toLowerCase() === key);
   if (c) await store.removeCard(c.id);
 }
-const kept = (kind, front) => store.S.cards.some((c) => c.deck === DECKS[kind].id && c.front.trim().toLowerCase() === front.trim().toLowerCase());
+export const kept = (kind, front) => store.S.cards.some((c) => c.deck === DECKS[kind].id && c.front.trim().toLowerCase() === front.trim().toLowerCase());
 const slug = (s) => String(s || "x").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 30);
 const sentenceAround = (text, at) => { const s = text.lastIndexOf(".", at) + 1, e = text.indexOf(".", at); return text.slice(s, e < 0 ? undefined : e + 1).replace(/==/g, "").trim(); };
 
 // a full-screen room that slides up over the app
-function room(title, sub, onClose, beforeClose) {
+export function room(title, sub, onClose, beforeClose) {
   const body = h("div", { class: "room-body" });
   const el = h("div", { class: "room", role: "dialog", "aria-modal": "true", "aria-label": title },
     h("header", { class: "room-top" },
