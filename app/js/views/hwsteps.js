@@ -6,6 +6,7 @@ import * as store from "../store.js";
 import * as hw from "../homework.js";
 import { imagesToPdf } from "../pdf.js";
 import { toast } from "../ui.js";
+import { speaking, reading } from "./rooms.js";
 
 const slug = (s) => String(s || "work").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) || "work";
 // what she has picked or recorded in a step survives a re-render of the screen
@@ -146,8 +147,8 @@ function record(c) {
   return h("div", null, s.prompt ? h("p", null, s.prompt) : null, rows, h("div", { class: "row-actions", style: { marginTop: "10px" } }, send), msg);
 }
 
-const BODIES = { questions, read, words, watch, check, text, photos, record, link: text };
-export const STEP_LABEL = { questions: "Questions", read: "Read", words: "New words", watch: "Watch", check: "Check", text: "Note", photos: "Photos", record: "Record", link: "Link" };
+const BODIES = { questions, read, words, watch, check, text, photos, record, speaking, reading, link: text };
+export const STEP_LABEL = { questions: "Questions", read: "Read", words: "New words", watch: "Watch", check: "Check", text: "Note", photos: "Photos", record: "Record", speaking: "Speaking", reading: "Reading", link: "Link" };
 
 // c = { date, hw, task, step, advance }
 export function stepBody(c) { return (BODIES[c.step.type] || text)(c); }
