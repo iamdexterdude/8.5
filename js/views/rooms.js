@@ -49,21 +49,17 @@ const sentOf = (c) => hw.stateOf(c.date).steps[c.step.id]?.sent || {};
 
 export function speaking(c) {
   const s = c.step, topics = s.topics || [];
-  const total = topics.reduce((n, t) => n + t.questions.length, 0);
   const wrap = h("div", { class: "sp" });
   const draw = () => {
-    const sent = sentOf(c), done = Object.keys(sent).length;
+    const sent = sentOf(c);
     wrap.replaceChildren(
-      s.intro ? h("p", { class: "muted" }, s.intro) : null,
       h("div", { class: "sp-grid" }, topics.map((t, ti) => {
         const n = t.questions.filter((_, qi) => sent[qkey(ti, qi)]).length, all = t.questions.length;
-        return h("button", { class: "sp-topic" + (n === all ? " full" : ""), onclick: () => openSpeaking(c, ti, draw) },
-          h("span", { class: "sp-num num" }, t.num || String(ti + 1)),
+        return h("button", { class: "sp-topic" + (n === all ? " full" : ""), "aria-label": `${t.name}, ${n} of ${all} sent`, onclick: () => openSpeaking(c, ti, draw) },
+          h("span", { class: "sp-num num" }, t.num || String(ti + 1), n === all ? icon("check", 16) : null),
           h("span", { class: "sp-name" }, t.name),
-          h("span", { class: "sp-meta num" }, n === all ? "All sent" : n ? `${n} of ${all} sent` : `${all} questions`),
-          h("span", { class: "sp-bar" }, h("i", { style: { width: `${(n / all) * 100}%` } })));
-      })),
-      h("p", { class: "tiny faint num", style: { marginTop: "10px" } }, `${done} of ${total} answers sent. Each one reaches your teacher the moment you send it.`));
+          h("span", { class: "sp-dots-row", "aria-hidden": "true" }, t.questions.map((_, qi) => h("i", { class: sent[qkey(ti, qi)] ? "on" : "" }))));
+      })));
   };
   draw();
   return wrap;
@@ -174,11 +170,12 @@ export function reading(c) {
   const s = c.step, ps = s.passages || [];
   const res = hw.stateOf(c.date).steps[s.id]?.results || {};
   return h("div", { class: "rd" },
-    s.intro ? h("p", { class: "muted" }, s.intro) : null,
-    ps.length ? h("div", { class: "rd-list" }, ps.map((p, i) => h("button", { class: "rd-item", onclick: () => openReading(c, i) },
-      h("span", { class: "rd-k num" }, `Passage ${i + 1}`), h("span", { class: "rd-t" }, p.title),
-      h("span", { class: "rd-m num" }, res[i] ? `${res[i].score} of ${res[i].of}` : `${countQs(p)} questions${p.minutes ? `, ${p.minutes} min` : ""}`)))) : h("p", { class: "muted" }, "The passages arrive here soon."),
-    h("p", { class: "tiny faint" }, "Select any word in the passage to highlight it or keep it in Reading words."));
+    h("div", { class: "sp-grid rd-grid" }, ps.length
+      ? ps.map((p, i) => h("button", { class: "sp-topic" + (res[i] ? " full" : ""), onclick: () => openReading(c, i) },
+          h("span", { class: "sp-num num" }, `Passage ${i + 1}`, res[i] ? h("b", null, `${res[i].score}/${res[i].of}`) : null),
+          h("span", { class: "sp-name" }, p.title),
+          h("span", { class: "sp-foot num" }, `${countQs(p)} questions${p.minutes ? ` · ${p.minutes} min` : ""}`)))
+      : [1, 2].map((i) => h("div", { class: "sp-topic ghost" }, h("span", { class: "sp-num num" }, `Passage ${i}`), h("span", { class: "sp-name" }, "Soon")))));
 }
 const countQs = (p) => (p.groups || []).reduce((n, g) => n + (g.items || []).length, 0);
 
