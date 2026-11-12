@@ -64,9 +64,9 @@ function notesSection() {
   if (!nudge.pushable()) { sec.append(h("p", { class: "muted" }, ios && !standalone ? "On iPhone: add 8.5 to your Home Screen first (Share, then Add to Home Screen), then open it from there." : "This browser can't show notifications.")); return sec; }
   const draw = () => {
     const on = nudge.isOn(), blocked = Notification.permission === "denied";
-    sec.replaceChildren(h("div", { class: "shead" }, h("h2", null, "Notifications")),
+    sec.replaceChildren(...[h("div", { class: "shead" }, h("h2", null, "Notifications")),
       h("p", { class: "small muted" }, blocked ? "Notifications are blocked for 8.5 in your browser settings." : "Short notes about what's waiting: an answer not sent, cards due, the lesson close. They learn your hours and stay quiet at night."),
-      blocked ? null : h("div", { class: "row-actions" }, h("button", { class: "btn" + (on ? "" : " primary"), onclick: async (e) => { e.currentTarget.disabled = true; if (on) { await nudge.disable(); toast("Notifications off."); } else { const r = await nudge.enable(); toast(r === "on" ? "Notifications on." : "Notifications weren't allowed."); } draw(); } }, on ? "Turn off" : "Turn on")));
+      blocked ? null : h("div", { class: "row-actions" }, h("button", { class: "btn" + (on ? "" : " primary"), onclick: async (e) => { e.currentTarget.disabled = true; if (on) { await nudge.disable(); toast("Notifications off."); } else { const r = await nudge.enable(); toast(r === "on" ? "Notifications on." : "Notifications weren't allowed."); } draw(); } }, on ? "Turn off" : "Turn on"))].filter(Boolean));
   };
   draw(); return sec;
 }

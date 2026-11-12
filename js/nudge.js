@@ -102,14 +102,14 @@ const QUESTIONS = [
 // shows one question as a small glass card above the tab bar, if one is due. Called from Today and after the speaking room.
 export async function maybeAsk() {
   const m = me(), now = Date.now(), asked = m.asked || {};
-  if (now - (m.lastAsk || 0) < 3 * DAY || document.querySelector(".ask")) return;
+  if (now - (m.lastAsk || 0) < 3 * DAY || document.querySelector(".nudge-card")) return;
   const r = await rhythm(), q = QUESTIONS.find((x) => !asked[x.id] && x.when(r, now));
   if (!q) return;
   setMe({ lastAsk: now, asked: { ...asked, [q.id]: now } });
-  const card = h("div", { class: "ask", role: "group", "aria-label": q.text() },
+  const card = h("div", { class: "nudge-card", role: "group", "aria-label": q.text() },
     h("p", null, q.text()),
     h("div", { class: "row-actions" }, q.options.map(([label, ans]) => h("button", { class: "btn small", onclick: () => { (q.save || ((rr, a) => setMe(a)))(r, ans); track("answer", q.id); card.classList.add("out"); setTimeout(() => card.remove(), 300); sync(); } }, label))),
-    h("button", { class: "ask-x", "aria-label": "Dismiss", onclick: () => { card.classList.add("out"); setTimeout(() => card.remove(), 300); } }, "×"));
+    h("button", { class: "nudge-x", "aria-label": "Dismiss", onclick: () => { card.classList.add("out"); setTimeout(() => card.remove(), 300); } }, "×"));
   document.body.append(card);
   setTimeout(() => { if (card.isConnected) { card.classList.add("out"); setTimeout(() => card.remove(), 300); } }, 20000);
 }
@@ -249,9 +249,9 @@ export function sync(force = false, { leaving = false } = {}) {
 export function offer() {
   if (!pushable() || Notification.permission !== "default" || store.S.kv.push === "off") return;
   const asks = store.S.kv.pushAsks || [];
-  if (asks.length >= 3 || (asks.length && Date.now() - asks[asks.length - 1] < 4 * DAY) || document.querySelector(".ask")) return;
+  if (asks.length >= 3 || (asks.length && Date.now() - asks[asks.length - 1] < 4 * DAY) || document.querySelector(".nudge-card")) return;
   kvSet("pushAsks", [...asks, Date.now()]);
-  const card = h("div", { class: "ask wide", role: "group", "aria-label": "Notifications" },
+  const card = h("div", { class: "nudge-card wide", role: "group", "aria-label": "Notifications" },
     h("p", null, h("b", null, "When something's waiting"), h("br"), h("span", { class: "muted" }, "A short note when an answer isn't sent, cards are due, or the lesson is close. Only at your hours.")),
     h("div", { class: "row-actions" },
       h("button", { class: "btn small", onclick: () => { card.classList.add("out"); setTimeout(() => card.remove(), 300); } }, "Not now"),
