@@ -1,0 +1,14 @@
+# Every ten minutes: ask the relay to send the notes that are due (each phone plans its own; see app/js/nudge.js).
+name: nudges
+on:
+  schedule: [{ cron: "*/10 * * * *" }]
+  workflow_dispatch: {}
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - run: |
+          curl -fsS -m 60 -X POST https://eight-five-publish.vercel.app/api \
+            -H "Content-Type: application/json" \
+            -d "{\"op\":\"tick\",\"secret\":\"${{ secrets.NUDGE_SECRET }}\"}"
