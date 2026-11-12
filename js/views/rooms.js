@@ -8,6 +8,7 @@ import { h, icon, mmss } from "../util.js";
 import * as store from "../store.js";
 import * as hw from "../homework.js";
 import { toast } from "../ui.js";
+import { orb } from "./orb.js";
 
 const DECKS = {
   speaking: { id: "deck-speaking", name: "Speaking phrases", note: "Phrases you kept from model answers." },
@@ -71,10 +72,11 @@ export function speaking(c) {
 function openSpeaking(c, ti0, redraw) {
   const s = c.step, topics = s.topics;
   let ti = ti0, qi = Math.max(0, topics[ti].questions.findIndex((_, i) => !sentOf(c)[qkey(ti, i)]));
-  const R = room(topics[ti].name, "Speaking, Part 1", () => { stopAll(); redraw(); });
+  const O = orb();
+  const R = room(topics[ti].name, "Speaking, Part 1", () => { stopAll(); O.destroy(); redraw(); });
   let rec = null, stream = null, timer = null, take = null, secs = 0, showModel = false, ans = 0;
 
-  function stopAll() { try { if (rec && rec.state !== "inactive") rec.stop(); } catch {} stream?.getTracks().forEach((t) => t.stop()); clearInterval(timer); }
+  function stopAll() { try { if (rec && rec.state !== "inactive") rec.stop(); } catch {} stream?.getTracks().forEach((t) => t.stop()); clearInterval(timer); O.quiet(); }
   const pickMime = () => { for (const m of ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg;codecs=opus"]) if (window.MediaRecorder?.isTypeSupported?.(m)) return m; return ""; };
   const extOf = (t) => (/mp4/.test(t) ? "m4a" : /ogg/.test(t) ? "ogg" : "webm");
 
@@ -84,8 +86,8 @@ function openSpeaking(c, ti0, redraw) {
     const mime = pickMime(), parts = [];
     try { rec = new MediaRecorder(stream, mime ? { mimeType: mime, audioBitsPerSecond: 40000 } : { audioBitsPerSecond: 40000 }); } catch { rec = new MediaRecorder(stream); }
     rec.ondataavailable = (e) => e.data.size && parts.push(e.data);
-    rec.onstop = () => { stream.getTracks().forEach((t) => t.stop()); clearInterval(timer); take = new Blob(parts, { type: rec.mimeType || mime || "audio/webm" }); take.url = URL.createObjectURL(take); rec = null; store.S.busy = Math.max(0, (store.S.busy || 1) - 1); draw(); };
-    store.S.busy = (store.S.busy || 0) + 1; rec.start(1000); secs = 0;
+    rec.onstop = () => { O.quiet(); stream.getTracks().forEach((t) => t.stop()); clearInterval(timer); take = new Blob(parts, { type: rec.mimeType || mime || "audio/webm" }); take.url = URL.createObjectURL(take); rec = null; store.S.busy = Math.max(0, (store.S.busy || 1) - 1); draw(); };
+    store.S.busy = (store.S.busy || 0) + 1; rec.start(1000); secs = 0; O.listen(stream);
     timer = setInterval(() => { secs++; const t = R.el.querySelector(".mic-t"); if (t) t.textContent = mmss(secs); if (secs >= (s.max || 120)) rec?.stop(); }, 1000);
     draw();
   }
@@ -139,19 +141,21 @@ function openSpeaking(c, ti0, redraw) {
   function draw(dir = 0) {
     const t = topics[ti], q = t.questions[qi], sent = sentOf(c)[qkey(ti, qi)], recording = !!rec;
     const dots = h("div", { class: "sp-dots" }, t.questions.map((_, i) => h("button", { class: (i === qi ? "on " : "") + (sentOf(c)[qkey(ti, i)] ? "sent" : ""), "aria-label": `Question ${i + 1}`, onclick: () => { if (rec) return; stopAll(); take = null; showModel = false; qi = i; draw(); } })));
-    const mic = recording
-      ? h("button", { class: "mic live", "aria-label": "Stop recording", onclick: () => rec?.stop() }, h("span", { class: "mic-ring" }), icon("stop", 30))
-      : h("button", { class: "mic", "aria-label": take ? "Record again" : "Record your answer", onclick: start }, icon("mic", 30));
+    const mic = O.el;
+    mic.setAttribute("aria-label", recording ? "Stop recording" : take ? "Record again" : "Record your answer");
+    mic.onclick = () => (rec ? rec.stop() : start());
+    mic.classList.toggle("small", !recording && !!(take || showModel));
+    O.icon(icon(recording ? "stop" : "mic", 22));
     const card = h("article", { class: "sp-card" + (dir > 0 ? " in-r" : dir < 0 ? " in-l" : "") },
       h("div", { class: "sp-qk num" }, `Question ${qi + 1} of ${t.questions.length}`),
       h("h2", { class: "sp-q" }, q.q),
       h("div", { class: "sp-rec" },
         mic,
         h("div", { class: "sp-state" },
-          recording ? h("span", null, h("b", { class: "mic-t num" }, mmss(secs)), " Recording. Tap to stop.")
+          recording ? h("span", null, h("b", { class: "mic-t num" }, mmss(secs)), " Recording. Tap the sphere to stop.")
             : take ? h("span", null, "Listen back, then send.")
-            : sent ? h("span", { class: "ok-t" }, icon("check", 16), " Sent. You can record a better one if you like.")
-            : h("span", { class: "muted" }, "Tap the microphone and answer as you would in the exam."))),
+            : sent ? h("span", { class: "ok-t" }, icon("check", 16), " Sent. Tap the sphere to record a better one.")
+            : h("span", { class: "muted" }, "Tap the sphere and answer as you would in the exam."))),
       take && !recording ? h("div", { class: "sp-take" }, h("audio", { controls: true, src: take.url }),
         h("div", { class: "row-actions" }, h("button", { class: "btn", onclick: () => { take = null; draw(); } }, "Discard"), h("button", { class: "btn primary", onclick: (e) => send(e.currentTarget) }, icon("upload", 18), "Send"))) : null,
       sent && !take && !recording && !showModel && q.answers?.length ? h("button", { class: "btn quiet", onclick: () => { showModel = true; draw(); } }, icon("eye", 18), "See the model answer") : null,
