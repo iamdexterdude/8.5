@@ -11,16 +11,17 @@ const tashkentTime = (iso) => new Intl.DateTimeFormat("en-GB", { timeZone: "Asia
 export default async function (ctx) {
   const today = todayISO();
   hw.refresh(today);
-  const date = ctx.params[0] && /^\d{4}-\d{2}-\d{2}$/.test(ctx.params[0]) ? ctx.params[0] : today;
+  const cur = hw.currentDate(today);
+  const date = ctx.params[0] && /^\d{4}-\d{2}-\d{2}$/.test(ctx.params[0]) ? ctx.params[0] : cur || today;
   const homework = hw.homeworkFor(date);
   const root = h("div", { class: "hwv" });
-  const isToday = date === today;
+  const isToday = date === today || date === cur;
 
   const p = homework ? hw.dayProgress(date, homework) : null;
   const minutes = homework ? homework.tasks.reduce((a, t) => a + (t.minutes || 0), 0) : 0;
   root.append(h("header", { class: "hwhead-top" },
     h("div", null,
-      h("div", { class: "kicker" }, isToday ? "Today" : fmtDate(date, { weekday: "long" })),
+      h("div", { class: "kicker" }, isToday ? (homework && hw.dueLabel()) || "Today" : fmtDate(date, { weekday: "long" })),
       h("h1", null, isToday ? "Homework" : fmtDate(date, { day: "numeric", month: "long" })),
       homework ? h("div", { class: "hwmeta num" }, p.complete ? "Everything is in" : `${p.tasksDone} of ${p.tasks} done${minutes ? ` · ${dur(minutes)}` : ""}`) : null),
     !isToday ? h("a", { class: "btn small quiet", href: "#/homework" }, "Today") : null));

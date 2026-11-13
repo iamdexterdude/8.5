@@ -1,6 +1,6 @@
 // App state in memory, backed by IndexedDB. Views read from here and call the functions below to change data.
 import * as db from "./db.js";
-import { todayISO, uid, addDays, dowOf, lessonMoment } from "./util.js";
+import { todayISO, uid, addDays, dowOf, lessonMoment, diffDays } from "./util.js";
 
 export const S = {
   config: null,
@@ -43,7 +43,9 @@ export async function setSetting(key, value) { S.kv[key] = value; await db.put("
 export function lessonDays() { return (S.kv.classConfig?.lessonDays || S.config.defaults.lessonDays || [1, 3, 5]).map(Number); }
 export function lessonTime() { return S.kv.classConfig?.lessonTime || setting("lessonTime"); }
 export function lessonLink() { return S.kv.classConfig?.lessonLink || setting("meetingLink") || ""; }
-export const isLessonDay = (iso) => lessonDays().includes(dowOf(iso) === 0 ? 7 : dowOf(iso));
+// lessons on set weekdays, or every N days counted from a first lesson ({ lessonEvery: 2, lessonFrom: "2026-11-10" })
+export const lessonEvery = () => { const c = S.kv.classConfig; return c?.lessonEvery > 1 && /^\d{4}-\d{2}-\d{2}$/.test(c.lessonFrom || "") ? { every: Number(c.lessonEvery), from: c.lessonFrom } : null; };
+export const isLessonDay = (iso) => { const e = lessonEvery(); if (e) { const n = diffDays(e.from, iso); return n >= 0 && n % e.every === 0; } return lessonDays().includes(dowOf(iso) === 0 ? 7 : dowOf(iso)); };
 export function lessonStart(iso) { return lessonMoment(iso, lessonTime()); }
 // the next lesson from now: today's if it has not ended, else the next lesson day
 export function nextLesson(now = new Date()) {

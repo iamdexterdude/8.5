@@ -116,7 +116,7 @@ function nudgeLoop() {
   const replay = (a, cls) => { a.classList.remove(cls); void a.offsetWidth; a.classList.add(cls); };
   let wasUnread = null, timer = 0;
   const tick = () => {
-    const t = todayISO(), hw = hwm.homeworkFor(t), here = parseHash().name;
+    const t = hwm.currentDate(todayISO()), hw = t ? hwm.homeworkFor(t) : null, here = parseHash().name;
     const pending = !!(hw && !hwm.dayProgress(t, hw).complete && here !== "homework");
     hwA.classList.toggle("pending", pending);
     const note = hwm.F.config?.ankiNote;

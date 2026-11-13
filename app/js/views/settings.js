@@ -22,7 +22,7 @@ export default async function (ctx) {
 
   const time = h("input", { type: "time", value: store.lessonTime(), "aria-label": "Lesson start time" }); time.addEventListener("change", () => store.setSetting("lessonTime", time.value || "19:00"));
   root.append(h("section", { class: "section" }, h("div", { class: "shead" }, h("h2", null, "Lessons")),
-    h("p", { class: "small muted" }, `Lesson days: ${store.lessonDays().map((d) => ["", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][d]).join(", ")}. Your teacher sets these.`),
+    h("p", { class: "small muted" }, store.lessonEvery() ? `Lessons every ${store.lessonEvery().every === 2 ? "other day" : store.lessonEvery().every + " days"}${store.nextLesson() ? `, next on ${new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }).format(new Date(store.nextLesson().date + "T12:00:00Z"))}` : ""}. Your teacher sets these.` : `Lesson days: ${store.lessonDays().map((d) => ["", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][d]).join(", ")}. Your teacher sets these.`),
     h("div", { class: "field" }, h("label", null, "Lesson start time (Tashkent)"), time),
     text("meetingLink", "Lesson link", { type: "url", inputMode: "url", placeholder: "https://" })));
 
