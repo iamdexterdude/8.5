@@ -146,6 +146,16 @@ function serviceWorker() {
   }).catch(() => {});
 }
 
+// a pill at the top while the teacher looks at the app as a student; Exit goes back to Teacher mode
+function viewingBanner() {
+  const who = hwm.viewingAs(), el = document.querySelector(".viewas");
+  if (!who) { el?.remove(); document.body.classList.remove("viewing"); return; }
+  if (el) { el.querySelector("b").textContent = who; return; }
+  document.body.classList.add("viewing");
+  document.body.append(h("div", { class: "viewas", role: "status" }, h("span", null, h("span", { class: "viewas-k" }, "Viewing as "), h("b", null, who)),
+    h("button", { class: "btn small", onclick: async () => { await hwm.viewAs(""); location.hash = "#/admin"; } }, "Exit")));
+}
+
 async function boot() {
   buildNav();
   await store.load();
@@ -159,6 +169,7 @@ async function boot() {
   nudgeLoop();
   pulse.noteVisit();
   try { nudge.start(); } catch {}
+  viewingBanner(); store.onChange(viewingBanner);
   if (!store.S.kv.welcomed && !new URLSearchParams(location.search).has("nowelcome")) {
     if (navigator.onLine) hwm.primeConfig({ timeout: 15000 }).catch(() => {});   // the lesson settings, in the background; the welcome does not wait
     // the first open: the welcome is the opening, and it asks for a name. The quiet dark screen gives way to it the moment it is on the page.

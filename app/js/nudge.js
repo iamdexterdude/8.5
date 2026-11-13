@@ -235,7 +235,7 @@ export async function disable() {
 
 let syncing = null, lastSync = 0;
 export function sync(force = false, { leaving = false } = {}) {
-  if (!isOn() || (!force && !leaving && Date.now() - lastSync < 60000)) return Promise.resolve();
+  if (hw.viewingAs() || !isOn() || (!force && !leaving && Date.now() - lastSync < 60000)) return Promise.resolve();
   lastSync = Date.now();
   return (syncing = (async () => {
     const p = await plan();
