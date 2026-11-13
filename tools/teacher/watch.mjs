@@ -248,7 +248,7 @@ async function handle(id) {
     if (kind === "homework" && made.date !== req.date) summary += `\nNote: published for ${day(made.date)}, not ${day(req.date)}, because your note named that day.`;
     await status({ state: "published", date: made.date || req.date, summary });
     await notify(`8.5: ${kind === "homework" ? `the homework for ${day(made.date)}` : kind === "mock" ? `${made.title || made.id}` : `the deck ${made.name}`} is live.\n\n${summary}`);
-    state.lastResult = { id, ok: true, date: hw.date, at: new Date().toISOString() };
+    state.lastResult = { id, ok: true, date: made.date, at: new Date().toISOString() };
     await cleanup(id);
   } catch (e) {
     const final = e instanceof Final || n >= MAX_TRIES;
