@@ -40,12 +40,13 @@ export function refresh(date = todayISO(), { force = false, timeout } = {}) {
     let changed = false;
     const same = (a, b) => JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
     try {
-      for (const d of [date, addDays(date, -1)]) {
+      // today back to the last lesson before it: homework set at a lesson stays current until the next one
+      for (const d of sinceLastLesson(date)) {
         const v = await fetchDec(`hw/${d}.json`, { timeout });
         if (!same(F.hw[d], v)) { F.hw[d] = v; changed = true; }
       }
       const cv = await fetchDec("config.json", { timeout });
-      if (!same(F.config, cv)) { F.config = cv; changed = true; await store.setSetting("classConfig", cv ? { lessonDays: cv.lessonDays, lessonTime: cv.lessonTime, lessonLink: cv.lessonLink } : null); }
+      if (!same(F.config, cv)) { F.config = cv; changed = true; await store.setSetting("classConfig", cv ? { lessonDays: cv.lessonDays, lessonEvery: cv.lessonEvery, lessonFrom: cv.lessonFrom, lessonTime: cv.lessonTime, lessonLink: cv.lessonLink } : null); }
       const decks = (await fetchDec("decks/index.json", { timeout })) || [];
       if (!same(F.decks, decks)) { F.decks = decks; changed = true; }
       for (const d of decks) if (!store.deckById(d.id) && !store.S.kv["deck-removed-" + d.id]) {
@@ -79,12 +80,18 @@ export async function primeConfig({ timeout = 15000 } = {}) {
   const cv = await fetchDec("config.json", { timeout });
   if (!cv) return null;
   F.config = cv;
-  await store.setSetting("classConfig", { lessonDays: cv.lessonDays, lessonTime: cv.lessonTime, lessonLink: cv.lessonLink });
+  await store.setSetting("classConfig", { lessonDays: cv.lessonDays, lessonEvery: cv.lessonEvery, lessonFrom: cv.lessonFrom, lessonTime: cv.lessonTime, lessonLink: cv.lessonLink });
   await persist();
   return cv;
 }
 
 export const homeworkFor = (date) => F.hw[date] || null;
+// the days from `date` back to the most recent lesson before it (that lesson included), a week at most
+export function sinceLastLesson(date = todayISO()) { const out = [date]; for (let i = 1; i <= 7; i++) { const d = addDays(date, -i); out.push(d); if (store.isLessonDay(d)) break; } return out; }
+// the homework that counts today: the newest one set since the last lesson before today
+export function currentDate(today = todayISO()) { for (const d of sinceLastLesson(today)) if (F.hw[d]) return d; return null; }
+// "Due tonight", "Due Saturday": when the current homework is wanted
+export function dueLabel() { const nl = store.nextLesson(); if (!nl) return ""; return nl.date === todayISO() ? "Due tonight" : `Due ${new Intl.DateTimeFormat("en-GB", { weekday: "long", timeZone: "UTC" }).format(new Date(nl.date + "T12:00:00Z"))}`; }
 export const studentName = () => store.setting("name") || "";   // the name she chose on her device; the class settings carry none
 const nameOf = () => studentName() || "Student";
 export const studentId = () => (studentName() || "student").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "student";

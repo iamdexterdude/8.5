@@ -13,8 +13,8 @@ import { dissolve } from "../fx.js";
 export default async function (ctx) {
   const today = todayISO(), name = hw.studentName();
   hw.refresh(today);
-  const lesson = store.lessonState(), homework = hw.homeworkFor(today);
-  const hwDone = !!(homework && hw.dayProgress(today, homework).complete);
+  const lesson = store.lessonState(), homework = hw.homeworkFor(today), hwDate = hw.currentDate(today), current = hwDate ? hw.homeworkFor(hwDate) : null;
+  const hwDone = !!(current && hw.dayProgress(hwDate, current).complete);
   const streak = store.streak(today);
   const root = h("div", { class: "todayv" });
 

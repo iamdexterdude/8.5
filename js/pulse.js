@@ -66,10 +66,10 @@ export async function weekStats() {
 const MOCK_MIN = { listening: "About 30 minutes, then two to check.", reading: "60 minutes. Keep the clock in view.", writing: "60 minutes for both tasks.", speaking: "About 14 minutes, recorded." };
 export async function nextStep() {
   const today = todayISO(), y = addDays(today, -1), sunday = dowOf(today) === 0;
-  const homework = hw.homeworkFor(today), hy = hw.homeworkFor(y);
-  if (homework && !hw.dayProgress(today, homework).complete) {
-    const p = hw.dayProgress(today, homework);
-    return { kind: "homework", k: "Today's homework", title: p.stepsDone ? `${p.steps - p.stepsDone} of ${p.steps} steps left` : `${p.steps} steps, ${p.tasks} ${p.tasks === 1 ? "task" : "tasks"}`, why: "Done today it settles. Done on the lesson day it is only rushed.", href: "#/homework", btn: p.stepsDone ? "Continue" : "Open" };
+  const cd = hw.currentDate(today), homework = cd ? hw.homeworkFor(cd) : null, hy = cd === y ? null : hw.homeworkFor(y);
+  if (homework && !hw.dayProgress(cd, homework).complete) {
+    const p = hw.dayProgress(cd, homework);
+    return { kind: "homework", k: cd === today ? "Today's homework" : `Homework · ${hw.dueLabel() || "still open"}`, title: p.stepsDone ? `${p.steps - p.stepsDone} of ${p.steps} steps left` : `${p.steps} steps, ${p.tasks} ${p.tasks === 1 ? "task" : "tasks"}`, why: "Done today it settles. Done on the lesson day it is only rushed.", href: "#/homework", btn: p.stepsDone ? "Continue" : "Open" };
   }
   if (hy && !hw.dayProgress(y, hy).complete) return { kind: "homework", k: "Yesterday's homework", title: "Still open", why: "Twenty minutes now beats an hour on the lesson day.", href: `#/homework/${y}`, btn: "Finish it" };
   const mocks = [...(hw.F.mocks || [])].sort((a, b) => (b.date || "").localeCompare(a.date || ""));
