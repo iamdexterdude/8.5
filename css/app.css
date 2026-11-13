@@ -956,3 +956,12 @@ main#view { padding: 14px 18px calc(var(--nav-h) + 46px + env(safe-area-inset-bo
 .pm-text .chunk { padding: 2px 3px; }
 .pm-card { max-height: 40dvh; }
 .pm-sheet h2:focus { outline: none; }
+
+/* ---------- view as a student */
+.viewas { position: fixed; z-index: 140; top: calc(10px + env(safe-area-inset-top, 0px)); left: 50%; translate: -50% 0; display: flex; align-items: center; gap: 10px; padding: 6px 6px 6px 16px; border-radius: 999px;
+  font-size: 14px; color: #fff; background: rgba(185, 127, 30, .92); -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); box-shadow: var(--lift); max-width: calc(100vw - 24px); }
+.viewas .btn { min-height: 32px; background: rgba(255, 255, 255, .22); color: #fff; box-shadow: none; }
+body.viewing main#view { padding-top: 64px; }
+.viewas-card { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin: 0 0 16px; padding: 14px 16px; border-radius: var(--r-card, 20px); background: var(--glass); -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur); box-shadow: inset 0 1px 0 var(--edge), var(--shadow); }
+.viewas-card .grow { flex: 1 1 220px; min-width: 0; } .viewas-card p { margin: 2px 0 0; }
+.viewas { white-space: nowrap; } .viewas-k { opacity: .85; }

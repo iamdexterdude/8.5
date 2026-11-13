@@ -139,6 +139,10 @@ async function studentTab(ctx) {
   const pretty = (id) => id.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
   const box = h("div", null);
   if (ids.length > 1) box.append(h("div", { class: "chips", style: { marginBottom: "12px" } }, ids.map((id) => h("button", { class: "chip" + (id === studentPick ? " on" : ""), onclick: () => { studentPick = id; ctx.rerender(); } }, pretty(id)))));
+  // see the app the way this student sees it: her name, her own items (like a mock from before the app), nothing sent
+  box.append(h("div", { class: "viewas-card" },
+    h("div", { class: "grow" }, h("b", null, `See the app as ${pretty(studentPick)}`), h("p", { class: "small muted" }, "Her name and her own items, like Progress. Her phone's cards and homework stay on her phone; their numbers are below.")),
+    h("button", { class: "btn primary small", onclick: async (e) => { e.currentTarget.disabled = true; await hw.viewAs(pretty(studentPick)); location.hash = "#/progress"; } }, icon("eye", 18), "View as student")));
   let rep = null;
   try { const t = await readPublished(`students/${studentPick}.json`); rep = t ? JSON.parse(t) : null; } catch {}
   if (!rep) { box.append(h("p", { class: "muted" }, "This report could not be read.")); return box; }

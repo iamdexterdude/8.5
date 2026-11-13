@@ -92,7 +92,15 @@ export function sinceLastLesson(date = todayISO()) { const out = [date]; for (le
 export function currentDate(today = todayISO()) { for (const d of sinceLastLesson(today)) if (F.hw[d]) return d; return null; }
 // "Due tonight", "Due Saturday": when the current homework is wanted
 export function dueLabel() { const nl = store.nextLesson(); if (!nl) return ""; return nl.date === todayISO() ? "Due tonight" : `Due ${new Intl.DateTimeFormat("en-GB", { weekday: "long", timeZone: "UTC" }).format(new Date(nl.date + "T12:00:00Z"))}`; }
-export const studentName = () => store.setting("name") || "";   // the name she chose on her device; the class settings carry none
+// "View as a student" (Teacher mode): for this browser tab only, the app takes a student's name and sends nothing
+export const viewingAs = () => { try { return sessionStorage.getItem("eight-view-as") || ""; } catch { return ""; } };
+export async function viewAs(name) {
+  try { name ? sessionStorage.setItem("eight-view-as", name) : sessionStorage.removeItem("eight-view-as"); } catch {}
+  F.history = null; F.historyAt = 0; await persist(); store.changed();
+  await refresh(undefined, { force: true });
+}
+const STUDENT_OPS = new Set(["upload", "notify", "report", "push-sub", "push-off", "nudges"]);
+export const studentName = () => viewingAs() || store.setting("name") || "";   // the name she chose on her device; the class settings carry none
 const nameOf = () => studentName() || "Student";
 export const studentId = () => (studentName() || "student").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "student";
 
@@ -130,6 +138,7 @@ export async function addWords(date, step, task) {
 // ---------- the relay: her files and short lines reach the teacher; small reports let Teacher mode see how she is doing ----------
 const toB64 = (blob) => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(",")[1] || ""); r.onerror = () => rej(r.error); r.readAsDataURL(blob); });
 export async function relay(body, { timeout = 60000 } = {}) {
+  if (viewingAs() && STUDENT_OPS.has(body?.op)) { if (body.op === "upload" || body.op === "notify") import("./ui.js").then((u) => u.toast(`Viewing as ${viewingAs()}: nothing was sent.`)); return { ok: true, sent: [] }; }
   const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), timeout);
   try {
     const r = await fetch(RELAY, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal: ctl.signal });
