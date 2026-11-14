@@ -981,3 +981,145 @@ body.viewing main#view { padding-top: 64px; }
 .na-txt p { margin: 1px 0 0; font-size: 13.5px; color: var(--text-2); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 .na-actions { display: grid; gap: 4px; margin-top: 6px; } .na-actions .btn { width: 100%; }
 @media (prefers-reduced-motion: reduce) { .na-note { animation: none; opacity: 1; } }
+
+/* =====================================================================================================================
+   THE EXAM SCREEN, modelled on the computer-delivered IELTS: a plain white workspace, a part bar, number-in-box answers,
+   round radio buttons, drag-and-drop options, the navigation strip at the bottom. Text size and colours from Settings.
+   ===================================================================================================================== */
+.exam { background: #fff; color: #111; font-family: Arial, Helvetica, "Segoe UI", sans-serif; letter-spacing: 0; }
+.exam .ex-shell { --ex-fs: 16px; --ex-bg: #fff; --ex-fg: #111; --ex-soft: #f3f4f0; --ex-line: #cfd2d6; --ex-dark: #222; --ex-acc: #1f5bb4; --ex-hl: #fff176;
+  height: 100dvh; display: flex; flex-direction: column; background: var(--ex-bg); color: var(--ex-fg); font-size: var(--ex-fs); }
+.exam .ex-shell[data-fs="large"] { --ex-fs: 19px; } .exam .ex-shell[data-fs="xlarge"] { --ex-fs: 22px; }
+.exam .ex-shell[data-colour="wb"] { --ex-bg: #000; --ex-fg: #fff; --ex-soft: #1a1a1a; --ex-line: #555; --ex-dark: #fff; --ex-acc: #8ab4ff; --ex-hl: #806c00; }
+.exam .ex-shell[data-colour="yb"] { --ex-bg: #000; --ex-fg: #ffeb3b; --ex-soft: #1a1a1a; --ex-line: #6b6400; --ex-dark: #ffeb3b; --ex-acc: #ffeb3b; --ex-hl: #5c4c00; }
+
+/* the header */
+.exam .ex-top { flex: none; height: 58px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; padding: 0 16px; background: var(--ex-bg); color: var(--ex-fg); border-bottom: 1px solid var(--ex-line); box-shadow: 0 1px 4px rgba(0, 0, 0, .06); font-size: 15px; }
+.exam .ex-left { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.exam .ex-brand { font: 800 20px Arial, sans-serif; letter-spacing: .02em; color: #d3222a; }
+.exam .ex-cand { color: var(--ex-fg); opacity: .75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.exam .ex-mid { justify-self: center; }
+.exam .ex-clockwrap { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 16px; }
+.exam .ex-clockwrap.hidden .ex-clock { visibility: hidden; }
+.exam .ex-clockwrap.warn { color: #c62828; }
+.exam .ex-right { justify-self: end; display: flex; align-items: center; gap: 4px; }
+.exam .ex-tool { display: inline-flex; flex-direction: column; align-items: center; gap: 1px; min-width: 54px; padding: 4px 6px; border: 0; border-radius: 6px; background: transparent; color: var(--ex-fg); font: 12px Arial, sans-serif; cursor: pointer; }
+.exam .ex-tool:hover { background: var(--ex-soft); }
+.exam .ex-q { display: grid; place-items: center; width: 18px; height: 18px; border: 1.6px solid currentColor; border-radius: 50%; font-size: 12px; line-height: 1; }
+.exam .ex-vol { flex-direction: row; gap: 6px; } .exam .ex-vol input { width: 90px; accent-color: var(--ex-dark); }
+
+/* the part bar */
+.exam .ex-partbar { flex: none; margin: 10px 14px 0; padding: 10px 16px; border: 1px solid var(--ex-line); border-radius: 4px; background: var(--ex-soft); display: grid; gap: 2px; }
+.exam .ex-partbar b { font-size: 1.05em; } .exam .ex-partbar span { font-size: .95em; }
+
+/* the workspace */
+.exam .ex-body { flex: 1; min-height: 0; display: flex; margin: 10px 14px; border: 1px solid var(--ex-line); --split: 50%; background: var(--ex-bg); }
+.exam .ex-left-pane, .exam .ex-right-pane { background: var(--ex-bg); color: var(--ex-fg); overflow: auto; padding: 22px 26px 60px; }
+.exam .ex-left-pane { flex: 0 0 var(--split); border-right: 0; }
+.exam .ex-split { flex: none; width: 12px; cursor: col-resize; background: var(--ex-soft); border-left: 1px solid var(--ex-line); border-right: 1px solid var(--ex-line); position: relative; }
+.exam .ex-split::after { content: "⋮"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--ex-fg); opacity: .5; font-size: 18px; }
+.exam .listening .ex-body { flex-direction: column; } .exam .listening .ex-right-pane { flex: 1; max-width: 900px; width: 100%; margin: 0 auto; }
+.exam .ex-audio { flex: none; padding: 8px 16px; border-bottom: 1px solid var(--ex-line); background: var(--ex-soft); color: var(--ex-fg); }
+.exam .ex-audio-row { display: flex; align-items: center; gap: 10px; font-size: 14px; } .exam .ex-audio-s { color: var(--ex-fg); }
+
+/* the passage */
+.exam .passage { font-size: 1em; line-height: 1.7; max-width: 72ch; color: var(--ex-fg); }
+.exam .passage h2 { font: 700 1.35em Arial, sans-serif; text-align: center; margin: 4px 0 10px; letter-spacing: 0; color: var(--ex-fg); }
+.exam .passage .psub { font-style: italic; text-align: center; margin: 0 0 18px; }
+.exam .passage p { margin: 0 0 1em; } .exam .passage .plabel { margin-right: 8px; }
+.exam .passage .pnotes { border-top: 1px solid var(--ex-line); margin-top: 18px; padding-top: 8px; font-size: .82em; opacity: .85; } .exam .passage .pnotes p { margin: 0 0 4px; }
+.exam mark.hl { background: var(--ex-hl); color: inherit; border-radius: 0; cursor: pointer; padding: 0; }
+.exam mark.hl.has-note { box-shadow: inset 0 -2px 0 #e65100; }
+
+/* questions */
+.exam .qgroup-ex { margin-bottom: 30px; }
+.exam .qg-head { margin-bottom: 12px; } .exam .qg-head b { font-size: 1.02em; }
+.exam .qinst { margin: 4px 0 0; padding: 0; border: 0; background: none; font-size: .95em; color: var(--ex-fg); }
+.exam .qg-title { font: 700 1.05em Arial, sans-serif; text-align: center; margin: 6px 0 12px; letter-spacing: 0; color: var(--ex-fg); }
+.exam .gaplines { font-size: 1em; line-height: 2.3; }
+.exam .gapline { min-height: 1.6em; } .exam .gapline.blank { height: .7em; min-height: 0; }
+.exam .gapline.bullet { padding-left: 1.2em; position: relative; } .exam .gapline.bullet::before { content: "•"; position: absolute; left: .2em; }
+.exam .gap-h { font: 700 1em Arial, sans-serif; margin: 10px 0 0; letter-spacing: 0; color: var(--ex-fg); }
+.exam input.gap { display: inline-block; width: 9.5em; min-height: 0; height: 1.9em; padding: 0 6px; margin: 0 4px; border: 1px solid #8a8f96; border-radius: 3px; background: var(--ex-bg); color: var(--ex-fg); font: inherit; font-size: .95em; text-align: center; vertical-align: middle; box-shadow: none; }
+.exam input.gap::placeholder { color: var(--ex-fg); font-weight: 700; opacity: .9; }
+.exam input.gap:focus { outline: 2px solid var(--ex-acc); outline-offset: 0; box-shadow: none; }
+.exam .qtable-wrap { overflow-x: auto; } .exam .qtable { border-collapse: collapse; width: 100%; font-size: .95em; line-height: 2.1; }
+.exam .qtable th, .exam .qtable td { border: 1px solid var(--ex-line); padding: 6px 10px; text-align: left; vertical-align: top; } .exam .qtable th { background: var(--ex-soft); line-height: 1.4; }
+.exam .qitem { padding: 10px 0 14px; border-bottom: 0; }
+.exam .qhead { display: flex; gap: 10px; align-items: baseline; } .exam .qnum { flex: none; min-width: 1.6em; font-weight: 700; }
+.exam .qtext { flex: 1; font-size: 1em; }
+.exam .radios { display: grid; gap: 2px; margin: 8px 0 0 2.2em; }
+.exam .ex-radio { display: flex; align-items: flex-start; gap: 10px; padding: 6px 8px; border-radius: 3px; cursor: pointer; font-size: 1em; }
+.exam .ex-radio:hover { background: var(--ex-soft); }
+.exam .ex-radio input { flex: none; width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--ex-dark); }
+.exam .ex-radio .rl { font-weight: 700; min-width: 1em; }
+.exam .row-item { display: flex; align-items: center; gap: 10px; } .exam .row-item select { width: 5em; min-height: 34px; padding: 2px 6px; border: 1px solid #8a8f96; border-radius: 3px; background: var(--ex-bg); color: var(--ex-fg); font: inherit; box-shadow: none; }
+.exam .is-cur { background: color-mix(in srgb, var(--ex-acc) 7%, transparent); box-shadow: -3px 0 0 var(--ex-acc); }
+.exam td.is-cur, .exam .drop.is-cur { box-shadow: none; }
+
+/* drag and drop */
+.exam .matchwrap { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.exam .matchrows { display: grid; gap: 6px; }
+.exam .match-item { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; padding: 8px 0; }
+.exam .drop { display: inline-flex; align-items: center; justify-content: center; min-width: 9.5em; max-width: 100%; min-height: 2em; padding: 2px 10px; margin: 0 4px; border: 1.5px dashed #8a8f96; border-radius: 3px; background: var(--ex-bg); color: var(--ex-fg); vertical-align: middle; cursor: pointer; line-height: 1.35; font-size: .95em; }
+.exam .match-item .drop { justify-content: flex-start; min-height: 2.4em; margin: 0; }
+.exam .drop .drop-n { font-weight: 700; }
+.exam .drop.filled { border-style: solid; border-color: var(--ex-dark); background: var(--ex-soft); }
+.exam .drop.over { border-color: var(--ex-acc); background: color-mix(in srgb, var(--ex-acc) 12%, var(--ex-bg)); }
+.exam .drop:focus { outline: 2px solid var(--ex-acc); }
+.exam .dchips { display: grid; gap: 6px; align-content: start; padding: 10px; border: 1px solid var(--ex-line); border-radius: 4px; background: var(--ex-soft); }
+.exam .dchips.words { grid-template-columns: repeat(auto-fill, minmax(11em, 1fr)); margin-top: 14px; }
+.exam .dchips-t { font-weight: 700; margin-bottom: 2px; grid-column: 1 / -1; }
+.exam .dchip { display: flex; gap: 8px; align-items: flex-start; padding: 7px 10px; border: 1px solid #8a8f96; border-radius: 3px; background: var(--ex-bg); color: var(--ex-fg); cursor: grab; user-select: none; -webkit-user-select: none; line-height: 1.35; font-size: .95em; }
+.exam .dchip:active { cursor: grabbing; }
+.exam .dchip.picked { outline: 2px solid var(--ex-acc); background: color-mix(in srgb, var(--ex-acc) 12%, var(--ex-bg)); }
+.exam .dchip.used { opacity: .35; }
+@media (max-width: 760px) { .exam .matchwrap { grid-template-columns: 1fr; } }
+
+/* the navigation strip */
+.exam .ex-bottom { flex: none; padding: 0; background: var(--ex-bg); border-top: 1px solid var(--ex-line); }
+.exam .ex-nav { display: flex; align-items: center; gap: 10px; padding: 6px 10px calc(6px + env(safe-area-inset-bottom)); min-height: 60px; color: var(--ex-fg); }
+.exam .ex-review { flex: none; display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border: 1px solid var(--ex-line); border-radius: 3px; font-size: 14px; cursor: pointer; } .exam .ex-review input { width: 16px; height: 16px; accent-color: var(--ex-dark); }
+.exam .ex-parts2 { flex: 1; min-width: 0; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: thin; }
+.exam .ex-p { flex: none; display: flex; align-items: center; gap: 10px; padding: 6px 12px; border: 1px solid var(--ex-line); border-radius: 3px; background: var(--ex-bg); color: var(--ex-fg); font: 14px Arial, sans-serif; cursor: pointer; }
+.exam .ex-p span { opacity: .7; }
+.exam .ex-p.on { background: var(--ex-soft); cursor: default; border-color: var(--ex-dark); }
+.exam .ex-qs { display: flex; gap: 3px; flex-wrap: wrap; }
+.exam .ex-qn { position: relative; width: 28px; height: 28px; padding: 0; border: 1px solid transparent; border-radius: 3px; background: transparent; color: var(--ex-fg); font: 700 13px Arial, sans-serif; cursor: pointer; }
+.exam .ex-qn.done { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+.exam .ex-qn.cur { border-color: var(--ex-acc); background: color-mix(in srgb, var(--ex-acc) 14%, transparent); }
+.exam .ex-qn.flag::after { content: ""; position: absolute; top: 1px; right: 1px; width: 0; height: 0; border-left: 7px solid transparent; border-top: 7px solid #e65100; }
+.exam .ex-arrows { flex: none; display: flex; gap: 6px; }
+.exam .ex-arrow, .exam .ex-submit { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; min-width: 44px; padding: 0 10px; border: 0; border-radius: 3px; background: var(--ex-dark); color: var(--ex-bg); font: 700 14px Arial, sans-serif; cursor: pointer; }
+.exam .ex-arrow[disabled] { opacity: .3; cursor: default; }
+.exam .ex-submit { padding: 0 14px; }
+
+/* writing */
+.exam .wtask { line-height: 1.6; } .exam .wbox { border: 1px solid var(--ex-line); padding: 12px 16px; margin-bottom: 14px; font-weight: 700; font-style: italic; } .exam .wbox p { margin: 0 0 .7em; } .exam .wbox p:last-child { margin: 0; }
+.exam .wimg { max-width: 100%; border: 0; background: #fff; }
+.exam .essay-in { width: 100%; height: calc(100% - 36px); min-height: 320px; resize: none; border: 1px solid #8a8f96; border-radius: 3px; padding: 12px 14px; font: var(--ex-fs)/1.6 Arial, sans-serif; background: var(--ex-bg); color: var(--ex-fg); box-shadow: none; }
+.exam .essay-in:focus { outline: 2px solid var(--ex-acc); box-shadow: none; background: var(--ex-bg); }
+.exam .ex-under { justify-content: flex-end; font-size: 14px; color: var(--ex-fg); }
+
+/* small windows: settings, help, notes, the highlight bar, the confirm */
+.ex-pop { position: fixed; z-index: 220; top: 64px; right: 16px; width: min(320px, calc(100vw - 32px)); padding: 16px; background: #fff; color: #111; border: 1px solid #cfd2d6; border-radius: 4px; box-shadow: 0 10px 30px rgba(0, 0, 0, .18); font: 15px/1.45 Arial, sans-serif; }
+.ex-pop.note { position: absolute; }
+.ex-pop h3 { font: 700 16px Arial, sans-serif; margin: 0 0 10px; letter-spacing: 0; color: #111; }
+.ex-pop fieldset { border: 0; padding: 0; margin: 0 0 12px; } .ex-pop legend { font-weight: 700; margin-bottom: 4px; }
+.ex-pop .ex-radio { display: flex; gap: 8px; align-items: center; padding: 3px 0; cursor: pointer; }
+.ex-pop textarea { width: 100%; min-height: 80px; border: 1px solid #8a8f96; border-radius: 3px; padding: 8px; font: 15px Arial, sans-serif; background: #fff; color: #111; box-shadow: none; margin-bottom: 10px; }
+.ex-help { margin: 0 0 12px; padding-left: 18px; } .ex-help li { margin-bottom: 6px; }
+.ex-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 38px; padding: 0 16px; border: 1px solid #8a8f96; border-radius: 3px; background: #fff; color: #111; font: 700 14px Arial, sans-serif; cursor: pointer; }
+.ex-btn.dark { background: #222; color: #fff; border-color: #222; }
+.hl-bar { position: absolute; z-index: 230; display: flex; gap: 2px; padding: 3px; background: #222; border-radius: 4px; box-shadow: 0 6px 18px rgba(0, 0, 0, .25); }
+.hl-bar button { border: 0; background: transparent; color: #fff; font: 700 13px Arial, sans-serif; padding: 7px 12px; border-radius: 3px; cursor: pointer; } .hl-bar button:hover { background: rgba(255, 255, 255, .15); }
+.ex-confirm-in { border-radius: 4px; font-family: Arial, sans-serif; }
+.ex-notice { border-radius: 4px; font-family: Arial, sans-serif; }
+@media (max-width: 760px) {
+  .exam .ex-top { grid-template-columns: auto 1fr auto; padding: 0 10px; } .exam .ex-cand { display: none; } .exam .ex-tool span { display: none; } .exam .ex-tool { min-width: 38px; }
+  .exam .ex-body { flex-direction: column; margin: 8px; } .exam .reading .ex-left-pane { flex: 0 0 45%; border-bottom: 1px solid var(--ex-line); } .exam .ex-split { display: none; }
+  .exam .writing .ex-body { flex-direction: column; } .exam .writing .ex-left-pane { flex: 0 0 40%; }
+  .exam .ex-left-pane, .exam .ex-right-pane { padding: 16px 16px 40px; }
+  .exam .ex-review span { display: none; } .exam .ex-submit span { display: none; }
+}
+@media (max-width: 760px) { .exam .ex-nav { flex-wrap: wrap; row-gap: 6px; } .exam .ex-parts2 { order: 3; flex-basis: 100%; } .exam .ex-review { order: 1; } .exam .ex-arrows { order: 2; margin-left: auto; } }
