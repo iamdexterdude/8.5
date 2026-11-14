@@ -13,7 +13,7 @@ const MIN_PW = 4;
 const ORIGINS = [/^https:\/\/iamdexterdude\.github\.io$/, /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/];
 const PATH_OK = /^(hw\/\d{4}-\d{2}-\d{2}\.json|config\.json|requests\/[a-z0-9-]{1,40}\/(request|part-\d{1,3})\.json|mocks\/index\.json|mocks\/[a-z0-9-]{2,40}\/mock\.json|results\/[a-z0-9-]{2,40}\.json|decks\/index\.json|decks\/[a-z0-9-]{2,40}\.json)$/;
 // "Send to Claude": the request and its attachments go to requests/<id>/; the watcher on the teacher's PC answers in status.json
-const READ_OK = /^(requests\/[a-z0-9-]{1,40}\/status\.json|students\/[a-z0-9-]{1,40}\.json)$/;
+const READ_OK = /^(requests\/[a-z0-9-]{1,40}\/status\.json|students\/[a-z0-9-]{1,40}\.json|config\.json)$/;
 const MAX_FILE = 3.5 * 1024 * 1024;
 
 // ---- password: salted PBKDF2 with a server-side pepper. The hash file is public (feed repo); without the pepper it is useless.
