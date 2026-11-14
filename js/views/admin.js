@@ -4,7 +4,8 @@ import { h, icon, todayISO, addDays, fmtDate, fmtShort } from "../util.js";
 import * as store from "../store.js";
 import * as hw from "../homework.js";
 import { adminLoad, adminSave, putEncrypted, fetchPublished, readPublished, listPublished, sendTeacherNote, sendToClaude, claudeStatus, session, lock, unlock, changePassword } from "../publish.js";
-import { SITE } from "../feedkey.js";
+import { SITE, FEED_KEY } from "../feedkey.js";
+import { decryptJson } from "../crypto.js";
 import { head, toast } from "../ui.js";
 
 export const live = false;
@@ -39,12 +40,17 @@ function lockPanel(ctx) {
   setTimeout(() => p.focus(), 50);
   return h("div", null, h("p", { class: "muted" }, "For the teacher. The student never needs this screen."), h("div", { class: "field", style: { maxWidth: "340px" } }, h("label", null, "Teacher password"), p), btn, msg);
 }
-async function syncFromPublished() {
-  try { const c = await fetchPublished("config.json"); if (c) adminSave({ cfg: c }); } catch {}
+// the class settings as they are in the feed right now (through the relay, so no five-minute cache)
+async function freshConfig() {
+  try { const t = await readPublished("config.json"); if (t) return await decryptJson(JSON.parse(t), FEED_KEY); } catch {}
+  try { return await fetchPublished("config.json"); } catch { return null; }
 }
+async function syncFromPublished() { const c = await freshConfig(); if (c) adminSave({ cfg: c }); return c; }
 const cfgOf = () => ({ ...(adminLoad().cfg || {}) });
 async function publishConfig(patch, out, done = "Published.") {
-  const c = { ...cfgOf(), ...patch, updatedAt: new Date().toISOString() };
+  if (out) out.textContent = "Publishing…";
+  const live = await freshConfig();   // never publish over a newer copy with an old one: only the patch changes
+  const c = { ...(live || cfgOf()), ...patch, updatedAt: new Date().toISOString() };
   adminSave({ cfg: c });
   if (out) out.textContent = "Publishing…";
   try { await putEncrypted("config.json", c, "Class settings"); hw.F.config = c; if (out) out.textContent = done; }
@@ -227,11 +233,27 @@ function ankiTab(ctx) {
 }
 
 // ------------------------------------------------------------------ class settings
+let classSynced = 0;
 function classTab(ctx) {
+  if (Date.now() - classSynced > 60000) { classSynced = Date.now(); syncFromPublished().then((c) => c && ctx.rerender()); }
   const c = cfgOf();
   const field = (label, key, type = "text", hint, props = {}) => h("div", { class: "field" }, h("label", null, label), h("input", { type, value: c[key] || "", autocomplete: "off", oninput: (e) => { c[key] = e.target.value.trim(); adminSave({ cfg: c }); }, ...props }), hint ? h("span", { class: "tiny faint" }, hint) : null);
   const days = new Set((c.lessonDays || [1, 3, 5]).map(Number));
   const dayChips = h("div", { class: "chips" }, [1, 2, 3, 4, 5, 6, 7].map((d) => h("button", { class: "chip" + (days.has(d) ? " on" : ""), "aria-pressed": String(days.has(d)), onclick: (e) => { days.has(d) ? days.delete(d) : days.add(d); c.lessonDays = [...days].sort(); adminSave({ cfg: c }); e.currentTarget.classList.toggle("on", days.has(d)); } }, ["", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][d])));
+  // the schedule: every other day from a first lesson, or fixed weekdays
+  const schedule = () => {
+    const alt = c.lessonEvery > 1, box = h("div", { class: "field" }, h("div", { class: "lbl" }, "Lessons"));
+    const seg = h("div", { class: "seg", role: "group", "aria-label": "Lesson schedule" },
+      h("button", { "aria-pressed": String(alt), onclick: () => { c.lessonEvery = 2; c.lessonFrom ||= todayISO(); adminSave({ cfg: c }); ctx.rerender(); } }, "Every other day"),
+      h("button", { "aria-pressed": String(!alt), onclick: () => { c.lessonEvery = null; adminSave({ cfg: c }); ctx.rerender(); } }, "Set weekdays"));
+    box.append(seg);
+    if (alt) {
+      const from = h("input", { type: "date", value: c.lessonFrom || todayISO(), "aria-label": "A lesson day", onchange: (e) => { c.lessonFrom = e.target.value; adminSave({ cfg: c }); } });
+      const next = [0, 1, 2, 3].map((i) => { let d = c.lessonFrom || todayISO(); while (d < todayISO()) d = addDays(d, c.lessonEvery); return fmtDate(addDays(d, i * c.lessonEvery), { weekday: "short", day: "numeric", month: "short" }); });
+      box.append(h("div", { class: "field", style: { marginTop: "10px", maxWidth: "260px" } }, h("label", null, "Any one lesson day"), from), h("p", { class: "small muted" }, `Next lessons: ${next.join(", ")}.`));
+    } else box.append(h("div", { style: { marginTop: "10px" } }, dayChips));
+    return box;
+  };
   const out = h("div", { class: "small muted", "aria-live": "polite" });
   const tnote = h("textarea", { rows: 2, placeholder: "A line that shows on her Today, once, until she taps Got it.", "aria-label": "Note for Today", value: c.todayNote?.text || "" });
   const nout = h("div", { class: "small muted", "aria-live": "polite" });
@@ -243,9 +265,9 @@ function classTab(ctx) {
     h("section", { class: "section" }, h("div", { class: "shead" }, h("h2", null, "The class")),
       h("p", { class: "small muted" }, "Students choose their own name the first time they open the app, and can change it in Settings."),
       field("Your Telegram username", "teacher", "text", "Gives the student a Message your teacher button.", { placeholder: "@username" }),
-      h("div", { class: "field" }, h("div", { class: "lbl" }, "Lesson days"), dayChips),
+      schedule(),
       h("div", { class: "grid3 wide" }, field("Lesson time", "lessonTime", "time"), field("Lesson link (Zoom, Meet, Telegram)", "lessonLink", "text", null, { placeholder: "https://" })),
-      h("div", { class: "row-actions" }, h("button", { class: "btn primary", onclick: () => publishConfig({ student: null, teacher: c.teacher, lessonDays: [...days].sort(), lessonEvery: c.lessonEvery, lessonFrom: c.lessonFrom, lessonTime: c.lessonTime, lessonLink: c.lessonLink }, out, "Published. The app picks it up the next time it opens.") }, icon("upload", 18), "Publish class settings")), out),
+      h("div", { class: "row-actions" }, h("button", { class: "btn primary", onclick: () => publishConfig({ student: null, teacher: c.teacher, lessonDays: [...days].sort(), lessonEvery: c.lessonEvery > 1 ? c.lessonEvery : null, lessonFrom: c.lessonEvery > 1 ? c.lessonFrom : null, lessonTime: c.lessonTime, lessonLink: c.lessonLink }, out, "Published. The app picks it up the next time it opens.") }, icon("upload", 18), "Publish class settings")), out),
     h("section", { class: "section" }, h("div", { class: "shead" }, h("h2", null, "A note on her Today")),
       h("div", { class: "field" }, tnote),
       h("div", { class: "row-actions" }, h("button", { class: "btn small primary", onclick: () => publishConfig({ todayNote: tnote.value.trim() ? { text: tnote.value.trim(), at: new Date().toISOString() } : null }, nout, "Published.") }, "Publish the note"), c.todayNote?.text ? h("button", { class: "btn small quiet", onclick: () => { tnote.value = ""; publishConfig({ todayNote: null }, nout, "Removed."); } }, "Remove") : null), nout),
