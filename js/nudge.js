@@ -162,7 +162,7 @@ export async function plan(now = Date.now()) {
 
   // the lesson is coming and the homework isn't in
   const nl = store.nextLesson(new Date(now)), start = nl ? nl.start.getTime() : null;
-  const hwDate = hw.homeworkDays().find((d) => { const day = hw.homeworkFor(d); return day && !hw.dayProgress(d, day).complete; });
+  const cd = hw.currentDate(), hwDate = cd && !hw.dayProgress(cd, hw.homeworkFor(cd)).complete ? cd : null;
   if (start && hwDate && start - now < 30 * HOUR && start > now) {
     const p = hw.dayProgress(hwDate, hw.homeworkFor(hwDate)), line = homeworkLine(hwDate), t = new Date(start), when = hhmm(t.getHours() * 60 + t.getMinutes());
     let first = start - 4 * HOUR; const usual = nextHour(start - 6 * HOUR, r.hours); if (usual && usual < start - 2 * HOUR) first = usual;
@@ -184,6 +184,25 @@ export async function plan(now = Date.now()) {
     const day = new Intl.DateTimeFormat("en-GB", { weekday: "long" }).format(new Date(r.lastSeen));
     out.push({ at: nextHour(now, r.hours) || now + 3 * HOUR, tag: `away-${dayKey(r.lastSeen)}`, title: `Since ${day}`, body: [dc.n ? `${dc.n} cards waiting` : "", sp?.next ? `${sp.total - sp.sent} speaking answers to go` : ""].filter(Boolean).join(" · ") || "Your homework is waiting.", url: hwDate ? "#/homework" : "#/anki" });
   }
+
+  // a note from the teacher she hasn't seen: her words, first
+  const tn = hw.F.config?.todayNote;
+  if (tn?.text && tn.at !== store.S.kv["note-seen"] && now - Date.parse(tn.at) < 2 * DAY)
+    out.push({ at: Math.max(now + 20 * MIN, Date.parse(tn.at) + 20 * MIN), tag: `note-${tn.at}`, title: "A note from your teacher", body: tn.text, url: "#/today", urgent: true });
+
+  // the morning after a lesson: last night's homework, not opened yet
+  if (hwDate && hw.dayProgress(hwDate, hw.homeworkFor(hwDate)).stepsDone === 0 && !(store.S.kv.life || []).some(([t, e]) => e === "room" && t * 1000 > Date.parse(hwDate))) {
+    const day = hw.homeworkFor(hwDate), titles = (day.tasks || []).map((x) => x.title.split(":")[0]).join(" · ");
+    const dayAfter = Date.parse(hwDate + "T12:00:00") + DAY, morning = nextHour(Math.max(now, at(dayAfter, 0)), r.hours) || at(dayAfter, r.wake + 60);
+    if (morning < at(dayAfter, 1439) && morning > now) out.push({ at: morning, tag: `fresh-${hwDate}`, title: "From the last lesson", body: `${titles}${hw.dueLabel() ? ` · ${hw.dueLabel().toLowerCase()}` : ""}`, url: "#/homework" });
+  }
+
+  // a mock waiting, on a day without a lesson
+  try {
+    const M = await import("./mocks.js");
+    const mk = [...(hw.F.mocks || [])].sort((a, b) => (b.date || "").localeCompare(a.date || "")).map((x) => ({ x, next: M.SECTIONS.find((sec) => M.attempt(x.id, sec)?.status !== "done") })).find((y) => y.next);
+    if (mk) { const t = nextHour(now + HOUR, r.hours); if (t && !store.isLessonDay(new Date(t).toISOString().slice(0, 10))) out.push({ at: t, tag: `mock-${mk.x.id}-${mk.next}`, title: `${mk.x.title || "Your mock"}: ${M.LABEL[mk.next]} is next`, body: { listening: "About 30 minutes. Headphones.", reading: "60 minutes. Somewhere quiet.", writing: "60 minutes for both tasks.", speaking: "About 14 minutes, out loud." }[mk.next] || "", url: "#/mock" }); }
+  } catch {}
 
   // a run of days: tonight is still open
   if (r.run >= 3 && !r.today) out.push({ at: at(now, Math.min(r.sleep, 1439) - 100), tag: `run-${dayKey(now)}`, title: `Day ${r.run + 1}?`, body: `${r.run} days in a row so far. Today is still open.`, url: dc.n ? "#/anki" : "#/today" });
@@ -245,18 +264,40 @@ export function sync(force = false, { leaving = false } = {}) {
   })().finally(() => { syncing = null; }));
 }
 
-// the gentle ask: after something real is done, not on the first open; three times at most, days apart
-export function offer() {
-  if (!pushable() || Notification.permission !== "default" || store.S.kv.push === "off") return;
-  const asks = store.S.kv.pushAsks || [];
-  if (asks.length >= 3 || (asks.length && Date.now() - asks[asks.length - 1] < 4 * DAY) || document.querySelector(".nudge-card")) return;
-  kvSet("pushAsks", [...asks, Date.now()]);
-  const card = h("div", { class: "nudge-card wide", role: "group", "aria-label": "Notifications" },
-    h("p", null, h("b", null, "When something's waiting"), h("br"), h("span", { class: "muted" }, "A short note when an answer isn't sent, cards are due, or the lesson is close. Only at your hours.")),
-    h("div", { class: "row-actions" },
-      h("button", { class: "btn small", onclick: () => { card.classList.add("out"); setTimeout(() => card.remove(), 300); } }, "Not now"),
-      h("button", { class: "btn small primary", onclick: async () => { card.classList.add("out"); setTimeout(() => card.remove(), 300); await enable(); } }, "Turn on")));
-  document.body.append(card);
+// the ask, every time the app opens while she hasn't decided: a sheet with what her own notes would say right now
+export const offer = () => askOnOpen();
+export async function askOnOpen(force = false) {
+  if (hw.viewingAs() || document.querySelector(".notif-ask")) return;
+  try { if (!force && sessionStorage.getItem("eight-asked")) return; sessionStorage.setItem("eight-asked", "1"); } catch {}
+  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent), standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+  if (!pushable()) {
+    if (!ios || standalone || Date.now() - (store.S.kv.iosHint || 0) < DAY) return;
+    kvSet("iosHint", Date.now());
+    return askSheet({ title: "Notifications on iPhone", body: "They work once 8.5 is on your Home Screen. In Safari, tap Share, then Add to Home Screen, and open 8.5 from there.", ok: "Got it" });
+  }
+  if (Notification.permission !== "default" || store.S.kv.push === "off") return;
+  let examples = [];
+  try { examples = (await plan(Date.now())).items.slice(0, 3); } catch {}
+  if (examples.length < 2) examples = [...examples, ...SAMPLES.filter((x) => !examples.some((e) => e.title === x.title))].slice(0, 3);
+  askSheet({ title: "Let 8.5 tap you on the shoulder", body: "Only about what's waiting for you, and only at your hours. Never at night, never in the lesson.", examples, ok: "Turn on", no: "Not now", onOk: () => enable() });
+}
+const SAMPLES = [
+  { title: "Not sent yet", body: "“What do you like about the area where you live?”" },
+  { title: "Lesson at 22:00", body: "Speaking 12 of 33 · Reading not opened" },
+  { title: "“on the same wavelength” is due", body: "14 cards · about 5 min" },
+];
+function askSheet({ title, body, examples = [], ok, no, onOk }) {
+  const close = () => { el.classList.add("out"); setTimeout(() => el.remove(), 320); };
+  const when = (t) => { if (!t) return "now"; const d = new Date(t), today = new Date().toDateString() === d.toDateString(); return (today ? "" : new Intl.DateTimeFormat("en-GB", { weekday: "short" }).format(d) + " ") + d.toTimeString().slice(0, 5); };
+  const el = h("div", { class: "notif-ask", role: "dialog", "aria-modal": "true", "aria-label": title },
+    h("div", { class: "na-sheet" },
+      examples.length ? h("div", { class: "na-stack", "aria-hidden": "true" }, examples.map((x, i) => h("div", { class: "na-note", style: { "--i": i } },
+        h("span", { class: "na-ic" }, "8.5"), h("div", { class: "na-txt" }, h("div", { class: "na-top" }, h("b", null, x.title), h("span", null, when(x.at))), h("p", null, x.body))))) : null,
+      h("h2", null, title), h("p", { class: "muted" }, body),
+      h("div", { class: "na-actions" },
+        ok ? h("button", { class: "btn primary", onclick: async () => { close(); await onOk?.(); } }, ok) : null,
+        no ? h("button", { class: "btn quiet", onclick: () => { close(); track("push-later"); } }, no) : null)));
+  document.body.append(el);
 }
 
 // wiring: called once at start
@@ -271,4 +312,8 @@ export function start() {
   });
   addEventListener("pagehide", () => { track("hide"); });
   setTimeout(() => { sync(true); }, 4000);
+  // ask once the opening and the welcome are out of the way
+  const ready = () => store.S.kv.welcomed && !document.getElementById("splash") && !document.querySelector(".welcome");
+  const wait = (n = 0) => { if (ready()) setTimeout(() => askOnOpen(), 900); else if (n < 120) setTimeout(() => wait(n + 1), 1000); };
+  wait();
 }
