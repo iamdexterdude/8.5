@@ -149,6 +149,22 @@ export default async function handler(req, res) {
       const text = JSON.stringify(b.data || {}); if (text.length > 200000) return send(res, 413, { ok: false, error: "Report too large." });
       await putFile(`students/${id}.json`, text, `Report: ${id}`); return send(res, 200, { ok: true });
     }
+    // decks a student shares with classmates: the cards scrambled by the app (shared/<id>.json), and a plain index of names and counts
+    if (op === "share") {
+      const id = String(b.id || "").toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/^-|-$/g, "").slice(0, 40);
+      if (!id) return send(res, 400, { ok: false, error: "No id." });
+      const text = JSON.stringify(b.data || {}); if (text.length > 900000) return send(res, 413, { ok: false, error: "Too many cards to share." });
+      await putFile(`shared/${id}.json`, text, `Shared decks: ${id}`);
+      let list = [];
+      const cur = await gh(`contents/shared/index.json?ref=${BRANCH}`, { headers: { Accept: "application/vnd.github.raw+json" } });
+      if (cur.ok) { try { list = JSON.parse(await cur.text()); } catch { list = []; } }
+      const sum = b.summary || {};
+      const entry = { id, name: clip(sum.name, 40) || id, at: new Date().toISOString(), decks: (Array.isArray(sum.decks) ? sum.decks : []).slice(0, 20).map((d) => ({ key: clip(d.key, 60), name: clip(d.name, 60), n: Math.max(0, Number(d.n) || 0), peek: (Array.isArray(d.peek) ? d.peek : []).slice(0, 3).map((x) => clip(x, 60)) })) };
+      list = (Array.isArray(list) ? list : []).filter((x) => x.id !== id);
+      if (entry.decks.length) list.push(entry);
+      await putFile("shared/index.json", JSON.stringify(list), `Shared index: ${id}`);
+      return send(res, 200, { ok: true });
+    }
     // ---------- nudges
     if (op === "push-sub") {
       const id = devId(b.id), sub = b.sub;
