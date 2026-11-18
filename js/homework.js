@@ -2,23 +2,23 @@
 // cached on the device. Her progress per homework step, and the sending of her work to the teacher through the relay.
 import * as db from "./db.js";
 import * as store from "./store.js";
-import { decryptJson } from "./crypto.js";
+import { decryptJson, encryptJson } from "./crypto.js";
 import { todayISO, uid, addDays } from "./util.js";
 import { RAW, RELAY, FEED_KEY } from "./feedkey.js";
 export { RAW, RELAY };
 
 // in memory: { config, hw: { date: homework | null }, decks: index, mocks: index, results: { mockId: estimate } }
-export const F = { config: null, hw: {}, decks: [], mocks: [], results: {}, history: null, status: "idle", checkedAt: 0, historyAt: 0 };
+export const F = { config: null, hw: {}, decks: [], mocks: [], results: {}, history: null, classmates: [], status: "idle", checkedAt: 0, historyAt: 0 };
 const SECTION_NAMES = ["listening", "reading", "writing", "speaking"];
 let inflight = null;
 
 export async function init() {
   const row = await db.get("feed", "feed");
-  if (row?.value) { F.config = row.value.config || null; F.hw = row.value.hw || {}; F.decks = row.value.decks || []; F.mocks = row.value.mocks || []; F.results = row.value.results || {}; F.history = row.value.history || null; }
+  if (row?.value) { F.config = row.value.config || null; F.hw = row.value.hw || {}; F.decks = row.value.decks || []; F.mocks = row.value.mocks || []; F.results = row.value.results || {}; F.history = row.value.history || null; F.classmates = row.value.classmates || []; }
   window.addEventListener("online", () => { flushOutbox(); refresh(todayISO(), { force: true }); });
   flushOutbox();
 }
-const persist = () => db.put("feed", { key: "feed", value: { config: F.config, hw: F.hw, decks: F.decks, mocks: F.mocks, results: F.results, history: F.history } });
+const persist = () => db.put("feed", { key: "feed", value: { config: F.config, hw: F.hw, decks: F.decks, mocks: F.mocks, results: F.results, history: F.history, classmates: F.classmates } });
 
 export async function fetchEnc(path, { timeout = 12000 } = {}) {
   const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), timeout);
@@ -65,6 +65,8 @@ export function refresh(date = todayISO(), { force = false, timeout } = {}) {
         F.historyAt = Date.now();
         const hist = studentName() ? await fetchDec(`history/${studentId()}.json`, { timeout }).catch(() => null) : null;
         if (!same(F.history, hist)) { F.history = hist; changed = true; }
+        // classmates' shared decks: names, counts and a peek, in a plain index
+        try { const r = await fetch(`${RAW}/shared/index.json?t=${Math.floor(Date.now() / 60000)}`, { cache: "no-store" }); if (r.ok) { const cm = (await r.json()).filter((x) => x.id !== studentId()); if (!same(F.classmates, cm)) { F.classmates = cm; changed = true; } } } catch {}
       }
       F.status = "ok";
     } catch (e) {
@@ -99,7 +101,7 @@ export async function viewAs(name) {
   F.history = null; F.historyAt = 0; await persist(); store.changed();
   await refresh(undefined, { force: true });
 }
-const STUDENT_OPS = new Set(["upload", "notify", "report", "push-sub", "push-off", "nudges"]);
+const STUDENT_OPS = new Set(["upload", "notify", "report", "push-sub", "push-off", "nudges", "share"]);
 export const studentName = () => viewingAs() || store.setting("name") || "";   // the name she chose on her device; the class settings carry none
 const nameOf = () => studentName() || "Student";
 export const studentId = () => (studentName() || "student").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "student";
@@ -202,6 +204,30 @@ export function report() {
         streak: store.streak(),
       };
       await relay({ op: "report", id: studentId(), data: snapshot }, { timeout: 15000 });
+      await shareDecks();
     } catch {}
   }, 1500);
 }
+
+// ---------- swap words: her own decks go to her classmates (scrambled), and theirs come to her ----------
+// only decks she made or filled herself (Speaking phrases, Reading words, Writing phrases, her own); never the teacher's or a classmate's
+export async function shareDecks(force = false) {
+  if (!studentName() || viewingAs()) return;
+  const on = store.setting("shareDecks") !== false;
+  const decks = on ? store.S.decks.filter((d) => d.kind === "mine").map((d) => ({ key: d.id, name: d.name, cards: store.S.cards.filter((c) => c.deck === d.id).map((c) => ({ id: c.id, front: c.front, back: c.back, example: c.example || "" })) })).filter((d) => d.cards.length) : [];
+  const sig = JSON.stringify([on, decks.map((d) => [d.key, d.name, d.cards.length, d.cards[d.cards.length - 1]?.id])]);
+  if (!force && store.S.kv.shareSig === sig) return;
+  const data = await encryptJson({ name: nameOf(), at: new Date().toISOString(), decks }, FEED_KEY);
+  await relay({ op: "share", id: studentId(), data, summary: { name: nameOf(), decks: decks.map((d) => ({ key: d.key, name: d.name, n: d.cards.length, peek: d.cards.slice(-3).map((c) => c.front) })) } }, { timeout: 20000 });
+  store.S.kv.shareSig = sig; db.put("kv", { key: "shareSig", value: sig }).catch(() => {});
+}
+// a classmate's deck becomes a deck of her own: new cards join, nothing she has studied is lost when it is tried again
+export async function tryClassmateDeck(cm, key) {
+  const full = await fetchDec(`shared/${cm.id}.json`, { timeout: 20000 });
+  const d = (full?.decks || []).find((x) => x.key === key);
+  if (!d) throw new Error("That deck is no longer shared.");
+  const id = `cm-${cm.id}-${String(key).replace(/[^a-z0-9-]/gi, "").slice(-24)}`;
+  await store.addTeacherDeck({ id, name: `${cm.name} · ${d.name}`, kind: "classmate", note: `From ${cm.name}'s Anki`, cards: d.cards.map((c) => ({ id: `cm-${cm.id}-${c.id}`, front: c.front, back: c.back, example: c.example || "" })) });
+  return id;
+}
+export const classmateDeckId = (cm, key) => `cm-${cm.id}-${String(key).replace(/[^a-z0-9-]/gi, "").slice(-24)}`;

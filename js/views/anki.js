@@ -39,7 +39,41 @@ function hub(ctx) {
     h("div", { class: "shead" }, h("h2", null, "Decks"), h("span", { class: "legend num" }, h("span", { class: "c-new" }, "new"), h("span", { class: "c-due" }, "due"), h("span", { class: "c-all" }, "all"))),
     S.decks.length ? list : h("p", { class: "muted" }, "No decks yet. Make one for each lesson, or wait for your teacher's."),
     h("div", { class: "row-actions", style: { marginTop: "12px" } }, h("button", { class: "btn", onclick: () => newDeck(ctx) }, icon("plus", 18), "New deck"), S.decks.length ? h("button", { class: "btn quiet", onclick: () => addCardSheet(ctx) }, "Add a card") : null)));
+  root.append(swapWords(ctx));
+  const before = JSON.stringify(hw.F.classmates || []);
+  hw.refresh().then(() => { if (JSON.stringify(hw.F.classmates || []) !== before && location.hash.startsWith("#/anki") && !ctx.params[0]) ctx.rerender(); }).catch(() => {});
+  hw.shareDecks().catch(() => {});
   return root;
+}
+
+// ---------- swap words: what classmates are keeping, a fan of their latest words, one tap to try a deck ----------
+const hue = (s) => [...String(s)].reduce((a, c) => (a * 31 + c.charCodeAt(0)) % 360, 7);
+function swapWords(ctx) {
+  const mates = (hw.F.classmates || []).filter((m) => (m.decks || []).length);
+  const on = store.setting("shareDecks") !== false;
+  const sec = h("section", { class: "section swap" },
+    h("div", { class: "shead" }, h("h2", null, "Swap words"),
+      h("button", { class: "swap-share" + (on ? " on" : ""), "aria-pressed": String(on), onclick: async () => { await store.setSetting("shareDecks", !on); hw.shareDecks(true).catch(() => {}); toast(on ? "Your decks are private now." : "Your decks are shared with your classmates."); ctx.rerender(); } }, h("i"), on ? "Sharing mine" : "Not sharing")),
+    h("p", { class: "small muted" }, mates.length ? "The words your classmates keep. Try a deck: it joins your Anki as your own copy." : "When your classmates keep words, their decks appear here."));
+  for (const m of mates) {
+    const total = m.decks.reduce((a, d) => a + d.n, 0), peek = m.decks.flatMap((d) => d.peek || []).slice(-3);
+    const card = h("article", { class: "mate" },
+      h("div", { class: "mate-top" }, h("span", { class: "mate-av", "aria-hidden": "true" }, (m.name || "?").slice(0, 1).toUpperCase()),
+        h("div", { class: "grow" }, h("b", null, m.name), h("span", { class: "num" }, `${total} ${total === 1 ? "word" : "words"} · ${m.decks.length} ${m.decks.length === 1 ? "deck" : "decks"}`)),
+        h("div", { class: "fan", "aria-hidden": "true" }, peek.map((w, i) => { const sp = h("span", null, w); sp.style.setProperty("--i", String(i - (peek.length - 1) / 2)); return sp; }))),
+      h("ul", { class: "mate-decks" }, m.decks.map((d) => {
+        const mine = store.deckById(hw.classmateDeckId(m, d.key));
+        const btn = h("button", { class: "btn small" + (mine ? "" : " primary"), onclick: async (e) => {
+          const b = e.currentTarget; b.disabled = true; b.textContent = "Opening…";
+          try { const id = await hw.tryClassmateDeck(m, d.key); const fresh = srs.queue({ deck: id }).length; location.hash = `#/anki/study/${encodeURIComponent(id)}${fresh ? "" : "?all=1"}`; }
+          catch (err) { toast(err.message || "Could not open that deck."); b.disabled = false; b.textContent = "Try"; }
+        } }, mine ? "Study" : "Try");
+        return h("li", null, h("div", { class: "grow" }, h("div", { class: "title" }, d.name), h("div", { class: "sub num" }, `${d.n} ${d.n === 1 ? "card" : "cards"}${mine ? " · in your Anki" : ""}`)), btn);
+      })));
+    card.style.setProperty("--h", String(hue(m.name)));
+    sec.append(card);
+  }
+  return sec;
 }
 
 function newDeck(ctx, after) {
