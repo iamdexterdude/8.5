@@ -50,11 +50,9 @@ function hub(ctx) {
 const hue = (s) => [...String(s)].reduce((a, c) => (a * 31 + c.charCodeAt(0)) % 360, 7);
 function swapWords(ctx) {
   const mates = (hw.F.classmates || []).filter((m) => (m.decks || []).length);
-  const on = store.setting("shareDecks") !== false;
   const sec = h("section", { class: "section swap" },
-    h("div", { class: "shead" }, h("h2", null, "Swap words"),
-      h("button", { class: "swap-share" + (on ? " on" : ""), "aria-pressed": String(on), onclick: async () => { await store.setSetting("shareDecks", !on); hw.shareDecks(true).catch(() => {}); toast(on ? "Your decks are private now." : "Your decks are shared with your classmates."); ctx.rerender(); } }, h("i"), on ? "Sharing mine" : "Not sharing")),
-    h("p", { class: "small muted" }, mates.length ? "The words your classmates keep. Try a deck: it joins your Anki as your own copy." : "When your classmates keep words, their decks appear here."));
+    h("div", { class: "shead" }, h("h2", null, "Swap words")),
+    h("p", { class: "small muted" }, mates.length ? "The words your classmates keep. Add a deck and it joins your Anki." : "When your classmates keep words, their decks appear here."));
   for (const m of mates) {
     const total = m.decks.reduce((a, d) => a + d.n, 0), peek = m.decks.flatMap((d) => d.peek || []).slice(-3);
     const card = h("article", { class: "mate" },
@@ -66,8 +64,8 @@ function swapWords(ctx) {
         const btn = h("button", { class: "btn small" + (mine ? "" : " primary"), onclick: async (e) => {
           const b = e.currentTarget; b.disabled = true; b.textContent = "Opening…";
           try { const id = await hw.tryClassmateDeck(m, d.key); const fresh = srs.queue({ deck: id }).length; location.hash = `#/anki/study/${encodeURIComponent(id)}${fresh ? "" : "?all=1"}`; }
-          catch (err) { toast(err.message || "Could not open that deck."); b.disabled = false; b.textContent = "Try"; }
-        } }, mine ? "Study" : "Try");
+          catch (err) { toast(err.message || "Could not open that deck."); b.disabled = false; b.textContent = "Add"; }
+        } }, mine ? "Study" : "Add");
         return h("li", null, h("div", { class: "grow" }, h("div", { class: "title" }, d.name), h("div", { class: "sub num" }, `${d.n} ${d.n === 1 ? "card" : "cards"}${mine ? " · in your Anki" : ""}`)), btn);
       })));
     card.style.setProperty("--h", String(hue(m.name)));

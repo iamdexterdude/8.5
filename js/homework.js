@@ -213,7 +213,7 @@ export function report() {
 // only decks she made or filled herself (Speaking phrases, Reading words, Writing phrases, her own); never the teacher's or a classmate's
 export async function shareDecks(force = false) {
   if (!studentName() || viewingAs()) return;
-  const on = store.setting("shareDecks") !== false;
+  const on = true;   // every student shares her own decks with the class
   const decks = on ? store.S.decks.filter((d) => d.kind === "mine").map((d) => ({ key: d.id, name: d.name, cards: store.S.cards.filter((c) => c.deck === d.id).map((c) => ({ id: c.id, front: c.front, back: c.back, example: c.example || "" })) })).filter((d) => d.cards.length) : [];
   const sig = JSON.stringify([on, decks.map((d) => [d.key, d.name, d.cards.length, d.cards[d.cards.length - 1]?.id])]);
   if (!force && store.S.kv.shareSig === sig) return;
