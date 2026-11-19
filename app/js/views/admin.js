@@ -139,7 +139,7 @@ function claudeTab(ctx) {
 async function studentTab(ctx) {
   // every student who has opened the app under a name has a report in the feed; pick one
   let ids = [];
-  try { ids = (await listPublished("students")).filter((f) => f.endsWith(".json")).map((f) => f.replace(/\.json$/, "")).sort(); } catch {}
+  try { ids = (await listPublished("students")).filter((f) => f.endsWith(".json")).map((f) => f.replace(/\.json$/, "")).filter((id) => hw.enrolled(id)).sort(); } catch {}
   if (!ids.length) return h("div", null, h("p", { class: "muted" }, "Nothing reported yet. A student's app sends a small report each time they study, finish homework or a mock."));
   if (!ids.includes(studentPick)) studentPick = ids[0];
   const pretty = (id) => id.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
