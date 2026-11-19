@@ -66,7 +66,7 @@ export function refresh(date = todayISO(), { force = false, timeout } = {}) {
         const hist = studentName() ? await fetchDec(`history/${studentId()}.json`, { timeout }).catch(() => null) : null;
         if (!same(F.history, hist)) { F.history = hist; changed = true; }
         // classmates' shared decks: names, counts and a peek, in a plain index
-        try { const r = await fetch(`${RAW}/shared/index.json?t=${Math.floor(Date.now() / 60000)}`, { cache: "no-store" }); if (r.ok) { const cm = (await r.json()).filter((x) => x.id !== studentId()); if (!same(F.classmates, cm)) { F.classmates = cm; changed = true; } } } catch {}
+        try { const r = await fetch(`${RAW}/shared/index.json?t=${Math.floor(Date.now() / 60000)}`, { cache: "no-store" }); if (r.ok) { const cm = (await r.json()).filter((x) => x.id !== studentId() && enrolled(x.id)); if (!same(F.classmates, cm)) { F.classmates = cm; changed = true; } } } catch {}
       }
       F.status = "ok";
     } catch (e) {
@@ -103,6 +103,8 @@ export async function viewAs(name) {
 }
 const STUDENT_OPS = new Set(["upload", "notify", "report", "push-sub", "push-off", "nudges", "share"]);
 export const studentName = () => viewingAs() || store.setting("name") || "";   // the name she chose on her device; the class settings carry none
+// the class list in the settings (ids like "muslima"); a device under any other name is a test, and takes no part in sharing or reports
+export const enrolled = (id = studentId()) => { const l = F.config?.students; return !Array.isArray(l) || !l.length || l.includes(id); };
 const nameOf = () => studentName() || "Student";
 export const studentId = () => (studentName() || "student").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "student";
 
@@ -187,6 +189,7 @@ export async function askForHomework(date) {
 // a small picture of her work for Teacher mode: Anki, mocks, homework, check-ins. Sent quietly, at most once a minute.
 let reportTimer = 0;
 export function report() {
+  if (!enrolled() && !viewingAs()) return;
   clearTimeout(reportTimer);
   reportTimer = setTimeout(async () => {
     try {
@@ -212,7 +215,7 @@ export function report() {
 // ---------- swap words: her own decks go to her classmates (scrambled), and theirs come to her ----------
 // only decks she made or filled herself (Speaking phrases, Reading words, Writing phrases, her own); never the teacher's or a classmate's
 export async function shareDecks(force = false) {
-  if (!studentName() || viewingAs()) return;
+  if (!studentName() || viewingAs() || !enrolled()) return;
   const on = true;   // every student shares her own decks with the class
   const decks = on ? store.S.decks.filter((d) => d.kind === "mine").map((d) => ({ key: d.id, name: d.name, cards: store.S.cards.filter((c) => c.deck === d.id).map((c) => ({ id: c.id, front: c.front, back: c.back, example: c.example || "" })) })).filter((d) => d.cards.length) : [];
   const sig = JSON.stringify([on, decks.map((d) => [d.key, d.name, d.cards.length, d.cards[d.cards.length - 1]?.id])]);
