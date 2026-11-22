@@ -128,6 +128,7 @@ function renderGroup(g, row, onChange, at) {
   const nums = numsOfGroup(g);
   const box = h("div", { class: "qgroup-ex" });
   box.append(h("div", { class: "qg-head" }, h("b", null, nums.length > 1 ? `Questions ${nums[0]}–${nums[nums.length - 1]}` : `Question ${nums[0]}`), g.instructions ? h("p", { class: "qinst" }, g.instructions) : null));
+  if (g.image) box.append(h("img", { src: /^(https?:|data:)/.test(g.image) ? g.image : `${RAW}/${g.image}`, alt: g.title || "The picture for these questions", class: "qimg" }));
   const set = (n, v) => { R[n] = v; onChange(n); };
 
   // drag and drop: options to boxes (tap an option, then a box, works too)
