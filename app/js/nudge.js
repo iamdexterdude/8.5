@@ -204,10 +204,37 @@ export async function plan(now = Date.now()) {
     if (mk) { const t = nextHour(now + HOUR, r.hours); if (t && !store.isLessonDay(new Date(t).toISOString().slice(0, 10))) out.push({ at: t, tag: `mock-${mk.x.id}-${mk.next}`, title: `${mk.x.title || "Your mock"}: ${M.LABEL[mk.next]} is next`, body: { listening: "About 30 minutes. Headphones.", reading: "60 minutes. Somewhere quiet.", writing: "60 minutes for both tasks.", speaking: "About 14 minutes, out loud." }[mk.next] || "", url: "#/mock" }); }
   } catch {}
 
+  // a word for what she did: her best fact of the week, at most every three days, at an hour she usually comes
+  const praise = await praiseNote(r, now);
+  if (praise && !(store.S.kv.nsent || []).some((s) => String(s.tag).startsWith("praise-") && now - s.at < 3 * DAY)) {
+    const t = nextHour(now + 2 * HOUR, r.hours) || now + 4 * HOUR;
+    out.push({ at: t, tag: `praise-${dayKey(t)}`, url: "#/progress", ...praise });
+  }
+
   // a run of days: tonight is still open
   if (r.run >= 3 && !r.today) out.push({ at: at(now, Math.min(r.sleep, 1439) - 100), tag: `run-${dayKey(now)}`, title: `Day ${r.run + 1}?`, body: `${r.run} days in a row so far. Today is still open.`, url: dc.n ? "#/anki" : "#/today" });
 
   return schedule(out, r, now);
+}
+
+// the strongest true thing about her last seven days, in a line. Nothing when the week was quiet.
+async function praiseNote(r, now) {
+  const week = now - 7 * DAY, life = store.S.kv.life || [];
+  if (!r.lastSeen || now - r.lastSeen > 2 * DAY) return null;   // away: the "since" note speaks instead
+  const answers = life.filter(([t, e]) => e === "sent" && t * 1000 > week).length;
+  let reviews = [];
+  try { reviews = (await db.all("reviewlog")).filter((x) => Date.parse(x.at) > week); } catch {}
+  const known = reviews.filter((x) => x.rating >= 3).reverse().map((x) => store.S.cards.find((c) => c.id === x.cardId)).find((c) => c?.front && c.front.length <= 40);
+  const finished = hw.homeworkDays().find((d) => Date.parse(d + "T23:59:00") > week && hw.dayProgress(d, hw.homeworkFor(d)).complete);
+  const pick = [
+    answers >= 8 && { title: `${answers} answers this week`, body: "Every one of them is speaking you won't have to find on the day." },
+    finished && { title: "All your homework is in", body: "Every task from the last lesson, done. That's how the score moves." },
+    reviews.length >= 80 && { title: `${reviews.length} cards this week`, body: known ? `“${known.front}” is yours now. More will follow.` : "The words are starting to stay." },
+    r.run >= 5 && { title: `${r.run} days in a row`, body: "Quietly, it's becoming a habit." },
+    answers >= 3 && { title: `${answers} answers this week`, body: "Your voice gets easier each time you press record." },
+    reviews.length >= 30 && known && { title: `“${known.front}”`, body: `You knew it this week. ${reviews.length} cards reviewed so far.` },
+  ].find(Boolean);
+  return pick || null;
 }
 
 // her hours, the lesson, the daily budget, and how much she has ignored lately
