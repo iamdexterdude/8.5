@@ -45,8 +45,10 @@ export function lessonTime() { return S.kv.classConfig?.lessonTime || setting("l
 export function lessonLink() { return S.kv.classConfig?.lessonLink || setting("meetingLink") || ""; }
 // lessons on set weekdays, or every N days counted from a first lesson ({ lessonEvery: 2, lessonFrom: "2026-11-10" })
 export const lessonEvery = () => { const c = S.kv.classConfig; return c?.lessonEvery > 1 && /^\d{4}-\d{2}-\d{2}$/.test(c.lessonFrom || "") ? { every: Number(c.lessonEvery), from: c.lessonFrom } : null; };
-export const isLessonDay = (iso) => { const e = lessonEvery(); if (e) { const n = diffDays(e.from, iso); return n >= 0 && n % e.every === 0; } return lessonDays().includes(dowOf(iso) === 0 ? 7 : dowOf(iso)); };
-export function lessonStart(iso) { return lessonMoment(iso, lessonTime()); }
+// one-off lessons outside the pattern ({ extraLessons: [{ date: "2026-11-28", time: "22:00", title: "…" }] })
+export const extraLesson = (iso) => (S.kv.classConfig?.extraLessons || []).find((x) => x?.date === iso) || null;
+export const isLessonDay = (iso) => { if (extraLesson(iso)) return true; const e = lessonEvery(); if (e) { const n = diffDays(e.from, iso); return n >= 0 && n % e.every === 0; } return lessonDays().includes(dowOf(iso) === 0 ? 7 : dowOf(iso)); };
+export function lessonStart(iso) { return lessonMoment(iso, extraLesson(iso)?.time || lessonTime()); }
 // the next lesson from now: today's if it has not ended, else the next lesson day
 export function nextLesson(now = new Date()) {
   const mins = Number(setting("lessonMinutes")) || 90; let d = todayISO();

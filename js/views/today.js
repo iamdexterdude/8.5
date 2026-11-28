@@ -66,8 +66,8 @@ export default async function (ctx) {
 }
 
 function lessonCard(ctx, today, lesson, homework) {
-  const title = homework?.lesson?.title || "", focus = homework?.lesson?.focus || "";
-  const time = store.lessonTime(), link = homework?.lesson?.link || store.lessonLink();
+  const extra = store.extraLesson(today), title = homework?.lesson?.title || extra?.title || "", focus = homework?.lesson?.focus || extra?.focus || "";
+  const time = extra?.time || store.lessonTime(), link = homework?.lesson?.link || store.lessonLink();
   const when = h("span", { class: "num" }), act = h("span", { class: "row-actions" });
   const box = h("section", { class: "lesson" },
     h("div", { class: "lesson-k" }, lesson.phase === "after" ? "Tonight's lesson" : lesson.phase === "during" ? "Lesson now" : "Lesson tonight"),
