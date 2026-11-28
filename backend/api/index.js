@@ -1,6 +1,6 @@
 // The 8.5 relay. POST JSON { op, ... }.
 //   teacher (password checked against teacher.json in the feed repo): login, publish, remove, password, list, read
-//   student (no password):                                             upload (a file to the teacher's Telegram), notify (a line of text)
+//   student (no password):                                             upload (a file to the teacher's Telegram), notify (a line of text), backup (a sealed copy of her data)
 //   nudges (no password):  push-sub, push-off, nudges (the phone's own plan of short notes);  tick (secret): send what is due
 import { pbkdf2Sync, timingSafeEqual, randomBytes } from "node:crypto";
 import webpush from "web-push";
@@ -132,6 +132,15 @@ export default async function handler(req, res) {
   try {
     const op = String(b.op || "");
     // ---------- student
+    // a full, sealed copy of one student's app data (only the teacher's private key opens it); git history keeps every version
+    if (op === "backup") {
+      const id = String(b.id || ""), d = b.data;
+      if (!/^[a-z0-9-]{1,40}$/.test(id)) return send(res, 400, { ok: false, error: "Bad id." });
+      if (!d || typeof d !== "object" || d.v !== 1 || ![d.key, d.iv, d.ct].every((x) => typeof x === "string" && /^[A-Za-z0-9+/=]+$/.test(x))) return send(res, 400, { ok: false, error: "Bad backup." });
+      const text = JSON.stringify({ v: 1, alg: String(d.alg || "").slice(0, 40), zip: !!d.zip, key: d.key, iv: d.iv, ct: d.ct, at: new Date().toISOString() });
+      if (text.length > 4 * 1024 * 1024) return send(res, 413, { ok: false, error: "Backup too large." });
+      await putFile(`backups/${id}.json`, text, `Backup ${id}`); return send(res, 200, { ok: true });
+    }
     if (op === "upload") {
       const { name, type, caption, data } = b;
       if (typeof data !== "string" || !data) return send(res, 400, { ok: false, error: "No file." });
