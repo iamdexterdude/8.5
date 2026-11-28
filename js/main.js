@@ -169,6 +169,12 @@ async function boot() {
   nudgeLoop();
   pulse.noteVisit();
   try { nudge.start(); } catch {}
+  // presence for the teacher: the screen she is on, a heartbeat each minute, and when she leaves
+  const here = (state = "open") => { if (hwm.viewingAs() || hwm.teacherDevice() || !hwm.studentName()) return; const body = JSON.stringify({ op: "here", id: hwm.studentId(), name: hwm.studentName(), screen: parseHash().name, state });
+    try { fetch(hwm.RELAY_URL, { method: "POST", body, keepalive: true, headers: { "Content-Type": "text/plain" } }).catch(() => {}); } catch {} };
+  let lastHere = 0; const beat = () => { if (!document.hidden && Date.now() - lastHere > 50000) { lastHere = Date.now(); here(); } };
+  addEventListener("hashchange", () => { lastHere = 0; beat(); }); setInterval(beat, 60000); setTimeout(beat, 3000);
+  document.addEventListener("visibilitychange", () => { if (document.hidden) here("hide"); else { lastHere = 0; beat(); } });
   setTimeout(() => import("./backup.js").then((B) => B.start()).catch(() => {}), 5000);   // her data, sealed, off the phone
   setTimeout(() => import("./mocks.js").then(async (M) => { await M.sendPendingReports(); await M.sendPendingSubmissions(); }).catch(() => {}), 8000);   // mock reports not sent yet
   viewingBanner(); store.onChange(viewingBanner);

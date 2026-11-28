@@ -27,9 +27,11 @@ export async function relay(op, body = {}, { timeout = 30000 } = {}) {
 const withPassword = (body = {}) => { const p = session(); if (!p) throw new Error("Teacher mode is locked."); return { password: p, ...body }; };
 
 export async function unlock(password) {
-  try { await relay("login", { password }); try { sessionStorage.setItem(SESSION, password); } catch {} return { status: "ok" }; }
+  try { await relay("login", { password }); try { sessionStorage.setItem(SESSION, password); localStorage.setItem("eight-teacher-device", "1"); } catch {} return { status: "ok" }; }
   catch (e) { return { status: e.status === 401 ? "wrong" : e.status === 409 ? "none" : e.status === 429 ? "wait" : "error", message: e.message }; }
 }
+// where each student is in the app: online now, last seen, recent sessions
+export async function classPresence() { return relay("class", withPassword({}), { timeout: 20000 }); }
 export async function changePassword(newPassword) { await relay("password", withPassword({ newPassword })); try { sessionStorage.setItem(SESSION, newPassword); } catch {} }
 
 // ---- publishing: scrambled with the feed key, committed by the relay
