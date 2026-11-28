@@ -145,7 +145,7 @@ function dueCard() {
 
 // ---------- "No pressure": what the notes say when the tasks are not done. Dry, dark, short. ----------
 const SLIP = "Why do hw? Just let it slip.";   // the only line for unfinished tasks (Dexter's choice)
-const NIGHT = ["Why keep grinding? Just go sleep.", "Come on, it's not for you."];   // late at night in the app
+const NIGHT = ["Why keep grinding? Just go sleep.", "Come on, it's not for you.", "are u really here to study? you??"];   // late at night in the app
 const NP = { untouched: [SLIP], halfway: [SLIP], hour: [SLIP], fresh: [SLIP], away: [SLIP], draft: [SLIP] };
 const pickLine = (list, seed) => { let x = 0; for (const c of String(seed)) x = (x * 31 + c.charCodeAt(0)) >>> 0; return list[x % list.length]; };
 
