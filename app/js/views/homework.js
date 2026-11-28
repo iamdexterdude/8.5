@@ -22,7 +22,7 @@ export default async function (ctx) {
   root.append(h("header", { class: "hwhead-top" },
     h("div", null,
       h("div", { class: "kicker" }, isToday ? "No pressure. Seriously." : fmtDate(date, { weekday: "long" })),
-      h("h1", { class: isToday ? "np" : "" }, isToday ? "qimasangchiii" : fmtDate(date, { day: "numeric", month: "long" })),
+      h("h1", { class: isToday ? "np" : "" }, isToday ? "qo'ysangchii" : fmtDate(date, { day: "numeric", month: "long" })),
       homework ? h("div", { class: "hwmeta num" }, p.complete ? "All done. Nobody asked you to." : `${p.tasksDone} of ${p.tasks} done${minutes ? ` · ${dur(minutes)}, if you feel like it` : ""}`) : null),
     !isToday ? h("a", { class: "btn small quiet", href: "#/homework" }, "Today") : null));
 
