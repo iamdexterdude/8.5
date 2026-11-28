@@ -11,8 +11,10 @@ export function adminLoad() { try { return JSON.parse(localStorage.getItem(LOCAL
 export function adminSave(patch) { const v = { ...adminLoad(), ...patch }; try { localStorage.setItem(LOCAL, JSON.stringify(v)); } catch {} return v; }
 
 // ---- the unlocked session (this tab only)
-export function session() { try { return sessionStorage.getItem(SESSION) || null; } catch { return null; } }
-export function lock() { try { sessionStorage.removeItem(SESSION); } catch {} }
+export function session() { try { return sessionStorage.getItem(SESSION) || (localStorage.getItem("eight-teacher-device") === "1" ? localStorage.getItem(SESSION) : null) || null; } catch { return null; } }
+export function lock() { try { sessionStorage.removeItem(SESSION); localStorage.removeItem(SESSION); } catch {} }
+// this is not the teacher's device after all: it becomes a student's again
+export function forgetTeacherDevice() { lock(); try { localStorage.removeItem("eight-teacher-device"); } catch {} }
 
 export async function relay(op, body = {}, { timeout = 30000 } = {}) {
   const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), timeout);
@@ -27,7 +29,7 @@ export async function relay(op, body = {}, { timeout = 30000 } = {}) {
 const withPassword = (body = {}) => { const p = session(); if (!p) throw new Error("Teacher mode is locked."); return { password: p, ...body }; };
 
 export async function unlock(password) {
-  try { await relay("login", { password }); try { sessionStorage.setItem(SESSION, password); localStorage.setItem("eight-teacher-device", "1"); } catch {} return { status: "ok" }; }
+  try { await relay("login", { password }); try { sessionStorage.setItem(SESSION, password); localStorage.setItem("eight-teacher-device", "1"); localStorage.setItem(SESSION, password); } catch {} return { status: "ok" }; }
   catch (e) { return { status: e.status === 401 ? "wrong" : e.status === 409 ? "none" : e.status === 429 ? "wait" : "error", message: e.message }; }
 }
 // where each student is in the app: online now, last seen, recent sessions

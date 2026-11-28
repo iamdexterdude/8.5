@@ -17,9 +17,11 @@ const lines = (t) => t.split("\n").map((x) => x.trim()).filter(Boolean);
 
 export default async function (ctx) {
   const root = h("div");
-  root.append(head("Teacher mode", { back: "#/today", actions: session() ? h("button", { class: "btn small quiet", onclick: () => { lock(); ctx.rerender(); } }, "Lock") : null }));
+  if (["claude", "student", "mocks", "anki", "class", "music"].includes(ctx.params[0])) tab = ctx.params[0];
+  const mine = hw.teacherDevice();
+  root.append(head(mine ? ({ claude: "Send to Claude", student: "Students", mocks: "Mocks", anki: "Anki", class: "Class", music: "Music" }[tab] || "Teacher") : "Teacher mode", { back: mine ? null : "#/today", actions: session() ? h("button", { class: "btn small quiet", onclick: () => { lock(); ctx.rerender(); } }, "Lock") : null }));
   if (!session()) { root.append(lockPanel(ctx)); return root; }
-  root.append(h("nav", { class: "seg", "aria-label": "Teacher mode", style: { marginBottom: "16px" } }, [["claude", "Send to Claude"], ["student", "Students"], ["mocks", "Mocks"], ["anki", "Anki"], ["class", "Class"], ["music", "Music"]].map(([k, l]) => h("button", { class: "seglink", "aria-current": tab === k ? "page" : null, onclick: () => { tab = k; ctx.rerender(); } }, l))));
+  root.append(h("nav", { class: "seg", "aria-label": "Teacher mode", style: { marginBottom: "16px" } }, [["claude", "Send to Claude"], ["student", "Students"], ["mocks", "Mocks"], ["anki", "Anki"], ["class", "Class"], ["music", "Music"]].map(([k, l]) => h("button", { class: "seglink", "aria-current": tab === k ? "page" : null, onclick: () => { location.hash = `#/admin/${k}`; } }, l))));
   root.append(tab === "claude" ? claudeTab(ctx) : tab === "student" ? await studentTab(ctx) : tab === "mocks" ? mocksTab(ctx) : tab === "anki" ? ankiTab(ctx) : tab === "class" ? classTab(ctx) : musicTab(ctx));
   return root;
 }
@@ -38,7 +40,8 @@ function lockPanel(ctx) {
   }
   p.addEventListener("keydown", (e) => e.key === "Enter" && go());
   setTimeout(() => p.focus(), 50);
-  return h("div", null, h("p", { class: "muted" }, "For the teacher. The student never needs this screen."), h("div", { class: "field", style: { maxWidth: "340px" } }, h("label", null, "Teacher password"), p), btn, msg);
+  const back = hw.teacherDevice() ? h("p", { class: "small", style: { marginTop: "18px" } }, h("button", { class: "btn small quiet", onclick: async () => { const P = await import("../publish.js"); P.forgetTeacherDevice(); location.hash = "#/today"; location.reload(); } }, "This is a student's device")) : null;
+  return h("div", null, h("p", { class: "muted" }, "For the teacher. The student never needs this screen."), h("div", { class: "field", style: { maxWidth: "340px" } }, h("label", null, "Teacher password"), p), btn, msg, back);
 }
 // the class settings as they are in the feed right now (through the relay, so no five-minute cache)
 async function freshConfig() {
