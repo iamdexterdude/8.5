@@ -1170,3 +1170,22 @@ nav a[data-tab="homework"][aria-current] .lb, nav a[data-tab="homework"].on .lb 
 
 /* the No pressure tab: a yawning face instead of a line icon */
 .nav a .ic .tab-img { width: 30px; height: 30px; display: block; border-radius: 50%; object-fit: cover; box-shadow: 0 2px 6px rgba(0,0,0,.22); }
+
+/* the No pressure tab: z's drifting up off the sleepy face, forever */
+.nav a .ic .zzz { position: absolute; left: 62%; bottom: 62%; width: 0; height: 0; pointer-events: none; z-index: 2; }
+.nav a .ic .zzz i { position: absolute; left: 0; bottom: 0; font: 800 italic 11px/1 ui-rounded, "SF Pro Rounded", "Nunito", system-ui, sans-serif; color: #6d7cff;
+  text-shadow: 0 0 6px rgba(255,255,255,.95), 0 1px 2px rgba(40,50,120,.25); opacity: 0; transform-origin: 0 100%;
+  animation: zfloat 3.6s cubic-bezier(.33, 0, .25, 1) infinite; will-change: transform, opacity; }
+.nav a .ic .zzz i:nth-child(1) { animation-delay: 0s; }
+.nav a .ic .zzz i:nth-child(2) { animation-delay: .9s; font-size: 13px; }
+.nav a .ic .zzz i:nth-child(3) { animation-delay: 1.8s; font-size: 15px; }
+.nav a .ic .zzz i:nth-child(4) { animation-delay: 2.7s; font-size: 12px; }
+@keyframes zfloat {
+  0%   { opacity: 0; transform: translate(0, 0) scale(.35) rotate(-14deg); }
+  14%  { opacity: 1; }
+  45%  { transform: translate(9px, -16px) scale(.85) rotate(6deg); }
+  72%  { opacity: .9; }
+  100% { opacity: 0; transform: translate(4px, -34px) scale(1.15) rotate(-8deg); }
+}
+.nav a[aria-current="page"] .ic .zzz i { color: #ff3b3b; }
+@media (prefers-reduced-motion: reduce) { .nav a .ic .zzz i { animation-duration: 7s; } }
