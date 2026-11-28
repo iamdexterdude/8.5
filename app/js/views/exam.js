@@ -459,6 +459,7 @@ async function finishLR(mock, section, row, { auto = false } = {}) {
     await M.saveAttempt(row);
   }
   M.sendReport(mock, section, row).catch(() => {});   // the full report to the teacher's Telegram
+  M.submitPart(mock, section, row).catch(() => {});   // and the part itself, for marking
   hw.report();
 }
 
@@ -530,6 +531,7 @@ async function speakingExam(ctx, mock, row) {
     await M.saveAttempt(row);
     try { if (document.fullscreenElement) await document.exitFullscreen(); } catch {}
     M.sendReport(mock, "speaking", row).catch(() => {});
+    M.submitPart(mock, "speaking", row).catch(() => {});
     hw.report(); ctx.rerender();
   }
   show();

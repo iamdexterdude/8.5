@@ -61,6 +61,17 @@ function mockBlock(ctx, m, sum) {
   return sec;
 }
 
+// the marks for Writing or Speaking: the band, the four criteria, each task, the note, and her sentences put right
+const CRIT = { "TA/TR": "Task", TA: "Task achievement", TR: "Task response", CC: "Coherence and cohesion", LR: "Vocabulary", GRA: "Grammar", FC: "Fluency and coherence", P: "Pronunciation" };
+function marks(est) {
+  const out = [h("p", { class: "lead num" }, h("b", null, est.band.toFixed(1)), " overall")];
+  const crit = Object.entries(est.criteria || {});
+  if (crit.length) out.push(h("div", { class: "chips", style: { margin: "6px 0 10px" } }, crit.map(([k, v]) => h("span", { class: "chip on", title: CRIT[k] || k }, `${CRIT[k] || k} ${Number(v).toFixed(1)}`))));
+  if (est.note) out.push(h("p", null, est.note));
+  for (const t of est.tasks || []) out.push(h("p", { class: "small" }, h("b", null, `Task ${t.no}: ${Number(t.band).toFixed(1)}`), t.comment ? ` · ${t.comment}` : ""));
+  if ((est.fixes || []).length) out.push(h("h3", null, "Your sentences, better"), h("ul", { class: "small" }, est.fixes.map((f) => h("li", { style: { margin: "4px 0" } }, f))));
+  return out;
+}
 function detail(m, s, a, est) {
   sheet((close) => {
     const box = h("div", { class: "mockdetail" }, h("div", { class: "kicker" }, m.title || m.id), h("h2", null, M.LABEL[s]));
@@ -68,10 +79,10 @@ function detail(m, s, a, est) {
       box.append(h("p", { class: "lead num" }, h("b", null, a.band?.toFixed(1)), ` · ${a.raw} of ${a.total} correct`), a.leaves ? h("p", { class: "small muted" }, `You left the exam screen ${a.leaves} ${a.leaves === 1 ? "time" : "times"}.`) : null,
         h("ol", { class: "answers" }, (a.detail || []).map((d) => h("li", { class: d.ok ? "ok" : "no" }, h("span", { class: "n num" }, d.n), h("span", { class: "mine" }, d.mine || "—"), d.ok ? null : h("span", { class: "key" }, d.key)))));
     } else if (s === "writing") {
-      if (est?.band != null) box.append(h("p", { class: "lead num" }, h("b", null, est.band.toFixed(1)), " from your teacher"), est.note ? h("p", { class: "muted" }, est.note) : null);
+      if (est?.band != null) box.append(...marks(est)); else box.append(h("p", { class: "muted" }, "Being marked. Your band appears here in a few minutes."));
       for (const [k, t] of Object.entries(a.texts || {})) box.append(h("h3", null, `Task ${k}`, h("span", { class: "faint small num" }, ` · ${M.countWords(t)} words`)), h("div", { class: "essay" }, t));
     } else {
-      if (est?.band != null) box.append(h("p", { class: "lead num" }, h("b", null, est.band.toFixed(1)), " from your teacher"), est.note ? h("p", { class: "muted" }, est.note) : null);
+      if (est?.band != null) box.append(...marks(est)); else box.append(h("p", { class: "muted" }, "Being marked. Your band appears here in a few minutes."));
       box.append(h("div", { class: "recs" }, (a.recordings || []).map((r) => h("div", { class: "rec" }, h("span", { class: "small muted" }, r.label), h("audio", { controls: true, preload: "none", src: r.url ||= URL.createObjectURL(r.blob) })))));
     }
     box.append(h("div", { class: "row-actions", style: { marginTop: "14px" } }, h("button", { class: "btn", onclick: close }, "Close")));

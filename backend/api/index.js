@@ -49,6 +49,13 @@ async function putFile(path, text, message) {
   if (!r.ok) throw new Error("GitHub " + r.status + ": " + ((await r.json().catch(() => ({}))).message || ""));
   return (await r.json()).commit?.sha || "";
 }
+async function putBase64(path, b64, message) {
+  let sha; const cur = await gh(`contents/${path}?ref=${BRANCH}`);
+  if (cur.ok) sha = (await cur.json()).sha; else if (cur.status !== 404) throw new Error("GitHub " + cur.status);
+  const r = await gh(`contents/${path}`, { method: "PUT", body: JSON.stringify({ message, content: b64, branch: BRANCH, ...(sha ? { sha } : {}) }) });
+  if (!r.ok) throw new Error("GitHub " + r.status + ": " + ((await r.json().catch(() => ({}))).message || ""));
+  return (await r.json()).commit?.sha || "";
+}
 async function removeFile(path, message) {
   const cur = await gh(`contents/${path}?ref=${BRANCH}`);
   if (cur.status === 404) return false; if (!cur.ok) throw new Error("GitHub " + cur.status);
@@ -132,6 +139,15 @@ export default async function handler(req, res) {
   try {
     const op = String(b.op || "");
     // ---------- student
+    // a finished mock part, in the open, for marking: submissions/<student>/<mock>/<section>.json, recordings beside it
+    if (op === "submit") {
+      const id = String(b.id || ""), mock = String(b.mock || ""), name = String(b.name || "");
+      if (!/^[a-z0-9-]{1,40}$/.test(id) || !/^[a-z0-9-]{2,40}$/.test(mock) || !/^(listening|reading|writing|speaking)\.json$|^speaking-\d{1,2}\.(webm|m4a|ogg)$/.test(name)) return send(res, 400, { ok: false, error: "Bad submission." });
+      const path = `submissions/${id}/${mock}/${name}`;
+      if (name.endsWith(".json")) { const text = JSON.stringify(b.data || {}); if (text.length > 1500000) return send(res, 413, { ok: false, error: "Too large." }); await putFile(path, text, `Submission: ${id} ${mock} ${name}`); }
+      else { const d = String(b.data || ""); if (!/^[A-Za-z0-9+/=]+$/.test(d) || d.length > MAX_FILE * 1.37) return send(res, 413, { ok: false, error: "Bad recording." }); await putBase64(path, d, `Recording: ${id} ${mock} ${name}`); }
+      return send(res, 200, { ok: true });
+    }
     // a full, sealed copy of one student's app data (only the teacher's private key opens it); git history keeps every version
     if (op === "backup") {
       const id = String(b.id || ""), d = b.data;
@@ -158,6 +174,12 @@ export default async function handler(req, res) {
       const text = JSON.stringify(b.data || {}); if (text.length > 200000) return send(res, 413, { ok: false, error: "Report too large." });
       await putFile(`students/${id}.json`, text, `Report: ${id}`); return send(res, 200, { ok: true });
     }
+    // the class at a glance, fresh from GitHub (the raw CDN lags minutes): who keeps which decks, and how much they study
+    if (op === "mates") {
+      const cur = await gh(`contents/shared/index.json?ref=${BRANCH}`, { headers: { Accept: "application/vnd.github.raw+json" } });
+      let list = []; if (cur.ok) { try { list = JSON.parse(await cur.text()); } catch {} }
+      return send(res, 200, { ok: true, list: Array.isArray(list) ? list : [] });
+    }
     // decks a student shares with classmates: the cards scrambled by the app (shared/<id>.json), and a plain index of names and counts
     if (op === "share") {
       const id = String(b.id || "").toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/^-|-$/g, "").slice(0, 40);
@@ -168,9 +190,11 @@ export default async function handler(req, res) {
       const cur = await gh(`contents/shared/index.json?ref=${BRANCH}`, { headers: { Accept: "application/vnd.github.raw+json" } });
       if (cur.ok) { try { list = JSON.parse(await cur.text()); } catch { list = []; } }
       const sum = b.summary || {};
-      const entry = { id, name: clip(sum.name, 40) || id, at: new Date().toISOString(), decks: (Array.isArray(sum.decks) ? sum.decks : []).slice(0, 20).map((d) => ({ key: clip(d.key, 60), name: clip(d.name, 60), n: Math.max(0, Number(d.n) || 0), peek: (Array.isArray(d.peek) ? d.peek : []).slice(0, 3).map((x) => clip(x, 60)) })) };
+      const st = sum.stats || {}, num = (x) => Math.max(0, Math.min(1e6, Math.round(Number(x) || 0)));
+      const entry = { id, name: clip(sum.name, 40) || id, at: new Date().toISOString(), decks: (Array.isArray(sum.decks) ? sum.decks : []).slice(0, 20).map((d) => ({ key: clip(d.key, 60), name: clip(d.name, 60), n: Math.max(0, Number(d.n) || 0), peek: (Array.isArray(d.peek) ? d.peek : []).slice(0, 3).map((x) => clip(x, 60)) })),
+        stats: { cards: num(st.cards), learned: num(st.learned), today: num(st.today), week: num(st.week), run: num(st.run), last: /^\d{4}-\d{2}-\d{2}T[\d:.]+Z$/.test(String(st.last || "")) ? st.last : null, studying: (Array.isArray(st.studying) ? st.studying : []).slice(0, 6).map((d) => ({ name: clip(d.name, 60), n: num(d.n), learned: num(d.learned) })) } };
       list = (Array.isArray(list) ? list : []).filter((x) => x.id !== id);
-      if (entry.decks.length) list.push(entry);
+      list.push(entry);
       await putFile("shared/index.json", JSON.stringify(list), `Shared index: ${id}`);
       return send(res, 200, { ok: true });
     }

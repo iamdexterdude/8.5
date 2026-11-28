@@ -199,3 +199,35 @@ export async function sendPendingReports() {
     if (!(await sendReport(mock, row.section, row))) return;
   }
 }
+
+// ---------- for marking: each finished part goes to the feed in the open (submissions/<student>/<mock>/), recordings too.
+// The watcher on the teacher's PC marks Writing and Speaking within minutes and publishes results/<mock>--<student>.json.
+const b64Of = async (blob) => { const u8 = new Uint8Array(await blob.arrayBuffer()); let s = ""; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s); };
+const extFor = (t) => (/mp4/.test(t) ? "m4a" : /ogg/.test(t) ? "ogg" : "webm");
+export async function submitPart(mock, section, row) {
+  if (hw.viewingAs() || !hw.studentName() || row.submitted) return false;
+  const id = hw.studentId(), base = { student: hw.studentName(), id, mock: mock.id, title: mock.title || mock.id, section, startedAt: row.startedAt, finishedAt: row.finishedAt, leaves: row.leaves || 0, events: row.events || [] };
+  let data = base;
+  if (section === "listening" || section === "reading") data = { ...base, raw: row.raw, total: row.total, band: row.band, responses: row.responses || {}, flags: row.flags || {}, detail: row.detail || [] };
+  else if (section === "writing") data = { ...base, tasks: (mock.writing?.tasks || []).map((t) => ({ no: t.no, minWords: t.words, prompt: t.prompt, text: String(row.texts?.[t.no] || ""), words: countWords(row.texts?.[t.no]) })) };
+  else if (section === "speaking") {
+    const recs = [];
+    for (const [k, r] of (row.recordings || []).entries()) {
+      if (!(r.blob instanceof Blob)) continue;
+      const name = `speaking-${k + 1}.${extFor(r.blob.type)}`;
+      await hw.relay({ op: "submit", id, mock: mock.id, name, data: await b64Of(r.blob) }, { timeout: 90000 });
+      recs.push({ file: name, part: r.part, question: r.label, seconds: r.seconds });
+    }
+    data = { ...base, recordings: recs };
+  }
+  await hw.relay({ op: "submit", id, mock: mock.id, name: `${section}.json`, data }, { timeout: 60000 });
+  row.submitted = new Date().toISOString(); await saveAttempt(row); return true;
+}
+export async function sendPendingSubmissions() {
+  if (hw.viewingAs() || !hw.studentName()) return;
+  for (const row of [...store.S.mocks]) {
+    if (row.status !== "done" || row.submitted || !row.finishedAt || Date.now() - Date.parse(row.finishedAt) > 21 * 86400000) continue;
+    const mock = await load(row.mock).catch(() => null); if (!mock?.[row.section]) continue;
+    try { await submitPart(mock, row.section, row); } catch { return; }
+  }
+}
