@@ -211,7 +211,7 @@ export default async function handler(req, res) {
           if (await kv("SET", `n85:hwnote:${m[1]}`, "1", "NX", "EX", 14 * 86400)) {
             const day = new Intl.DateTimeFormat("en-GB", { weekday: "long", timeZone: "Asia/Tashkent" }).format(new Date(m[1] + "T12:00:00Z"));
             const bc = ((await kvJson("n85:bc")) || []).filter((x) => Date.now() - x.at < 20 * 3600000);
-            bc.push({ tag: `hw-${m[1]}`, title: "New tasks. No pressure.", body: `From ${day}'s lesson. Do them. Or don't. We'll see.`, url: "#/homework", at: Date.now() });
+            bc.push({ tag: `hw-${m[1]}`, title: "Why do hw? Just let it slip.", body: `New tasks from ${day}'s lesson.`, url: "#/homework", at: Date.now() });
             await kv("SET", "n85:bc", JSON.stringify(bc.slice(-5)));
           }
         } catch {}

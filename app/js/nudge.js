@@ -144,14 +144,8 @@ function dueCard() {
 }
 
 // ---------- "No pressure": what the notes say when the tasks are not done. Dry, dark, short. ----------
-const NP = {
-  untouched: ["Tasks? Never heard of them.", "Not even opened. Iconic.", "Zero done. Truly inspiring.", "Bold of you to show up empty-handed.", "The tasks are fine, thanks for asking."],
-  halfway: ["Halfway. Classic.", "Almost something.", "Started strong. Then life.", "Some of it. How generous."],
-  hour: ["One hour. Tasks untouched. Bold.", "An hour left. Love the confidence.", "The lesson's in an hour. Your tasks say hi.", "60 minutes. Miracles happen. Rarely."],
-  fresh: ["Still unopened. Impressive.", "Great job not opening it.", "You didn't even open it. Respect.", "Day two. Still a mystery to you.", "It's there. Just sitting. Like you."],
-  away: ["We noticed.", "Nobody's counting. We are.", "Missed you. The tasks didn't.", "Long break. Earned it? No."],
-  draft: ["Recorded. Not sent. Art.", "So close. Then nothing.", "You talked. Nobody heard."],
-};
+const SLIP = "Why do hw? Just let it slip.";   // the only line for unfinished tasks (Dexter's choice)
+const NP = { untouched: [SLIP], halfway: [SLIP], hour: [SLIP], fresh: [SLIP], away: [SLIP], draft: [SLIP] };
 const pickLine = (list, seed) => { let x = 0; for (const c of String(seed)) x = (x * 31 + c.charCodeAt(0)) >>> 0; return list[x % list.length]; };
 
 // ---------- the plan ----------
@@ -177,7 +171,7 @@ export async function plan(now = Date.now()) {
   if (start && hwDate && start - now < 30 * HOUR && start > now) {
     const p = hw.dayProgress(hwDate, hw.homeworkFor(hwDate)), line = homeworkLine(hwDate), t = new Date(start), when = hhmm(t.getHours() * 60 + t.getMinutes());
     let first = start - 4 * HOUR; const usual = nextHour(start - 6 * HOUR, r.hours); if (usual && usual < start - 2 * HOUR) first = usual;
-    out.push({ at: first, tag: `lesson-${hwDate}-a`, title: p.stepsDone ? `Lesson at ${when}. ${pickLine(NP.halfway, hwDate)}` : `Lesson at ${when}. ${pickLine(NP.untouched, hwDate)}`, body: line, url: "#/homework" });
+    out.push({ at: first, tag: `lesson-${hwDate}-a`, title: SLIP, body: line, url: "#/homework" });
     if (p.stepsDone / Math.max(1, p.steps) < 0.6) out.push({ at: start - 80 * MIN, tag: `lesson-${hwDate}-b`, title: pickLine(NP.hour, hwDate), body: line, url: "#/homework", urgent: true });
   }
 
@@ -193,7 +187,7 @@ export async function plan(now = Date.now()) {
   // she's been away a while: what is waiting, plainly
   if (r.lastSeen && now - r.lastSeen > 2.5 * DAY) {
     const day = new Intl.DateTimeFormat("en-GB", { weekday: "long" }).format(new Date(r.lastSeen));
-    out.push({ at: nextHour(now, r.hours) || now + 3 * HOUR, tag: `away-${dayKey(r.lastSeen)}`, title: `Since ${day}. ${pickLine(NP.away, dayKey(r.lastSeen))}`, body: [dc.n ? `${dc.n} cards waiting` : "", sp?.next ? `${sp.total - sp.sent} speaking answers to go` : ""].filter(Boolean).join(" · ") || "Your tasks are waiting. Patiently. Unlike us.", url: hwDate ? "#/homework" : "#/anki" });
+    out.push({ at: nextHour(now, r.hours) || now + 3 * HOUR, tag: `away-${dayKey(r.lastSeen)}`, title: SLIP, body: [dc.n ? `${dc.n} cards waiting` : "", sp?.next ? `${sp.total - sp.sent} speaking answers to go` : ""].filter(Boolean).join(" · ") || "Your tasks are waiting.", url: hwDate ? "#/homework" : "#/anki" });
   }
 
   // a note from the teacher she hasn't seen: her words, first
