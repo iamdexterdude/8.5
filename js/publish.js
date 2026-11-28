@@ -33,6 +33,8 @@ export async function unlock(password) {
   catch (e) { return { status: e.status === 401 ? "wrong" : e.status === 409 ? "none" : e.status === 429 ? "wait" : "error", message: e.message }; }
 }
 // where each student is in the app: online now, last seen, recent sessions
+export async function accountsList() { return relay("accounts", withPassword({}), { timeout: 20000 }); }
+export async function resetPin(id) { return relay("pin-reset", withPassword({ id }), { timeout: 20000 }); }
 export async function classPresence() { return relay("class", withPassword({}), { timeout: 20000 }); }
 export async function changePassword(newPassword) { await relay("password", withPassword({ newPassword })); try { sessionStorage.setItem(SESSION, newPassword); } catch {} }
 

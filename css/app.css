@@ -1231,3 +1231,21 @@ nav a[data-tab="homework"][aria-current] .lb, nav a[data-tab="homework"].on .lb 
 .live-now .dot.on { background: #34c759; box-shadow: 0 0 0 4px color-mix(in srgb, #34c759 25%, transparent); animation: dotbreathe 1.8s ease-in-out infinite; }
 .live-now .dot.off { background: var(--text-3); opacity: .5; }
 .live-now .shead .pill.live { background: color-mix(in srgb, #ff3b30 14%, transparent); color: #ff3b30; font-weight: 700; }
+
+/* the account screen: name and 4-digit PIN */
+.acct { position: fixed; inset: 0; z-index: 120; display: grid; place-items: center; padding: 20px max(16px, env(safe-area-inset-left, 0px)); background: radial-gradient(120% 80% at 20% 0%, #1e3a8a 0%, #0b1226 55%, #071018 100%); color: #fff; transition: opacity .3s; overflow: auto; }
+.acct.out { opacity: 0; }
+.acct-card { width: 100%; max-width: 380px; display: grid; gap: 12px; text-align: center; }
+.acct-mark { font: 800 34px/1 var(--f-display, system-ui); letter-spacing: -.02em; color: #fff; }
+.acct h1 { margin: 4px 0 0; font-size: 26px; color: #fff; }
+.acct .muted { color: rgba(255,255,255,.72); margin: 0; font-size: 15px; line-height: 1.45; }
+.acct-form { display: grid; gap: 8px; text-align: left; margin-top: 8px; }
+.acct-form label { font-size: 13px; color: rgba(255,255,255,.75); margin-top: 6px; }
+.acct-form input[type=text] { font-size: 17px; padding: 12px 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,.22); background: rgba(255,255,255,.08); color: #fff; }
+.acct-form input::placeholder { color: rgba(255,255,255,.45); }
+.acct .pin { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.acct .pin-d { text-align: center; font-size: 26px; font-weight: 700; padding: 10px 0; border-radius: 14px; border: 1px solid rgba(255,255,255,.22); background: rgba(255,255,255,.08); color: #fff; min-width: 0; }
+.acct .pin-d:focus, .acct-form input:focus { outline: 2px solid #7aa2ff; outline-offset: 1px; }
+.acct-err { min-height: 20px; margin: 4px 0 0; color: #ffb4a8; font-size: 14px; }
+.acct .btn.primary { justify-content: center; padding: 13px; font-size: 16px; margin-top: 4px; }
+.acct-switch { color: rgba(255,255,255,.8) !important; justify-self: center; background: transparent !important; }

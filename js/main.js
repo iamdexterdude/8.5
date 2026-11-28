@@ -189,9 +189,16 @@ async function boot() {
   let lastHere = 0; const beat = () => { if (!document.hidden && Date.now() - lastHere > 50000) { lastHere = Date.now(); here(); } };
   addEventListener("hashchange", () => { lastHere = 0; beat(); }); setInterval(beat, 60000); setTimeout(beat, 3000);
   document.addEventListener("visibilitychange", () => { if (document.hidden) here("hide"); else { lastHere = 0; beat(); } });
-  setTimeout(() => import("./backup.js").then((B) => B.start()).catch(() => {}), 5000);   // her data, sealed, off the phone
   setTimeout(() => import("./mocks.js").then(async (M) => { await M.sendPendingReports(); await M.sendPendingSubmissions(); }).catch(() => {}), 8000);   // mock reports not sent yet
   viewingBanner(); store.onChange(viewingBanner);
+  // her account: a name and a 4-digit PIN, the same on every device. Asked once on each device; then her work follows her.
+  const ACC = await import("./account.js");
+  if (!hwm.teacherDevice() && !hwm.viewingAs() && !ACC.signedIn() && !new URLSearchParams(location.search).has("nowelcome")) {
+    const sp = document.getElementById("splash"); if (sp) { sp.dataset.gone = "1"; sp.style.transition = "opacity .4s"; sp.style.opacity = "0"; setTimeout(() => sp.remove(), 450); }
+    await ACC.gate();
+    if (store.S.kv.welcomed) { await render(); return ACC.startSync(); }
+  }
+  ACC.startSync();
   if (!store.S.kv.welcomed && !new URLSearchParams(location.search).has("nowelcome")) {
     if (navigator.onLine) hwm.primeConfig({ timeout: 15000 }).catch(() => {});   // the lesson settings, in the background; the welcome does not wait
     // the first open: the welcome is the opening, and it asks for a name. The quiet dark screen gives way to it the moment it is on the page.
