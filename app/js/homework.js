@@ -46,7 +46,7 @@ export function refresh(date = todayISO(), { force = false, timeout } = {}) {
         if (!same(F.hw[d], v)) { F.hw[d] = v; changed = true; }
       }
       const cv = await fetchDec("config.json", { timeout });
-      if (!same(F.config, cv)) { F.config = cv; changed = true; await store.setSetting("classConfig", cv ? { lessonDays: cv.lessonDays, lessonEvery: cv.lessonEvery, lessonFrom: cv.lessonFrom, lessonTime: cv.lessonTime, lessonLink: cv.lessonLink } : null); }
+      if (!same(F.config, cv)) { F.config = cv; changed = true; await store.setSetting("classConfig", cv ? { lessonDays: cv.lessonDays, lessonEvery: cv.lessonEvery, lessonFrom: cv.lessonFrom, lessonTime: cv.lessonTime, lessonLink: cv.lessonLink, extraLessons: cv.extraLessons || [] } : null); }
       const decks = (await fetchDec("decks/index.json", { timeout })) || [];
       if (!same(F.decks, decks)) { F.decks = decks; changed = true; }
       for (const d of decks) if (!store.deckById(d.id) && !store.S.kv["deck-removed-" + d.id]) {
