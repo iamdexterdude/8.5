@@ -70,7 +70,7 @@ export function runWelcome({ name: known = "" } = {}) {
       };
       const seq = [
         [0, name ? `${name}.` : "Welcome.", "This was made for you."],
-        [2400, "Lessons, homework, mocks.", "All in one place, and nothing to type."],
+        [2400, "Lessons, tasks, mocks.", "All in one place, and nothing to type."],
         [4600, "Your words, your cards.", "Anki, the way you want it."],
         [6800, "Vocabulary is 95.77% of the work.", "Every word you keep moves the band. The rest follows."],
         [9400, "One target.", ""],

@@ -136,7 +136,7 @@ export function homeworkDays() { return Object.entries(F.hw).filter(([, v]) => v
 
 // ---------- homework decks (the "new words" steps) ----------
 export async function addWords(date, step, task) {
-  await store.addTeacherDeck({ id: `hw-${date}-${step.id}`, name: step.deck || `${task.title}: ${step.title}`, kind: "teacher", note: "From your homework, " + date, cards: (step.cards || []).map((c, i) => ({ id: `hw-${date}-${step.id}-${i}`, front: c.front || c.term, back: (c.back || c.meaning || "").split("\nExample:")[0].trim(), example: (c.back || "").split("\nExample:")[1]?.trim() || c.example || "" })) });
+  await store.addTeacherDeck({ id: `hw-${date}-${step.id}`, name: step.deck || `${task.title}: ${step.title}`, kind: "teacher", note: "From your tasks, " + date, cards: (step.cards || []).map((c, i) => ({ id: `hw-${date}-${step.id}-${i}`, front: c.front || c.term, back: (c.back || c.meaning || "").split("\nExample:")[0].trim(), example: (c.back || "").split("\nExample:")[1]?.trim() || c.example || "" })) });
 }
 
 // ---------- the relay: her files and short lines reach the teacher; small reports let Teacher mode see how she is doing ----------
@@ -180,7 +180,7 @@ export const queued = async () => (await db.all("outbox")).length;
 export async function askForHomework(date) {
   const row = stateOf(date);
   if (row.asked) return "already";
-  const r = await sendText(`${nameOf()} is asking for the homework (${date}).`);
+  const r = await sendText(`${nameOf()} is asking for the tasks (${date}).`);
   await patchState(date, { asked: new Date().toISOString(), askedSent: r === "sent" });
   store.changed();
   return r;

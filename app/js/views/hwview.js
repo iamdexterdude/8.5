@@ -11,7 +11,7 @@ export const dur = (m) => (m >= 60 ? `${Math.floor(m / 60)} h${m % 60 ? ` ${m % 
 export function homeworkSection(date, homework) {
   const cur = hw.currentStep(date, homework);
   const p = hw.dayProgress(date, homework);
-  const sec = h("section", { class: "section hw", "aria-label": "Today's homework" },
+  const sec = h("section", { class: "section hw", "aria-label": "Today's tasks" },
     );
   const advance = () => { scrollNext = true; openTask = null; };
 

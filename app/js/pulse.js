@@ -69,9 +69,9 @@ export async function nextStep() {
   const cd = hw.currentDate(today), homework = cd ? hw.homeworkFor(cd) : null, hy = cd === y ? null : hw.homeworkFor(y);
   if (homework && !hw.dayProgress(cd, homework).complete) {
     const p = hw.dayProgress(cd, homework);
-    return { kind: "homework", k: cd === today ? "Today's homework" : `Homework · ${hw.dueLabel() || "still open"}`, title: p.stepsDone ? `${p.steps - p.stepsDone} of ${p.steps} steps left` : `${p.steps} steps, ${p.tasks} ${p.tasks === 1 ? "task" : "tasks"}`, why: "Done today it settles. Done on the lesson day it is only rushed.", href: "#/homework", btn: p.stepsDone ? "Continue" : "Open" };
+    return { kind: "homework", k: cd === today ? "Today's tasks" : `Tasks · ${hw.dueLabel() || "still open"}`, title: p.stepsDone ? `${p.steps - p.stepsDone} of ${p.steps} steps left` : `${p.steps} steps, ${p.tasks} ${p.tasks === 1 ? "task" : "tasks"}`, why: "Done today it settles. Done on the lesson day it is only rushed.", href: "#/homework", btn: p.stepsDone ? "Continue" : "Open" };
   }
-  if (hy && !hw.dayProgress(y, hy).complete) return { kind: "homework", k: "Yesterday's homework", title: "Still open", why: "Twenty minutes now beats an hour on the lesson day.", href: `#/homework/${y}`, btn: "Finish it" };
+  if (hy && !hw.dayProgress(y, hy).complete) return { kind: "homework", k: "Yesterday's tasks", title: "Still open", why: "Twenty minutes now beats an hour on the lesson day.", href: `#/homework/${y}`, btn: "Finish it" };
   const mocks = [...(hw.F.mocks || [])].sort((a, b) => (b.date || "").localeCompare(a.date || ""));
   for (const m of mocks) {
     const next = M.SECTIONS.find((s) => M.attempt(m.id, s)?.status !== "done");
@@ -120,11 +120,11 @@ export async function noticed({ lesson, step }) {
     `${hb.lateDays7} of the last seven evenings you were here after eleven. Late brains lose spelling first. Try the same work at nine and compare.`,
     `After eleven on ${hb.lateDays7} of the last seven days. Nothing wrong with night owls, but the exam is in the morning.`], { reply: ["Fair", "Night is my only quiet time"] });
   if (hb.hwNight >= 2) add("hw-night", 4, [
-    `Homework keeps getting finished around midnight. The lesson is at ${time}; the afternoon before it is wide open.`,
-    `Two homeworks handed in after eleven. The work is the same at six; the sleep is not.`], { reply: ["Noted", "Afternoons are full"] });
+    `Tasks keep getting finished around midnight. The lesson is at ${time}; the afternoon before it is wide open.`,
+    `Two task days handed in after eleven. The work is the same at six; the sleep is not.`], { reply: ["Noted", "Afternoons are full"] });
   if (hb.hwLate.length && step?.kind !== "homework") { const r = hb.hwLate[hb.hwLate.length - 1]; add("hw-late", 3, [
-    `The homework for ${fmtShort(r.date)} came in ${diffDays(r.date, dayOf(r.completedAt))} days after its day. Memory holds less of what is rushed.`,
-    `${fmtShort(r.date)}'s homework arrived late. One late day is nothing; a habit is something.`], { reply: ["Noted", "That week was heavy"] }); }
+    `The tasks for ${fmtShort(r.date)} came in ${diffDays(r.date, dayOf(r.completedAt))} days after its day. Memory holds less of what is rushed.`,
+    `${fmtShort(r.date)}'s tasks arrived late. One late day is nothing; a habit is something.`], { reply: ["Noted", "That week was heavy"] }); }
   if (step?.kind === "anki" && /^\d+/.test(step.title) && Number(step.title.match(/^\d+/)[0]) >= 25) add("piling", 2, [
     `${step.title.match(/^\d+/)[0]} cards are waiting, which means some are slipping. Ten now, ten tonight.`], { href: "#/anki/study", btn: "Ten now" });
   if (hb.usualHour != null && hour <= hb.usualHour - 3 && slot !== "night") add("early", 2, [
@@ -133,7 +133,7 @@ export async function noticed({ lesson, step }) {
     `${hb.activeDays7} of the last seven days. This is what 8.5 is made of.`,
     `Every day this week but one, or none. Steady beats brilliant.`], { reply: ["Keeping it", "Thank you"] });
   if (dowOf(today) === 1 && (slot === "morning" || slot === "midday") && hb.reviews7 + hb.hwDone) add("week", 2, [
-    `Last week: ${hb.reviews7} reviews, ${hb.hwDone} ${hb.hwDone === 1 ? "homework" : "homeworks"}, ${hb.activeDays7} active days. New week, same chair.`], {});
+    `Last week: ${hb.reviews7} reviews, ${hb.hwDone} ${hb.hwDone === 1 ? "task day" : "task days"}, ${hb.activeDays7} active days. New week, same chair.`], {});
   if (lesson.phase === "soon" && !hb.todayActive) add("warm", 3, [
     "Lesson soon and nothing warmed up. Five cards before we start, so the English is already running."], { href: "#/anki/study", btn: "Warm up" });
   if (!list.length) return null;

@@ -56,7 +56,7 @@ export default async function (ctx) {
 
   // ---- the week in dots and numbers
   const w = await pulse.weekStats();
-  const nums = [w.reviews ? `${w.reviews} ${w.reviews === 1 ? "review" : "reviews"}` : null, w.homework ? `${w.homework} homework` : null, w.mocks ? `${w.mocks} mock ${w.mocks === 1 ? "part" : "parts"}` : null].filter(Boolean);
+  const nums = [w.reviews ? `${w.reviews} ${w.reviews === 1 ? "review" : "reviews"}` : null, w.homework ? `${w.homework} ${w.homework === 1 ? "task day" : "task days"}` : null, w.mocks ? `${w.mocks} mock ${w.mocks === 1 ? "part" : "parts"}` : null].filter(Boolean);
   root.append(h("section", { class: "week" },
     h("div", { class: "week-dots", "aria-label": "The last seven days" }, w.days.map((d) => h("i", { class: (d.on ? "on" : "") + (d.today ? " now" : ""), title: d.iso }))),
     h("span", { class: "week-k" }, streak ? `${streak} ${streak === 1 ? "day" : "days"} in a row` : w.active ? `${w.active} of 7 days` : "A quiet week so far"),

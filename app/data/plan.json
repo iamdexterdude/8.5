@@ -140,7 +140,7 @@
  "rhythm": [
   {
    "day": "Mon",
-   "what": "Lesson + homework",
+   "what": "Lesson + tasks",
    "time": "1.5 h + 1.5 h"
   },
   {
@@ -150,7 +150,7 @@
   },
   {
    "day": "Wed",
-   "what": "Lesson + homework",
+   "what": "Lesson + tasks",
    "time": "1.5 h + 1.5 h"
   },
   {
@@ -160,7 +160,7 @@
   },
   {
    "day": "Fri",
-   "what": "Lesson + homework",
+   "what": "Lesson + tasks",
    "time": "1.5 h + 1.5 h"
   },
   {
@@ -176,7 +176,7 @@
  ],
  "rules": [
   "Every piece of writing is marked within 24 hours and rewritten. Unmarked writing doesn't count.",
-  "All speaking homework is recorded. Listening back is half the exercise.",
+  "All speaking tasks are recorded. Listening back is half the exercise.",
   "Timed means timed: phone in another room, no dictionary.",
   "The error log is updated every day.",
   "On a bad day the minimum is 45 minutes: one Part 2 recording, one reading passage, 10 minutes of error log. Never zero.",

@@ -86,7 +86,7 @@ function notebookSheet(c, after) {
     draw();
     return h("div", null,
       h("h2", null, "Your notebook"),
-      h("p", { class: "muted", style: { marginTop: "8px" } }, "Photograph every page where you wrote your speaking answers. Your homework is finished once your notebook and all your answers are in."),
+      h("p", { class: "muted", style: { marginTop: "8px" } }, "Photograph every page where you wrote your speaking answers. Your tasks are finished once your notebook and all your answers are in."),
       h("div", { class: "row-actions", style: { marginTop: "14px" } }, input, h("label", { class: "btn", for: "nb-" + c.step.id }, icon("plus", 18), "Take or choose photos")),
       grid, h("div", { class: "row-actions", style: { marginTop: "12px", justifyContent: "flex-end" } }, send), msg);
   });

@@ -64,7 +64,7 @@ const MAX_ATTACH = 60 * 1024 * 1024;
 const STEP_TEXT = { picked: "The PC has it. Claude is reading your note…", building: "Claude is building it…", fixing: "Claude is fixing a problem it found…", publishing: "Publishing it to her app…" };
 const kb = (n) => (n >= 1048576 ? (n / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(n / 1024)) + " KB");
 const KINDS = {
-  homework: { label: "Homework", ph: "For example:\nSpeaking: two Part 1 topics, Hometown and Weekends, 12 questions, the sample answer is in the PDF I attached, highlight the phrases in bold. She writes answers by hand, photographs them, and records one answer per question.\nWriting: review today's lesson on Task 2 planning, upload notes.\nReading: watch RM13 day 4 passage 3 walkthrough (link).", help: "Mention the date, each task, the topics and questions, what she must read, watch, write, photograph or record, and any links. Attach PDFs or photos." },
+  homework: { label: "Tasks", ph: "For example:\nSpeaking: two Part 1 topics, Hometown and Weekends, 12 questions, the sample answer is in the PDF I attached, highlight the phrases in bold. She writes answers by hand, photographs them, and records one answer per question.\nWriting: review today's lesson on Task 2 planning, upload notes.\nReading: watch RM13 day 4 passage 3 walkthrough (link).", help: "Mention the date, each task, the topics and questions, what she must read, watch, write, photograph or record, and any links. Attach PDFs or photos." },
   mock: { label: "Mock", ph: "For example:\nMock 3, Cambridge 18 Test 2. Listening paper, reading paper, writing paper and the keys are in the PDFs; the audio is attached. Speaking: use the Part 1 topics Work and Hometown, the Part 2 card about a book, Part 3 on reading habits.", help: "Attach the papers (PDF), the answer keys and the listening audio (mp3 or m4a). Say which mock number this is. Claude builds the whole test and the app marks Listening and Reading by itself." },
   deck: { label: "Anki deck", ph: "For example:\nLesson 3 words: to spring up - appear suddenly | New cafes have sprung up everywhere\na sense of community\nto put up with - tolerate", help: "List the words or phrases, with meanings and examples if you have them. One per line is easiest. Claude makes the deck; every card arrives new." },
 };
@@ -140,14 +140,14 @@ async function studentTab(ctx) {
   // every student who has opened the app under a name has a report in the feed; pick one
   let ids = [];
   try { ids = (await listPublished("students")).filter((f) => f.endsWith(".json")).map((f) => f.replace(/\.json$/, "")).filter((id) => hw.enrolled(id)).sort(); } catch {}
-  if (!ids.length) return h("div", null, h("p", { class: "muted" }, "Nothing reported yet. A student's app sends a small report each time they study, finish homework or a mock."));
+  if (!ids.length) return h("div", null, h("p", { class: "muted" }, "Nothing reported yet. A student's app sends a small report each time they study, finish tasks or a mock."));
   if (!ids.includes(studentPick)) studentPick = ids[0];
   const pretty = (id) => id.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
   const box = h("div", null);
   if (ids.length > 1) box.append(h("div", { class: "chips", style: { marginBottom: "12px" } }, ids.map((id) => h("button", { class: "chip" + (id === studentPick ? " on" : ""), onclick: () => { studentPick = id; ctx.rerender(); } }, pretty(id)))));
   // see the app the way this student sees it: her name, her own items (like a mock from before the app), nothing sent
   box.append(h("div", { class: "viewas-card" },
-    h("div", { class: "grow" }, h("b", null, `See the app as ${pretty(studentPick)}`), h("p", { class: "small muted" }, "Her name and her own items, like Progress. Her phone's cards and homework stay on her phone; their numbers are below.")),
+    h("div", { class: "grow" }, h("b", null, `See the app as ${pretty(studentPick)}`), h("p", { class: "small muted" }, "Her name and her own items, like Progress. Her phone's cards and tasks stay on her phone; their numbers are below.")),
     h("button", { class: "btn primary small", onclick: async (e) => { e.currentTarget.disabled = true; await hw.viewAs(pretty(studentPick)); location.hash = "#/progress"; } }, icon("eye", 18), "View as student")));
   let rep = null;
   try { const t = await readPublished(`students/${studentPick}.json`); rep = t ? JSON.parse(t) : null; } catch {}
@@ -160,7 +160,7 @@ async function studentTab(ctx) {
     bits.push(`${hb.activeDays7 ?? 0} of the last 7 days active`);
     if (hb.usualHour != null) bits.push(`usually starts around ${String(hb.usualHour).padStart(2, "0")}:00`);
     if (hb.lateDays7) bits.push(`${hb.lateDays7} ${hb.lateDays7 === 1 ? "night" : "nights"} after 23:00 this week`);
-    if (hb.hwDone14) bits.push(`homework: ${hb.hwDone14} done in 14 days${hb.hwLate14 ? `, ${hb.hwLate14} late by two days or more` : ""}${hb.hwNight14 ? `, ${hb.hwNight14} finished after 23:00` : ""}`);
+    if (hb.hwDone14) bits.push(`tasks: ${hb.hwDone14} days done in 14${hb.hwLate14 ? `, ${hb.hwLate14} late by two days or more` : ""}${hb.hwNight14 ? `, ${hb.hwNight14} finished after 23:00` : ""}`);
     if (hb.lastActive) bits.push(`last active ${fmtShort(hb.lastActive)}`);
     box.append(h("section", { class: "section", style: { marginTop: "8px" } }, h("div", { class: "shead" }, h("h2", null, "Habits")), h("p", null, bits.join(" · ") + "."), h("p", { class: "tiny faint" }, "Her Today screen says these things to her too, gently, one at a time.")));
   }
@@ -172,7 +172,7 @@ async function studentTab(ctx) {
     h("div", { class: "row-actions", style: { marginTop: "10px" } }, h("button", { class: "btn small", onclick: () => { tab = "anki"; ctx.rerender(); } }, "Write her a note"))));
   if (rep.mocks?.length) box.append(h("section", { class: "section" }, h("div", { class: "shead" }, h("h2", null, "Mocks")),
     h("ul", { class: "rows" }, rep.mocks.slice().reverse().map((m) => h("li", null, h("div", { class: "row", style: { minHeight: "44px" } }, h("div", { class: "grow" }, h("div", { class: "title" }, `${m.mock} · ${m.section}`), h("div", { class: "sub num" }, `${when(m.finishedAt)}${m.leaves ? ` · left the screen ${m.leaves}×` : ""}`)), m.band != null ? h("b", { class: "num" }, `${m.band} (${m.raw})`) : h("span", { class: "faint small" }, "with you")))))));
-  if (rep.homework?.length) box.append(h("section", { class: "section" }, h("div", { class: "shead" }, h("h2", null, "Homework")),
+  if (rep.homework?.length) box.append(h("section", { class: "section" }, h("div", { class: "shead" }, h("h2", null, "Tasks")),
     h("ul", { class: "rows" }, rep.homework.slice().reverse().map((d) => h("li", null, h("div", { class: "row", style: { minHeight: "40px" } }, h("div", { class: "grow" }, fmtDate(d.date, { weekday: "short", day: "numeric", month: "short" })), h("span", { class: "pill " + (d.completedAt ? "ok" : d.done ? "warn" : "") }, d.completedAt ? "Done" : `${d.done} of ${d.total}`)))))));
   if (rep.checkins?.length) box.append(h("section", { class: "section" }, h("div", { class: "shead" }, h("h2", null, "What she said on Today")),
     h("ul", { class: "rows" }, rep.checkins.slice().reverse().map((c) => h("li", null, h("div", { class: "row", style: { minHeight: "40px", alignItems: "flex-start" } }, h("div", { class: "grow" }, h("div", { class: "sub" }, c.prompt), h("div", null, c.answer)), h("span", { class: "tiny faint num" }, when(c.at))))))));
@@ -290,7 +290,7 @@ function musicTab(ctx) {
     h("div", { class: "field", style: { margin: "6px 0" } }, h("label", { class: "small" }, "A line from you (optional)"), h("input", { type: "text", value: t.note || "", oninput: (e) => { t.note = e.target.value; save(); } })),
     h("div", { class: "row-actions" }, h("span", { class: "tiny faint num" }, `Track ${i + 1}`), h("button", { class: "btn small quiet danger", onclick: () => { list.splice(i, 1); save(); ctx.rerender(); } }, icon("trash", 16), "Remove"))));
   const bulk = h("textarea", { rows: 4, placeholder: "Title - Artist - https://link", "aria-label": "Add many tracks" });
-  return h("div", null, h("p", { class: "small muted" }, "After she finishes a day's homework she gets one track from this list, in order."),
+  return h("div", null, h("p", { class: "small muted" }, "After she finishes a day's tasks she gets one track from this list, in order."),
     h("p", { class: "tiny faint" }, `${list.length} tracks`), rows,
     h("div", { class: "row-actions", style: { marginTop: "10px" } },
       h("button", { class: "btn", onclick: () => { list.push({ title: "", artist: "", url: "", note: "" }); save(); ctx.rerender(); } }, icon("plus", 18), "Add a track"),

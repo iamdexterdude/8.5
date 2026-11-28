@@ -1162,3 +1162,8 @@ body.viewing main#view { padding-top: 64px; }
 .fan span { background: var(--fan); color: var(--text); transform: translateX(calc(var(--i) * 18px)) rotate(calc(var(--i) * 10deg)); }
 .fan span:nth-child(1) { z-index: 1; } .fan span:nth-child(2) { z-index: 2; } .fan span:nth-child(3) { z-index: 3; }
 
+
+/* NO PRESSURE: the tasks tab, in pure red, on purpose */
+nav a[data-tab="homework"] .lb, nav a[data-tab="homework"] .ic { color: #ff0000 !important; }
+nav a[data-tab="homework"][aria-current] .lb, nav a[data-tab="homework"].on .lb { color: #ff0000 !important; }
+.hwv .hwhead-top h1.np { color: #ff0000; }
