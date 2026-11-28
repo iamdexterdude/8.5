@@ -12,6 +12,7 @@ import * as db from "../db.js";
 import { treat } from "./treat.js";
 import * as nudge from "../nudge.js";
 import { orb } from "./orb.js";
+import { imagesToPdf } from "../pdf.js";
 
 const DECKS = {
   speaking: { id: "deck-speaking", name: "Speaking phrases", note: "Phrases you kept from model answers." },
@@ -50,6 +51,46 @@ export function room(title, sub, onClose, beforeClose) {
 /* ============================================================ speaking */
 const qkey = (ti, qi) => `t${ti}q${qi}`;
 const sentOf = (c) => hw.stateOf(c.date).steps[c.step.id]?.sent || {};
+// the notebook: photos of her handwritten answers, required to finish unless the homework says notebook: false
+const needsNotebook = (c) => c.step.notebook !== false;
+const notebookOf = (c) => hw.stateOf(c.date).steps[c.step.id]?.notebook || null;
+const totalOf = (c) => (c.step.topics || []).reduce((n, x) => n + x.questions.length, 0);
+// finished = every answer sent and, when required, the notebook in. Returns true the moment it becomes finished.
+async function finishSpeaking(c) {
+  if (hw.stepDone(c.date, c.step.id)) return false;
+  if (Object.keys(sentOf(c)).length < totalOf(c) || (needsNotebook(c) && !notebookOf(c))) return false;
+  await hw.setStep(c.date, c.step.id, { done: true, doneAt: new Date().toISOString() }); await hw.noteCompletion(c.date, c.hw);
+  return true;
+}
+function notebookSheet(c, after) {
+  const files = [];
+  sheet((close) => {
+    const grid = h("div", { class: "thumbs" }), msg = h("div", { class: "small muted", "aria-live": "polite", style: { marginTop: "6px" } });
+    const send = h("button", { class: "btn primary", disabled: true }, icon("upload", 18), "Send my notebook");
+    const draw = () => {
+      grid.replaceChildren(...files.map((f, i) => h("div", { class: "thumb" }, h("img", { src: f.url || (f.url = URL.createObjectURL(f.file)), alt: `Page ${i + 1}` }), h("button", { class: "x", "aria-label": `Remove page ${i + 1}`, onclick: () => { files.splice(i, 1); draw(); } }, icon("close", 16)))));
+      send.disabled = !files.length; send.lastChild.textContent = files.length ? `Send my notebook (${files.length} ${files.length === 1 ? "page" : "pages"})` : "Send my notebook";
+    };
+    const input = h("input", { type: "file", accept: "image/*", multiple: true, class: "sr", id: "nb-" + c.step.id, onchange: (e) => { for (const f of e.target.files) files.push({ file: f }); e.target.value = ""; draw(); } });
+    send.onclick = async () => {
+      send.disabled = true; msg.textContent = "Making the PDF…";
+      try {
+        const parts = await imagesToPdf(files.map((f) => f.file)), base = `${c.date}_speaking_notebook`;
+        msg.textContent = "Sending…";
+        const r = await hw.sendFiles({ date: c.date, label: "Speaking notebook", files: parts.map((blob, i) => ({ blob, name: parts.length > 1 ? `${base}_part${i + 1}.pdf` : `${base}.pdf` })) });
+        await hw.setStep(c.date, c.step.id, { notebook: { pages: files.length, at: new Date().toISOString() } });
+        close(); toast(r === "sent" ? "Notebook sent to your teacher." : "Saved. It sends when you're back online.");
+        const done = await finishSpeaking(c); after?.(done);
+      } catch (e) { console.error(e); msg.textContent = "That did not work. Check the photos and try again."; send.disabled = false; }
+    };
+    draw();
+    return h("div", null,
+      h("h2", null, "Your notebook"),
+      h("p", { class: "muted", style: { marginTop: "8px" } }, "Photograph every page where you wrote your speaking answers. Your homework is finished once your notebook and all your answers are in."),
+      h("div", { class: "row-actions", style: { marginTop: "14px" } }, input, h("label", { class: "btn", for: "nb-" + c.step.id }, icon("plus", 18), "Take or choose photos")),
+      grid, h("div", { class: "row-actions", style: { marginTop: "12px", justifyContent: "flex-end" } }, send), msg);
+  });
+}
 
 export function speaking(c) {
   const s = c.step, topics = s.topics || [];
@@ -63,7 +104,14 @@ export function speaking(c) {
           h("span", { class: "sp-num num" }, t.num || String(ti + 1), n === all ? icon("check", 16) : null),
           h("span", { class: "sp-name" }, t.name),
           h("span", { class: "sp-dots-row", "aria-hidden": "true" }, t.questions.map((_, qi) => h("i", { class: sent[qkey(ti, qi)] ? "on" : "" }))));
-      })));
+      }), needsNotebook(c) ? notebookTile() : null));
+  };
+  const notebookTile = () => {
+    const nb = notebookOf(c);
+    return h("button", { class: "sp-topic sp-notebook" + (nb ? " full" : ""), "aria-label": nb ? `Notebook sent, ${nb.pages} pages` : "Your notebook, required", onclick: () => notebookSheet(c, (done) => { draw(); if (done) setTimeout(() => treat({ line: `Part 1. All ${totalOf(c)}.`, sub: "Answers and notebook, all in" }), 600); }) },
+      h("span", { class: "sp-num num" }, icon(nb ? "check" : "upload", 16)),
+      h("span", { class: "sp-name" }, "Your notebook"),
+      h("span", { class: "sp-meta" }, nb ? `Sent · ${nb.pages} ${nb.pages === 1 ? "page" : "pages"}` : "Required · photos of your written answers"));
   };
   draw();
   return wrap;
@@ -121,11 +169,11 @@ function openSpeaking(c, ti0, redraw) {
     await hw.setStep(c.date, s.id, { sent, secs: took });
     dropDraft(k); nudge.track("sent", qkey(ti, qi));
     const total = topics.reduce((n, x) => n + x.questions.length, 0);
-    const finished = Object.keys(sent).length >= total && !hw.stepDone(c.date, s.id);
-    if (finished) { await hw.setStep(c.date, s.id, { done: true, doneAt: new Date().toISOString() }); await hw.noteCompletion(c.date, c.hw); }
+    const allSent = Object.keys(sent).length >= total, finished = await finishSpeaking(c);
     toast(r === "sent" ? "Sent to your teacher." : "Saved. It sends when you're back online.");
     take = null; showModel = true; ans = 0; draw();
     if (finished) setTimeout(() => celebrate(total, took), 900);
+    else if (allSent && needsNotebook(c) && !notebookOf(c)) setTimeout(() => { toast("All answers sent. Now your notebook, and it's done."); notebookSheet(c, (done) => { if (done) celebrate(total, took); }); }, 1400);
     else setTimeout(() => nudge.offer(), 2500);
   }
   // the last answer: the treat, with what she actually did
