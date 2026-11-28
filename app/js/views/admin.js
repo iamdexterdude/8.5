@@ -3,7 +3,7 @@
 import { h, icon, todayISO, addDays, fmtDate, fmtShort } from "../util.js";
 import * as store from "../store.js";
 import * as hw from "../homework.js";
-import { adminLoad, adminSave, putEncrypted, fetchPublished, readPublished, listPublished, sendTeacherNote, sendToClaude, claudeStatus, session, lock, unlock, changePassword, classPresence } from "../publish.js";
+import { adminLoad, adminSave, putEncrypted, fetchPublished, readPublished, listPublished, sendTeacherNote, sendToClaude, claudeStatus, session, lock, unlock, changePassword, classPresence, resetPin } from "../publish.js";
 import { SITE, FEED_KEY } from "../feedkey.js";
 import { decryptJson } from "../crypto.js";
 import { head, toast } from "../ui.js";
@@ -174,6 +174,8 @@ async function studentTab(ctx) {
   box.append(h("div", { class: "viewas-card" },
     h("div", { class: "grow" }, h("b", null, `See the app as ${pretty(studentPick)}`), h("p", { class: "small muted" }, "Her name and her own items, like Progress. Her phone's cards and tasks stay on her phone; their numbers are below.")),
     h("button", { class: "btn primary small", onclick: async (e) => { e.currentTarget.disabled = true; await hw.viewAs(pretty(studentPick)); location.hash = "#/progress"; } }, icon("eye", 18), "View as student")));
+  box.append(h("p", { class: "small muted", style: { margin: "6px 0 12px" } }, "Forgot the PIN? ",
+    h("button", { class: "btn small quiet", onclick: async (e) => { const b = e.currentTarget; b.disabled = true; try { await resetPin(studentPick); toast(`${pretty(studentPick)} can now create the account again with a new PIN. The work is kept.`); } catch (x) { toast(x.message); b.disabled = false; } } }, `Reset ${pretty(studentPick)}'s PIN`)));
   let rep = null;
   try { const t = await readPublished(`students/${studentPick}.json`); rep = t ? JSON.parse(t) : null; } catch {}
   if (!rep) { box.append(h("p", { class: "muted" }, "This report could not be read.")); return box; }

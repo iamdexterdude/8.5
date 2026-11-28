@@ -174,6 +174,47 @@ export default async function handler(req, res) {
       const text = JSON.stringify(b.data || {}); if (text.length > 200000) return send(res, 413, { ok: false, error: "Report too large." });
       await putFile(`students/${id}.json`, text, `Report: ${id}`); return send(res, 200, { ok: true });
     }
+    // ---------- accounts: a name and a 4-digit PIN, the same account on every device
+    // n85:acct:<id> { name, salt, hash, at }   n85:tok:<token> -> id   the data itself: accounts/<id>.json in the feed
+    if (op === "signup" || op === "login") {
+      if (!KV) return send(res, 503, { ok: false, error: "Accounts are not available right now." });
+      const name = String(b.name || "").trim().replace(/\s+/g, " ").slice(0, 40), pin = String(b.pin || "");
+      const id = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+      if (id.length < 2) return send(res, 400, { ok: false, error: "Write your name (at least 2 letters)." });
+      if (!/^\d{4}$/.test(pin)) return send(res, 400, { ok: false, error: "The PIN is 4 digits." });
+      const acct = await kvJson(`n85:acct:${id}`);
+      const pinHash = (salt) => pbkdf2Sync(PEPPER + ":pin:" + pin, Buffer.from(salt, "base64"), 120000, 32, "sha256").toString("base64");
+      if (op === "signup") {
+        if (acct) return send(res, 409, { ok: false, error: "That name already has an account. Log in with its PIN.", taken: true });
+        const salt = randomBytes(16).toString("base64");
+        await kv("SET", `n85:acct:${id}`, JSON.stringify({ name, salt, hash: pinHash(salt), at: Date.now() }));
+        await kv("SADD", "n85:accts", id);
+      } else {
+        if (!acct) return send(res, 404, { ok: false, error: "No account with that name. Check the spelling, or create one.", missing: true });
+        const fails = Number(await kv("GET", `n85:pinfail:${id}`)) || 0;
+        if (fails >= 8) return send(res, 429, { ok: false, error: "Too many wrong PINs. Wait an hour, or ask your teacher to reset it." });
+        const a = Buffer.from(pinHash(acct.salt), "base64"), h2 = Buffer.from(acct.hash, "base64");
+        if (a.length !== h2.length || !timingSafeEqual(a, h2)) { await kv("INCR", `n85:pinfail:${id}`); await kv("EXPIRE", `n85:pinfail:${id}`, 3600); return send(res, 401, { ok: false, error: "Wrong PIN." }); }
+        await kv("DEL", `n85:pinfail:${id}`);
+      }
+      const token = randomBytes(24).toString("hex");
+      await kv("SET", `n85:tok:${token}`, id, "EX", 400 * 86400);
+      return send(res, 200, { ok: true, id, name: acct?.name || name, token });
+    }
+    if (op === "sync-get" || op === "sync-put") {
+      const id = KV && /^[a-f0-9]{48}$/.test(String(b.token || "")) ? await kv("GET", `n85:tok:${b.token}`) : null;
+      if (!id) return send(res, 401, { ok: false, error: "Log in again.", relogin: true });
+      if (op === "sync-get") {
+        const r = await gh(`contents/accounts/${id}.json?ref=${BRANCH}`, { headers: { Accept: "application/vnd.github.raw+json" } });
+        if (r.status === 404) return send(res, 200, { ok: true, id, content: null });
+        if (!r.ok) throw new Error("GitHub " + r.status);
+        return send(res, 200, { ok: true, id, content: await r.text() });
+      }
+      const content = String(b.content || "");
+      if (!content || content.length > 4 * 1024 * 1024) return send(res, 413, { ok: false, error: "Too much to save at once." });
+      await putFile(`accounts/${id}.json`, content, `Sync: ${id}`);
+      return send(res, 200, { ok: true, id });
+    }
     // presence: where a student is in the app right now (Redis only, nothing in git)
     if (op === "here") {
       const id = String(b.id || "").toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/^-|-$/g, "").slice(0, 40);
@@ -232,13 +273,23 @@ export default async function handler(req, res) {
       return send(res, 200, { ok: true, ...(await tick()) });
     }
     // ---------- teacher
-    if (!["login", "publish", "remove", "password", "list", "read", "class"].includes(op)) return send(res, 400, { ok: false, error: "Unknown op." });
+    if (!["login", "publish", "remove", "password", "list", "read", "class", "pin-reset", "accounts"].includes(op)) return send(res, 400, { ok: false, error: "Unknown op." });
     if (blocked(ip)) return send(res, 429, { ok: false, error: "Too many wrong passwords. Wait fifteen minutes." });
     const rec = await teacherRecord();
     if (!rec) return send(res, 409, { ok: false, error: "No teacher password is set yet. Run: node tools/teacher/publish.mjs password" });
     if (!checkPassword(b.password, rec)) { failed(ip); return send(res, 401, { ok: false, error: "That is not the password." }); }
     tries.delete(ip);
     if (op === "login") return send(res, 200, { ok: true });
+    if (op === "pin-reset") {   // the student signs up again with the same name and a new PIN; her data stays
+      const id = String(b.id || "").toLowerCase().replace(/[^a-z0-9-]+/g, "-").slice(0, 40);
+      if (!id || !KV) return send(res, 400, { ok: false, error: "No such student." });
+      await kv("DEL", `n85:acct:${id}`, `n85:pinfail:${id}`); return send(res, 200, { ok: true });
+    }
+    if (op === "accounts") {
+      const ids = KV ? ((await kv("SMEMBERS", "n85:accts")) || []) : [], out = [];
+      for (const id of ids) { const a = await kvJson(`n85:acct:${id}`); if (a) out.push({ id, name: a.name, at: a.at }); }
+      return send(res, 200, { ok: true, list: out });
+    }
     if (op === "class") {
       const ids = KV ? ((await kv("SMEMBERS", "n85:here:ids")) || []) : [], out = [];
       for (const id of ids) {
