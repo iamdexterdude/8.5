@@ -21,9 +21,9 @@ export default async function (ctx) {
   const minutes = homework ? homework.tasks.reduce((a, t) => a + (t.minutes || 0), 0) : 0;
   root.append(h("header", { class: "hwhead-top" },
     h("div", null,
-      h("div", { class: "kicker" }, isToday ? (homework && hw.dueLabel()) || "Today" : fmtDate(date, { weekday: "long" })),
-      h("h1", null, isToday ? "Homework" : fmtDate(date, { day: "numeric", month: "long" })),
-      homework ? h("div", { class: "hwmeta num" }, p.complete ? "Everything is in" : `${p.tasksDone} of ${p.tasks} done${minutes ? ` · ${dur(minutes)}` : ""}`) : null),
+      h("div", { class: "kicker" }, isToday ? "No pressure. Seriously." : fmtDate(date, { weekday: "long" })),
+      h("h1", { class: isToday ? "np" : "" }, isToday ? "Qilishni hohlasang qil" : fmtDate(date, { day: "numeric", month: "long" })),
+      homework ? h("div", { class: "hwmeta num" }, p.complete ? "All done. Nobody asked you to." : `${p.tasksDone} of ${p.tasks} done${minutes ? ` · ${dur(minutes)}, if you feel like it` : ""}`) : null),
     !isToday ? h("a", { class: "btn small quiet", href: "#/homework" }, "Today") : null));
 
   if (!homework) root.append(noHomework(date, isToday));
@@ -31,7 +31,7 @@ export default async function (ctx) {
     root.append(homeworkSection(date, homework));
     const row = hw.stateOf(date);
     if (p.complete) {
-      root.append(h("div", { class: "donebar" }, h("div", null, h("b", null, "Done"), row.completedAt ? h("span", { class: "muted num" }, ` at ${tashkentTime(row.completedAt)}`) : null), h("button", { class: "btn small", onclick: () => openFinish(date, homework) }, "Open")));
+      root.append(h("div", { class: "donebar" }, h("div", null, h("b", null, "Done. Didn't have to."), row.completedAt ? h("span", { class: "muted num" }, ` at ${tashkentTime(row.completedAt)}`) : null), h("button", { class: "btn small", onclick: () => openFinish(date, homework) }, "Open")));
       if (isToday && !row.finishShown) { hw.patchState(date, { finishShown: true }); setTimeout(() => openFinish(date, homework), 350); }
     }
   }
@@ -47,7 +47,7 @@ export default async function (ctx) {
 
 function noHomework(date, isToday) {
   const row = hw.stateOf(date), asked = row.asked, who = hw.F.config?.teacher;
-  const sec = h("section", { class: "empty-hw" }, h("h2", null, isToday ? "Nothing yet" : "Nothing was set"), h("p", { class: "muted" }, isToday ? "Your teacher has not set today's homework. It appears here the moment it is published." : "No homework was published for this day."));
+  const sec = h("section", { class: "empty-hw" }, h("h2", null, isToday ? "Nothing here. Lucky you." : "Nothing was set"), h("p", { class: "muted" }, isToday ? "No tasks yet. Enjoy it while it lasts." : "No tasks were set for this day."));
   if (isToday) sec.append(h("div", { class: "row-actions" },
     h("button", { class: "btn primary", disabled: !!asked, onclick: async (e) => { const b = e.currentTarget; b.disabled = true; const r = await hw.askForHomework(date); toast(r === "sent" ? "Your teacher has been told." : "Saved. Message your teacher as well."); } }, asked ? `Asked at ${tashkentTime(asked)}` : "Ask for it"),
     who ? h("a", { class: "btn", href: `https://t.me/${who.replace(/^@/, "")}`, target: "_blank", rel: "noopener" }, "Message your teacher") : null));

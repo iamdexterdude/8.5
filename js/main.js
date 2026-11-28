@@ -9,7 +9,7 @@ import * as pulse from "./pulse.js";
 
 const TABS = [
   { id: "today", label: "Today", href: "#/today", icon: "today" },
-  { id: "homework", label: "Homework", href: "#/homework", icon: "homework" },
+  { id: "homework", label: "No pressure", href: "#/homework", icon: "homework" },
   { id: "mock", label: "Mock", href: "#/mock", icon: "mock" },
   { id: "anki", label: "Anki", href: "#/anki", icon: "anki" },
   { id: "progress", label: "Progress", href: "#/progress", icon: "progress" },

@@ -24,7 +24,7 @@ const SUB = {
   after: ["Lesson done. How did it land?", "That was the lesson. One minute for a thought?", "Lesson over. Let it settle for a moment."],
   rest: ["No lesson today.", "A day without a lesson. Use it however you like.", "A free day. Even a little counts."],
   streak: ["{streak} days in a row. Quietly impressive.", "Day {streak} of showing up.", "{streak} active days without a gap."],
-  hwDone: ["Homework is in. The evening is yours.", "Everything sent. Nothing hanging.", "All submitted. Good."],
+  hwDone: ["Tasks are in. The evening is yours.", "Everything sent. Nothing hanging.", "All submitted. Good."],
   sunday: ["Sunday. Rest is part of the plan.", "Sunday. Nothing is required of you today."],
 };
 
@@ -46,7 +46,7 @@ export const PROMPTS = [
   { key: "ready", when: ["soon"], kind: "chips", q: "How ready do you feel?", opts: ["Very", "Mostly", "Not really"] },
   // mornings and free days
   { key: "start", when: ["none", "day"], slots: ["morning"], kind: "chips", q: "One word for how you are starting today.", opts: ["Fresh", "Tired", "Focused", "Scattered"] },
-  { key: "first", when: ["none", "day"], slots: ["morning", "midday"], kind: "chips", q: "First thing today", opts: ["Homework", "Anki", "A mock", "Not yet"] },
+  { key: "first", when: ["none", "day"], slots: ["morning", "midday"], kind: "chips", q: "First thing today", opts: ["Tasks", "Anki", "A mock", "Not yet"] },
   { key: "minutes", when: ["none", "day"], slots: ["morning", "midday", "afternoon"], kind: "chips", q: "Minutes you can give English today, honestly.", opts: ["15", "30", "60", "More"] },
   { key: "english", when: ["none", "day"], kind: "text", q: "Where did English show up for you today, outside study?", ph: "A song, a video, a sign, a conversation" },
   { key: "word", when: ["none", "day", "after"], kind: "text", q: "A word or phrase you met this week that you like.", ph: "It goes nowhere unless you write it down" },

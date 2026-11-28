@@ -34,7 +34,7 @@ function copyFor(t, name) {
   const time = `${String(t.h).padStart(2, "0")}:${t.m}`;
   if (t.h >= 23 || t.h < 5) return { big: time, line: "All of it, done.", sub: "It is late. Everything is in. Sleep well" + (name ? ", " + name : "") + "." };
   if (t.h < 12) return { big: time, line: "Done before noon.", sub: "Everything is in. The day is yours." };
-  if (t.h < 17) return { big: time, line: "Homework done.", sub: "Everything is in." };
+  if (t.h < 17) return { big: time, line: "Tasks done.", sub: "Everything is in." };
   return { big: time, line: "Done for today.", sub: "Everything is in. The evening is yours." };
 }
 
@@ -49,7 +49,7 @@ export function openFinish(date, homework) {
   if (document.querySelector(".finish")) return;
   const row = hw.stateOf(date), when = row.completedAt || new Date().toISOString(), c = copyFor(tashkentParts(when), hw.studentName()), p = hw.dayProgress(date, homework), track = trackFor(date);
   const prev = document.activeElement;
-  const root = h("div", { class: "finish", role: "dialog", "aria-modal": "true", "aria-label": "Homework finished" });
+  const root = h("div", { class: "finish", role: "dialog", "aria-modal": "true", "aria-label": "Tasks finished" });
   const close = () => { root.classList.add("out"); setTimeout(() => root.remove(), 260); document.removeEventListener("keydown", esc); prev?.focus?.(); };
   const esc = (e) => { if (e.key === "Escape") close(); };
   root.append(
