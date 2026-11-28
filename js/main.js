@@ -17,7 +17,7 @@ const TABS = [
 // route head -> [module file, tab that stays highlighted]
 const ROUTES = {
   today: ["today", "today"], homework: ["homework", "homework"], mock: ["mock", "mock"], exam: ["exam", "mock"],
-  anki: ["anki", "anki"], progress: ["progress", "progress"], settings: ["settings", "today"], admin: ["admin", "today"],
+  anki: ["anki", "anki"], progress: ["progress", "progress"], review: ["review", "mock"], settings: ["settings", "today"], admin: ["admin", "today"],
 };
 const FULLSCREEN = new Set(["exam"]);   // routes that take the whole screen, no tab bar
 
