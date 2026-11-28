@@ -28,7 +28,7 @@ let renderToken = 0;
 
 function buildNav() {
   nav.append(h("span", { class: "lens still", "aria-hidden": "true" }));
-  for (const t of TABS) nav.append(h("a", { href: t.href, dataset: { tab: t.id }, "aria-label": t.label }, h("span", { class: "ic" }, t.img ? h("img", { src: t.img, alt: "", class: "tab-img", width: 30, height: 30 }) : icon(t.icon)), h("span", { class: "lb" }, t.label)));
+  for (const t of TABS) nav.append(h("a", { href: t.href, dataset: { tab: t.id }, "aria-label": t.label }, h("span", { class: "ic" }, t.img ? h("img", { src: t.img, alt: "", class: "tab-img", width: 30, height: 30 }) : icon(t.icon), t.img ? h("span", { class: "zzz", "aria-hidden": "true" }, h("i", null, "z"), h("i", null, "z"), h("i", null, "z"), h("i", null, "z")) : null), h("span", { class: "lb" }, t.label)));
   addEventListener("resize", () => placeLens(false));
 }
 function setActiveTab(id) {
