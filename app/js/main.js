@@ -19,6 +19,15 @@ const ROUTES = {
   today: ["today", "today"], homework: ["homework", "homework"], mock: ["mock", "mock"], exam: ["exam", "mock"],
   anki: ["anki", "anki"], progress: ["progress", "progress"], review: ["review", "mock"], settings: ["settings", "today"], admin: ["admin", "today"],
 };
+// the teacher's own device (Teacher mode opened on it): its own tab bar, straight into the class
+const TEACHER_TABS = [
+  { id: "t-student", label: "Students", href: "#/admin/student", icon: "progress" },
+  { id: "t-claude", label: "Send", href: "#/admin/claude", icon: "send" },
+  { id: "t-mocks", label: "Mocks", href: "#/admin/mocks", icon: "mock" },
+  { id: "t-anki", label: "Anki", href: "#/admin/anki", icon: "anki" },
+  { id: "t-class", label: "Class", href: "#/admin/class", icon: "settings" },
+];
+const asTeacher = () => hwm.teacherDevice() && !hwm.viewingAs();
 const FULLSCREEN = new Set(["exam"]);   // routes that take the whole screen, no tab bar
 
 const viewEl = document.getElementById("view");
@@ -28,7 +37,7 @@ let renderToken = 0;
 
 function buildNav() {
   nav.append(h("span", { class: "lens still", "aria-hidden": "true" }));
-  for (const t of TABS) nav.append(h("a", { href: t.href, dataset: { tab: t.id }, "aria-label": t.label }, h("span", { class: "ic" }, t.img ? h("img", { src: t.img, alt: "", class: "tab-img", width: 30, height: 30 }) : icon(t.icon), t.img ? h("span", { class: "zzz", "aria-hidden": "true" }, h("i", null, "z"), h("i", null, "z"), h("i", null, "z"), h("i", null, "z")) : null), h("span", { class: "lb" }, t.label)));
+  for (const t of asTeacher() ? TEACHER_TABS : TABS) nav.append(h("a", { href: t.href, dataset: { tab: t.id }, "aria-label": t.label }, h("span", { class: "ic" }, t.img ? h("img", { src: t.img, alt: "", class: "tab-img", width: 30, height: 30 }) : icon(t.icon), t.img ? h("span", { class: "zzz", "aria-hidden": "true" }, h("i", null, "z"), h("i", null, "z"), h("i", null, "z"), h("i", null, "z")) : null), h("span", { class: "lb" }, t.label)));
   addEventListener("resize", () => placeLens(false));
 }
 function setActiveTab(id) {
@@ -58,8 +67,12 @@ export const go = (hash) => { location.hash = hash; };
 let lastRoute = "";
 async function render({ keepScroll = false } = {}) {
   const token = ++renderToken;
-  const r = parseHash();
-  const [file, tab] = ROUTES[r.name] || ROUTES.today;
+  let r = parseHash();
+  if (asTeacher() && r.name !== "admin" && r.name !== "review") { history.replaceState(null, "", "#/admin/student"); r = parseHash(); }
+  const [file, tab0] = ROUTES[r.name] || ROUTES.today;
+  const tab = asTeacher() && r.name === "admin" ? `t-${r.params[0] || "student"}` : tab0;
+  document.body.classList.toggle("teacher-device", asTeacher());
+  if (nav.dataset.who !== (asTeacher() ? "teacher" : "student")) { nav.replaceChildren(); nav.dataset.who = asTeacher() ? "teacher" : "student"; buildNav(); }
   const y = keepScroll ? window.scrollY : 0;
   try {
     const mod = await import(`./views/${file}.js`);
@@ -116,6 +129,7 @@ function nudgeLoop() {
   const replay = (a, cls) => { a.classList.remove(cls); void a.offsetWidth; a.classList.add(cls); };
   let wasUnread = null, timer = 0;
   const tick = () => {
+    if (asTeacher() || !hwA?.isConnected || !ankiA?.isConnected) return false;   // the teacher's tab bar has no such badges
     const t = hwm.currentDate(todayISO()), hw = t ? hwm.homeworkFor(t) : null, here = parseHash().name;
     const pending = !!(hw && !hwm.dayProgress(t, hw).complete && here !== "homework");
     hwA.classList.toggle("pending", pending);
@@ -157,7 +171,7 @@ function viewingBanner() {
 }
 
 async function boot() {
-  buildNav();
+  nav.dataset.who = asTeacher() ? "teacher" : "student"; buildNav();
   await store.load();
   await hwm.init();
   dbm.onReady(async () => { try { await store.load(); store.changed(); } catch {} });
