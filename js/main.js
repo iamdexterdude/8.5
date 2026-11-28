@@ -169,6 +169,7 @@ async function boot() {
   nudgeLoop();
   pulse.noteVisit();
   try { nudge.start(); } catch {}
+  setTimeout(() => import("./backup.js").then((B) => B.start()).catch(() => {}), 5000);   // her data, sealed, off the phone
   setTimeout(() => import("./mocks.js").then((M) => M.sendPendingReports()).catch(() => {}), 8000);   // mock reports not sent yet
   viewingBanner(); store.onChange(viewingBanner);
   if (!store.S.kv.welcomed && !new URLSearchParams(location.search).has("nowelcome")) {

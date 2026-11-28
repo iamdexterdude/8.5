@@ -190,6 +190,7 @@ export async function askForHomework(date) {
 let reportTimer = 0;
 export function report() {
   if (!enrolled() && !viewingAs()) return;
+  if (!viewingAs()) import("./backup.js").then((B) => B.soon()).catch(() => {});
   clearTimeout(reportTimer);
   reportTimer = setTimeout(async () => {
     try {
