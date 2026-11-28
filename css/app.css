@@ -1243,9 +1243,10 @@ nav a[data-tab="homework"][aria-current] .lb, nav a[data-tab="homework"].on .lb 
 .acct-form label { font-size: 13px; color: rgba(255,255,255,.75); margin-top: 6px; }
 .acct-form input[type=text] { font-size: 17px; padding: 12px 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,.22); background: rgba(255,255,255,.08); color: #fff; }
 .acct-form input::placeholder { color: rgba(255,255,255,.45); }
-.acct .pin { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-.acct .pin-d { text-align: center; font-size: 26px; font-weight: 700; padding: 10px 0; border-radius: 14px; border: 1px solid rgba(255,255,255,.22); background: rgba(255,255,255,.08); color: #fff; min-width: 0; }
-.acct .pin-d:focus, .acct-form input:focus { outline: 2px solid #7aa2ff; outline-offset: 1px; }
+.acct .pin { display: block; }
+.acct .pin-in { width: 100%; text-align: center; font-size: 30px; font-weight: 700; letter-spacing: .7em; text-indent: .7em; padding: 10px 0; border-radius: 14px; border: 1px solid rgba(255,255,255,.22); background: rgba(255,255,255,.08); color: #fff; }
+.acct .pin-in::placeholder { color: rgba(255,255,255,.3); letter-spacing: .7em; }
+.acct .pin-in:focus, .acct-form input:focus { outline: 2px solid #7aa2ff; outline-offset: 1px; }
 .acct-err { min-height: 20px; margin: 4px 0 0; color: #ffb4a8; font-size: 14px; }
 .acct .btn.primary { justify-content: center; padding: 13px; font-size: 16px; margin-top: 4px; }
 .acct-switch { color: rgba(255,255,255,.8) !important; justify-self: center; background: transparent !important; }

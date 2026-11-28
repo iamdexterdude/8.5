@@ -175,13 +175,9 @@ export function gate() {
     draw();
   });
 }
-// four boxes for the PIN; typing moves on, Backspace moves back, a pasted PIN fills them all
+// the PIN: one field (fast typing, paste and password managers all work), drawn as four slots
 function pinBox(id) {
-  const boxes = [0, 1, 2, 3].map((i) => h("input", { type: "password", inputmode: "numeric", pattern: "[0-9]*", maxLength: 1, autocomplete: "off", id: i ? `${id}-${i}` : id, "aria-label": `PIN digit ${i + 1}`, class: "pin-d" }));
-  boxes.forEach((b, i) => {
-    b.addEventListener("input", () => { b.value = b.value.replace(/\D/g, "").slice(-1); if (b.value && boxes[i + 1]) boxes[i + 1].focus(); });
-    b.addEventListener("keydown", (e) => { if (e.key === "Backspace" && !b.value && boxes[i - 1]) boxes[i - 1].focus(); });
-    b.addEventListener("paste", (e) => { const d = (e.clipboardData?.getData("text") || "").replace(/\D/g, "").slice(0, 4); if (d.length > 1) { e.preventDefault(); d.split("").forEach((c, k) => { if (boxes[k]) boxes[k].value = c; }); boxes[Math.min(3, d.length - 1)].focus(); } });
-  });
-  return { el: h("div", { class: "pin" }, boxes), value: () => boxes.map((b) => b.value).join(""), focus: () => boxes[0].focus() };
+  const input = h("input", { type: "password", inputmode: "numeric", pattern: "[0-9]*", maxLength: 4, autocomplete: "current-password", id, class: "pin-in", "aria-label": "4-digit PIN", placeholder: "••••" });
+  input.addEventListener("input", () => { const v = input.value.replace(/\D/g, "").slice(0, 4); if (v !== input.value) input.value = v; });
+  return { el: h("div", { class: "pin" }, input), value: () => input.value.replace(/\D/g, ""), focus: () => input.focus() };
 }
