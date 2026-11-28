@@ -32,7 +32,7 @@ function mockCard(m) {
       state = "done";
       if (s === "listening" || s === "reading") right = h("span", { class: "num" }, h("b", null, a.band?.toFixed?.(1) ?? "–"), h("span", { class: "faint" }, ` · ${a.raw}/${a.total}`));
       else if (est?.[s]?.band != null) right = h("span", { class: "num" }, h("b", null, est[s].band.toFixed(1)), h("span", { class: "faint" }, " · from your teacher"));
-      else right = h("span", { class: "faint small" }, "With your teacher");
+      else right = h("span", { class: "faint small" }, "Being marked…");
     } else if (a?.status === "in-progress") { state = "open"; right = h("span", { class: "small" }, "In progress"); }
     else { state = s === next ? "next" : "later"; }
     const href = `#/exam/${encodeURIComponent(m.id)}/${s}`;

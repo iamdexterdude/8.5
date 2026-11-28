@@ -43,22 +43,32 @@ function hub(ctx) {
   const before = JSON.stringify(hw.F.classmates || []);
   hw.refresh().then(() => { if (JSON.stringify(hw.F.classmates || []) !== before && location.hash.startsWith("#/anki") && !ctx.params[0]) ctx.rerender(); }).catch(() => {});
   hw.shareDecks().catch(() => {});
+  // the class, live: their numbers and decks refresh while this screen is open
+  const live = setInterval(async () => { if (document.hidden) return; if (await hw.refreshMates().catch(() => false)) { const old = root.querySelector(".swap"); old?.replaceWith(swapWords(ctx)); } }, 45000);
+  hw.refreshMates().then((ch) => { if (ch) root.querySelector(".swap")?.replaceWith(swapWords(ctx)); }).catch(() => {});
+  ctx.onLeave?.(() => clearInterval(live));
   return root;
 }
 
 // ---------- swap words: what classmates are keeping, a fan of their latest words, one tap to try a deck ----------
 const hue = (s) => [...String(s)].reduce((a, c) => (a * 31 + c.charCodeAt(0)) % 360, 7);
 function swapWords(ctx) {
-  const mates = (hw.F.classmates || []).filter((m) => (m.decks || []).length);
+  const mates = hw.F.classmates || [];
+  const ago = (iso) => { if (!iso) return ""; const m = Math.round((Date.now() - Date.parse(iso)) / 60000); return m < 2 ? "studying now" : m < 60 ? `last card ${m} min ago` : m < 1440 ? `last card ${Math.round(m / 60)} h ago` : `last card ${Math.round(m / 1440)} d ago`; };
   const sec = h("section", { class: "section swap" },
-    h("div", { class: "shead" }, h("h2", null, "Swap words")),
-    h("p", { class: "small muted" }, mates.length ? "The words your classmates keep. Add a deck and it joins your Anki." : "When your classmates keep words, their decks appear here."));
+    h("div", { class: "shead" }, h("h2", null, "Your class"), h("span", { class: "pill live" }, "Live")),
+    h("p", { class: "small muted" }, mates.length ? "How everyone is doing with their cards, and the decks they keep. Add one and it joins your Anki." : "Your classmates appear here as soon as they open Anki."));
   for (const m of mates) {
-    const total = m.decks.reduce((a, d) => a + d.n, 0), peek = m.decks.flatMap((d) => d.peek || []).slice(-3);
+    m.decks ||= [];
+    const total = m.decks.reduce((a, d) => a + d.n, 0), peek = m.decks.flatMap((d) => d.peek || []).slice(-3), st = m.stats || {};
     const card = h("article", { class: "mate" },
       h("div", { class: "mate-top" }, h("span", { class: "mate-av", "aria-hidden": "true" }, (m.name || "?").slice(0, 1).toUpperCase()),
-        h("div", { class: "grow" }, h("b", null, m.name), h("span", { class: "num" }, `${total} ${total === 1 ? "word" : "words"} · ${m.decks.length} ${m.decks.length === 1 ? "deck" : "decks"}`)),
+        h("div", { class: "grow" }, h("b", null, m.name),
+          h("span", { class: "num" }, [st.today != null ? `${st.today} today` : null, st.week ? `${st.week} this week` : null, st.run > 1 ? `${st.run} days in a row` : null, st.learned ? `${st.learned} of ${st.cards} cards learned` : null].filter(Boolean).join(" · ") || `${total} ${total === 1 ? "word" : "words"} kept`),
+          st.last ? h("span", { class: "small faint" }, ago(st.last)) : null),
         h("div", { class: "fan", "aria-hidden": "true" }, peek.map((w, i) => { const sp = h("span", null, w); sp.style.setProperty("--i", String(i - (peek.length - 1) / 2)); return sp; }))),
+      (st.studying || []).length ? h("div", { class: "chips", style: { margin: "8px 0 2px" } }, st.studying.map((d) => h("span", { class: "chip" }, `${d.name} · ${d.learned}/${d.n}`))) : null,
+      m.decks.length ? null : h("p", { class: "small muted", style: { margin: "6px 0 0" } }, "No decks of their own yet."),
       h("ul", { class: "mate-decks" }, m.decks.map((d) => {
         const mine = store.deckById(hw.classmateDeckId(m, d.key));
         const btn = h("button", { class: "btn small" + (mine ? "" : " primary"), onclick: async (e) => {

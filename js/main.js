@@ -170,7 +170,7 @@ async function boot() {
   pulse.noteVisit();
   try { nudge.start(); } catch {}
   setTimeout(() => import("./backup.js").then((B) => B.start()).catch(() => {}), 5000);   // her data, sealed, off the phone
-  setTimeout(() => import("./mocks.js").then((M) => M.sendPendingReports()).catch(() => {}), 8000);   // mock reports not sent yet
+  setTimeout(() => import("./mocks.js").then(async (M) => { await M.sendPendingReports(); await M.sendPendingSubmissions(); }).catch(() => {}), 8000);   // mock reports not sent yet
   viewingBanner(); store.onChange(viewingBanner);
   if (!store.S.kv.welcomed && !new URLSearchParams(location.search).has("nowelcome")) {
     if (navigator.onLine) hwm.primeConfig({ timeout: 15000 }).catch(() => {});   // the lesson settings, in the background; the welcome does not wait
