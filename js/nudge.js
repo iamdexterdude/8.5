@@ -145,7 +145,8 @@ function dueCard() {
 
 // ---------- "No pressure": what the notes say when the tasks are not done. Dry, dark, short. ----------
 const SLIP = "Why do hw? Just let it slip.";   // the only line for unfinished tasks (Dexter's choice)
-const NIGHT = ["Why keep grinding? Just go sleep.", "Come on, it's not for you.", "are u really here to study? you??"];   // late at night in the app
+const NIGHT = ["Why keep grinding? Just go sleep."];   // late at night only
+const ANYTIME = ["Come on, it's not for you.", "are u really here to study? you??"];   // any time of day, once a day   // late at night in the app
 const NP = { untouched: [SLIP], halfway: [SLIP], hour: [SLIP], fresh: [SLIP], away: [SLIP], draft: [SLIP] };
 const pickLine = (list, seed) => { let x = 0; for (const c of String(seed)) x = (x * 31 + c.charCodeAt(0)) >>> 0; return list[x % list.length]; };
 
@@ -219,7 +220,8 @@ export async function plan(now = Date.now()) {
 
   // up late in the app: one note a night, a few minutes after she leaves (Dexter's lines)
   { const m = mins(now), active = r.lastSeen && now - r.lastSeen < 15 * MIN;
-    if (active && (m >= 1380 || m < 240)) { const night = dayKey(now - 5 * HOUR); out.push({ at: now + 3 * MIN, tag: `night-${night}`, title: pickLine(NIGHT, night), body: "", url: "#/today", urgent: true, night: true }); } }
+    if (active && (m >= 1380 || m < 240)) { const night = dayKey(now - 5 * HOUR); out.push({ at: now + 3 * MIN, tag: `night-${night}`, title: pickLine(NIGHT, night), body: "", url: "#/today", urgent: true, night: true }); }
+    else if (active) { const d = dayKey(now); out.push({ at: now + 3 * MIN, tag: `tease-${d}`, title: pickLine(ANYTIME, d), body: "", url: "#/today", urgent: true }); } }
 
   // a run of days: tonight is still open
   if (r.run >= 3 && !r.today) out.push({ at: at(now, Math.min(r.sleep, 1439) - 100), tag: `run-${dayKey(now)}`, title: `Day ${r.run + 1}?`, body: `${r.run} days in a row so far. Today is still open.`, url: dc.n ? "#/anki" : "#/today" });
