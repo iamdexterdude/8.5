@@ -1019,6 +1019,20 @@ body.viewing main#view { padding-top: 64px; }
 .exam .ex-split { flex: none; width: 12px; cursor: col-resize; background: var(--ex-soft); border-left: 1px solid var(--ex-line); border-right: 1px solid var(--ex-line); position: relative; }
 .exam .ex-split::after { content: "⋮"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--ex-fg); opacity: .5; font-size: 18px; }
 .exam .listening .ex-body { flex-direction: column; } .exam .listening .ex-right-pane { flex: 1; max-width: 900px; width: 100%; margin: 0 auto; }
+
+/* speaking mock: one centred column (question card, status, timer, button), not the two-pane split */
+.exam .ex-body.sp { display: flex; flex-direction: column; align-items: stretch; gap: 14px; overflow: auto; max-width: 760px; width: calc(100% - 28px); margin: 18px auto; padding: 28px 32px 40px; border-radius: 14px; }
+.exam .ex-body.sp { flex: 0 1 auto; }
+.exam .ex-body.sp > * { flex: none; }
+.exam .ex-body.sp .sp-k { font-size: 15px; color: var(--ex-fg); opacity: .75; }
+.exam .ex-body.sp .spcard { background: var(--ex-bg); border-color: var(--ex-line); color: var(--ex-fg); }
+.exam .ex-body.sp :is(.sp-q, .sp-status, .sp-ring) { color: var(--ex-fg); }
+.exam .ex-body.sp .spcard { margin: 0; padding: 26px 28px; min-height: 0; }
+.exam .ex-body.sp .sp-q { font-size: clamp(22px, 3.2vw, 30px); line-height: 1.25; }
+.exam .ex-body.sp .sp-status { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.exam .ex-body.sp .sp-ring { margin: 0; font-size: clamp(40px, 6vw, 56px); }
+.exam .ex-body.sp .row-actions .btn { min-width: 140px; }
+@media (max-width: 560px) { .exam .ex-body.sp { padding: 18px 16px 28px; margin: 8px auto; width: calc(100% - 16px); } .exam .ex-body.sp .spcard { padding: 18px; } }
 .exam .ex-audio { flex: none; padding: 8px 16px; border-bottom: 1px solid var(--ex-line); background: var(--ex-soft); color: var(--ex-fg); }
 .exam .ex-audio-row { display: flex; align-items: center; gap: 10px; font-size: 14px; } .exam .ex-audio-s { color: var(--ex-fg); }
 
