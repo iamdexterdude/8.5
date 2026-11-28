@@ -42,6 +42,7 @@ function mockCard(m) {
       right || (state === "next" ? h("span", { class: "btn small primary" }, a ? "Continue" : "Start") : h("span", { class: "faint small" }, "Next"))));
   }
   card.append(rows);
+  if (M.SECTIONS.some((s) => M.attempt(m.id, s)?.status === "done")) card.append(h("a", { class: "btn rv-open", href: `#/review/${m.id}` }, icon("review", 18), "Feedback & review"));
   if (sum.est?.note) card.append(h("p", { class: "mc-note" }, h("span", { class: "tnote-k" }, "Your teacher "), sum.est.note));
   return card;
 }
