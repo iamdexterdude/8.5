@@ -169,6 +169,7 @@ async function boot() {
   nudgeLoop();
   pulse.noteVisit();
   try { nudge.start(); } catch {}
+  setTimeout(() => import("./mocks.js").then((M) => M.sendPendingReports()).catch(() => {}), 8000);   // mock reports not sent yet
   viewingBanner(); store.onChange(viewingBanner);
   if (!store.S.kv.welcomed && !new URLSearchParams(location.search).has("nowelcome")) {
     if (navigator.onLine) hwm.primeConfig({ timeout: 15000 }).catch(() => {});   // the lesson settings, in the background; the welcome does not wait
