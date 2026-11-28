@@ -125,3 +125,77 @@ export function summary(mockId) {
   const overall = have.length === 4 ? roundHalf((bands.listening + bands.reading + bands.writing + bands.speaking) / 4) : null;
   return { rows, bands, overall, est, last: rows.map((r) => r.finishedAt).sort().pop() || null };
 }
+
+// ---------- the teacher's full report: sent to his Telegram when she finishes a part, and once for the whole mock ----------
+const TYPE = { gap: "Completion", table: "Table", mcq: "Multiple choice", multi: "Choose two", match: "Matching", headings: "Headings", tfng: "True/False/Not Given", ynng: "Yes/No/Not Given", short: "Short answer" };
+const groupNums = (g) => g.type === "gap" || g.type === "table" ? [...(g.lines || []).join("\n").matchAll(/\[\[(\d+)\]\]/g)].map((m) => Number(m[1])) : g.type === "multi" ? (g.n || []).map(Number) : (g.items || []).map((it) => Number(it.n));
+const mmOf = (ms) => { const m = Math.round(ms / 60000); return m >= 60 ? `${Math.floor(m / 60)} h${m % 60 ? ` ${m % 60} min` : ""}` : `${m} min`; };
+const clip = (s, n = 38) => { s = String(s || "").replace(/\s+/g, " ").trim(); return s.length > n ? s.slice(0, n - 1) + "…" : s; };
+function timeLine(row) {
+  const used = Date.parse(row.finishedAt) - Date.parse(row.startedAt), allowed = Date.parse(row.deadline) - Date.parse(row.startedAt);
+  const bits = [];
+  if (used > 0) bits.push(`${mmOf(used)}${allowed > 0 ? ` of ${mmOf(allowed)}` : ""}${row.auto ? " (time ran out)" : ""}`);
+  bits.push(row.leaves ? `left the screen ${row.leaves}×` : "stayed on the screen");
+  const when = new Date(row.finishedAt); bits.push(`finished ${when.toLocaleDateString("en-GB", { day: "numeric", month: "short" })} ${when.toTimeString().slice(0, 5)}`);
+  return bits.join(" · ");
+}
+export function reportText(mock, section, row) {
+  const who = hw.studentName() || "Student", title = mock.title || mock.id, sec = mock[section] || {}, L = [];
+  L.push(`REPORT · ${who} · ${title} · ${LABEL[section]}`);
+  if (section === "listening" || section === "reading") {
+    const det = new Map((row.detail || []).map((d) => [d.n, d]));
+    L.push(`Band ${row.band ?? "–"} · ${row.raw}/${row.total}`, timeLine(row), "");
+    const units = sec.parts || sec.passages || [], types = {};
+    for (const u of units) {
+      const nums = (u.groups || []).flatMap(groupNums), ok = nums.filter((n) => det.get(n)?.ok).length;
+      L.push(`${section === "reading" ? "Passage" : "Part"} ${u.no}${u.title ? ` "${clip(u.title, 40)}"` : ""}: ${ok}/${nums.length}`);
+      for (const g of u.groups || []) { const t = TYPE[g.type] || g.type, ns = groupNums(g); types[t] ||= [0, 0]; types[t][0] += ns.filter((n) => det.get(n)?.ok).length; types[t][1] += ns.length; }
+    }
+    L.push("", "By question type:", ...Object.entries(types).map(([t, [a, b]]) => `  ${t}: ${a}/${b}`));
+    const wrong = (row.detail || []).filter((d) => !d.ok), blank = wrong.filter((d) => !String(d.mine).trim());
+    L.push("", wrong.length ? `Wrong ${wrong.length}${blank.length ? ` (${blank.length} left blank)` : ""}:` : "No mistakes.");
+    for (const d of wrong) L.push(`  ${d.n}. her: ${d.mine ? clip(d.mine) : "—"} → key: ${clip(d.key, 44)}`);
+    const flagged = Object.keys(row.flags || {}).filter((k) => row.flags[k]);
+    if (flagged.length) L.push("", `Marked for review: ${flagged.join(", ")}`);
+    L.push("", "All answers:");
+    for (const u of units) {
+      const nums = (u.groups || []).flatMap(groupNums);
+      L.push(`${section === "reading" ? "P" : "Part "}${u.no}: ` + nums.map((n) => { const d = det.get(n); return `${n}${d?.ok ? "✓" : "✗"}${d?.mine ? clip(d.mine, 18) : "—"}`; }).join("  "));
+    }
+  } else if (section === "writing") {
+    L.push(timeLine(row), "");
+    for (const t of sec.tasks || []) {
+      const text = String(row.texts?.[t.no] || ""), w = countWords(text);
+      L.push(`Task ${t.no}: ${w} words${t.words && w < t.words ? ` (under ${t.words})` : ""}${text.trim() ? "" : " (nothing written)"}`);
+    }
+    L.push("", "The essays came as separate files.");
+  } else if (section === "speaking") {
+    const recs = row.recordings || [], byPart = {};
+    for (const r of recs) byPart[r.part] = (byPart[r.part] || 0) + 1;
+    L.push(timeLine(row), "", `${recs.length} recordings: ` + Object.entries(byPart).map(([p, n]) => `Part ${p} ×${n}`).join(", "), "The recordings came as separate files.");
+  }
+  // the whole mock, once every part in it is done
+  const parts = SECTIONS.filter((s) => mock[s]), done = parts.filter((s) => s === section || attempt(mock.id, s)?.status === "done");
+  if (parts.length > 1 && done.length === parts.length) {
+    const sm = summary(mock.id);
+    L.push("", `WHOLE MOCK DONE · ` + parts.map((s) => `${LABEL[s]} ${sm.bands[s] ?? (s === "writing" || s === "speaking" ? "(your estimate)" : "–")}`).join(" · "));
+  } else if (parts.length > 1) L.push("", `Still to do: ${parts.filter((s) => !done.includes(s)).map((s) => LABEL[s]).join(", ")}`);
+  return L.join("\n");
+}
+// split under the relay's 3000-character limit, at line breaks, and send in order
+export async function sendReport(mock, section, row) {
+  const text = reportText(mock, section, row), chunks = []; let cur = "";
+  for (const line of text.split("\n")) { if ((cur + "\n" + line).length > 2800 && cur) { chunks.push(cur); cur = line; } else cur = cur ? cur + "\n" + line : line; }
+  if (cur) chunks.push(cur);
+  for (const c of chunks) if ((await hw.sendText(c)) !== "sent") return false;
+  row.reported = new Date().toISOString(); await saveAttempt(row); return true;
+}
+// parts finished before reports existed (or while offline): sent once, the next time the app opens
+export async function sendPendingReports() {
+  if (hw.viewingAs() || !hw.studentName()) return;
+  for (const row of [...store.S.mocks]) {
+    if (row.status !== "done" || row.reported || !row.finishedAt || Date.now() - Date.parse(row.finishedAt) > 21 * 86400000) continue;
+    const mock = await load(row.mock).catch(() => null); if (!mock?.[row.section]) continue;
+    if (!(await sendReport(mock, row.section, row))) return;
+  }
+}

@@ -458,7 +458,7 @@ async function finishLR(mock, section, row, { auto = false } = {}) {
     if (files.length) row.sent = await hw.sendFiles({ date: mock.date || row.finishedAt.slice(0, 10), label: `${mock.title || mock.id} writing`, files });
     await M.saveAttempt(row);
   }
-  hw.sendText(`${hw.studentName() || "Student"} finished ${mock.title || mock.id} ${M.LABEL[section]}${row.band != null ? `: band ${row.band} (${row.raw}/${row.total})` : ""}${row.leaves ? `, left the screen ${row.leaves}×` : ""}.`);
+  M.sendReport(mock, section, row).catch(() => {});   // the full report to the teacher's Telegram
   hw.report();
 }
 
@@ -529,7 +529,7 @@ async function speakingExam(ctx, mock, row) {
     row.sent = await hw.sendFiles({ date: mock.date || row.finishedAt.slice(0, 10), label: `${mock.title || mock.id} speaking`, files });
     await M.saveAttempt(row);
     try { if (document.fullscreenElement) await document.exitFullscreen(); } catch {}
-    hw.sendText(`${hw.studentName() || "Student"} finished ${mock.title || mock.id} Speaking: ${files.length} recordings${row.leaves ? `, left the screen ${row.leaves}×` : ""}.`);
+    M.sendReport(mock, "speaking", row).catch(() => {});
     hw.report(); ctx.rerender();
   }
   show();
