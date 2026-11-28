@@ -174,6 +174,15 @@ export default async function handler(req, res) {
       const text = JSON.stringify(b.data || {}); if (text.length > 200000) return send(res, 413, { ok: false, error: "Report too large." });
       await putFile(`students/${id}.json`, text, `Report: ${id}`); return send(res, 200, { ok: true });
     }
+    // presence: where a student is in the app right now (Redis only, nothing in git)
+    if (op === "here") {
+      const id = String(b.id || "").toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/^-|-$/g, "").slice(0, 40);
+      if (!id || !KV) return send(res, 200, { ok: true });
+      const rec = { name: clip(b.name, 40) || id, screen: clip(b.screen, 30), state: b.state === "hide" ? "hide" : "open", at: Date.now() };
+      await kv("SET", `n85:here:${id}`, JSON.stringify(rec), "EX", 60 * 86400); await kv("SADD", "n85:here:ids", id);
+      if (rec.state === "open" || b.state === "hide") { await kv("LPUSH", `n85:herelog:${id}`, JSON.stringify([rec.at, rec.state, rec.screen])); await kv("LTRIM", `n85:herelog:${id}`, 0, 399); await kv("EXPIRE", `n85:herelog:${id}`, 60 * 86400); }
+      return send(res, 200, { ok: true });
+    }
     // the class at a glance, fresh from GitHub (the raw CDN lags minutes): who keeps which decks, and how much they study
     if (op === "mates") {
       const cur = await gh(`contents/shared/index.json?ref=${BRANCH}`, { headers: { Accept: "application/vnd.github.raw+json" } });
@@ -223,13 +232,22 @@ export default async function handler(req, res) {
       return send(res, 200, { ok: true, ...(await tick()) });
     }
     // ---------- teacher
-    if (!["login", "publish", "remove", "password", "list", "read"].includes(op)) return send(res, 400, { ok: false, error: "Unknown op." });
+    if (!["login", "publish", "remove", "password", "list", "read", "class"].includes(op)) return send(res, 400, { ok: false, error: "Unknown op." });
     if (blocked(ip)) return send(res, 429, { ok: false, error: "Too many wrong passwords. Wait fifteen minutes." });
     const rec = await teacherRecord();
     if (!rec) return send(res, 409, { ok: false, error: "No teacher password is set yet. Run: node tools/teacher/publish.mjs password" });
     if (!checkPassword(b.password, rec)) { failed(ip); return send(res, 401, { ok: false, error: "That is not the password." }); }
     tries.delete(ip);
     if (op === "login") return send(res, 200, { ok: true });
+    if (op === "class") {
+      const ids = KV ? ((await kv("SMEMBERS", "n85:here:ids")) || []) : [], out = [];
+      for (const id of ids) {
+        const now = await kvJson(`n85:here:${id}`); if (!now) continue;
+        const log = ((await kv("LRANGE", `n85:herelog:${id}`, 0, 399)) || []).map((x) => { try { return JSON.parse(x); } catch { return null; } }).filter(Boolean);
+        out.push({ id, ...now, log });
+      }
+      return send(res, 200, { ok: true, now: Date.now(), list: out });
+    }
     if (op === "password") {
       if (typeof b.newPassword !== "string" || b.newPassword.length < MIN_PW) return send(res, 400, { ok: false, error: `Use at least ${MIN_PW} characters.` });
       await putFile("teacher.json", JSON.stringify(hashPassword(b.newPassword)), "Teacher password"); teacherCache = { at: 0, v: undefined }; return send(res, 200, { ok: true });

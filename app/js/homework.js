@@ -102,7 +102,10 @@ export async function viewAs(name) {
   F.history = null; F.historyAt = 0; await persist(); store.changed();
   await refresh(undefined, { force: true });
 }
-const STUDENT_OPS = new Set(["upload", "notify", "report", "push-sub", "push-off", "nudges", "share", "submit", "backup"]);
+const STUDENT_OPS = new Set(["upload", "notify", "report", "push-sub", "push-off", "nudges", "share", "submit", "backup", "here"]);
+// the teacher's own phone or PC (set once Teacher mode is opened on it): it never reports, shares or submits as a student
+export const RELAY_URL = RELAY;
+export const teacherDevice = () => { try { return localStorage.getItem("eight-teacher-device") === "1"; } catch { return false; } };
 export const studentName = () => viewingAs() || store.setting("name") || "";   // the name she chose on her device; the class settings carry none
 // the class list in the settings (ids like "muslima"); a device under any other name is a test, and takes no part in sharing or reports
 export const enrolled = (id = studentId()) => { const l = F.config?.students; return !Array.isArray(l) || !l.length || l.includes(id); };
@@ -143,6 +146,7 @@ export async function addWords(date, step, task) {
 // ---------- the relay: her files and short lines reach the teacher; small reports let Teacher mode see how she is doing ----------
 const toB64 = (blob) => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(",")[1] || ""); r.onerror = () => rej(r.error); r.readAsDataURL(blob); });
 export async function relay(body, { timeout = 60000 } = {}) {
+  if (teacherDevice() && !viewingAs() && STUDENT_OPS.has(body?.op)) return { ok: true, sent: [] };
   if (viewingAs() && STUDENT_OPS.has(body?.op)) { if (body.op === "upload" || body.op === "notify") import("./ui.js").then((u) => u.toast(`Viewing as ${viewingAs()}: nothing was sent.`)); return { ok: true, sent: [] }; }
   const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), timeout);
   try {
@@ -188,6 +192,16 @@ export async function askForHomework(date) {
 }
 
 // a small picture of her work for Teacher mode: Anki, mocks, homework, check-ins. Sent quietly, at most once a minute.
+// minutes a day in the app (from opening to leaving) and on Anki (from the gaps between reviews), over the last 7 days
+async function timeSpent() {
+  const week = Date.now() - 7 * 86400000, life = (store.S.kv.life || []).filter(([t]) => t * 1000 > week);
+  let app = 0, open = null, sessions = 0;
+  for (const [t, e] of life) { const ms = t * 1000; if (e === "open") { if (open) app += 3 * 60000; open = ms; sessions++; } else if (e === "hide" && open) { app += Math.min(ms - open, 3 * 3600000); open = null; } }
+  let rev = []; try { rev = (await db.all("reviewlog")).map((r) => Date.parse(r.at)).filter((t) => t > week).sort((a, b) => a - b); } catch {}
+  let anki = rev.length ? 10000 : 0; for (let i = 1; i < rev.length; i++) { const g = rev[i] - rev[i - 1]; anki += g < 90000 ? g : 10000; }
+  const days = new Set(rev.map((t) => new Date(t).toDateString())).size;
+  return { appMin7: Math.round(app / 60000), ankiMin7: Math.round(anki / 60000), sessions7: sessions, ankiDays7: days, reviews7: rev.length };
+}
 let reportTimer = 0;
 export function report() {
   if (!enrolled() && !viewingAs()) return;
@@ -207,6 +221,7 @@ export function report() {
         homework: Object.values(store.S.hw).filter((r) => r.progress).map((r) => ({ date: r.date, done: r.progress.done, total: r.progress.total, completedAt: r.completedAt || null })).sort((a, b) => a.date.localeCompare(b.date)).slice(-14),
         checkins: store.S.checkins.slice(-12).map((c) => ({ at: c.at, prompt: c.prompt, answer: c.answer })),
         streak: store.streak(),
+        time: await timeSpent(),
       };
       await relay({ op: "report", id: studentId(), data: snapshot }, { timeout: 15000 });
       await shareDecks();

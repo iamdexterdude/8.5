@@ -3,7 +3,7 @@
 import { h, icon, todayISO, addDays, fmtDate, fmtShort } from "../util.js";
 import * as store from "../store.js";
 import * as hw from "../homework.js";
-import { adminLoad, adminSave, putEncrypted, fetchPublished, readPublished, listPublished, sendTeacherNote, sendToClaude, claudeStatus, session, lock, unlock, changePassword } from "../publish.js";
+import { adminLoad, adminSave, putEncrypted, fetchPublished, readPublished, listPublished, sendTeacherNote, sendToClaude, claudeStatus, session, lock, unlock, changePassword, classPresence } from "../publish.js";
 import { SITE, FEED_KEY } from "../feedkey.js";
 import { decryptJson } from "../crypto.js";
 import { head, toast } from "../ui.js";
@@ -136,6 +136,27 @@ function claudeTab(ctx) {
 }
 
 // ------------------------------------------------------------------ her work
+// right now: who is in the app, on which screen, and when each was last seen; today's visits and minutes
+const SCREENS = { today: "Today", homework: "No pressure", mock: "Mocks", exam: "a mock test", anki: "Anki", progress: "Progress", review: "Feedback & review", settings: "Settings" };
+async function rightNow(ctx) {
+  const sec = h("section", { class: "section live-now" }, h("div", { class: "shead" }, h("h2", null, "Right now"), h("span", { class: "pill live" }, "Live")));
+  let data = null; try { data = await classPresence(); } catch (e) { sec.append(h("p", { class: "small muted" }, "Could not load: " + e.message)); return sec; }
+  const now = data.now || Date.now(), list = (data.list || []).filter((x) => hw.enrolled(x.id)).sort((a, b) => b.at - a.at);
+  if (!list.length) { sec.append(h("p", { class: "small muted" }, "Nobody has opened the updated app yet.")); return sec; }
+  const ago = (ms) => { const m = Math.round(ms / 60000); return m < 1 ? "just now" : m < 60 ? `${m} min ago` : m < 1440 ? `${Math.floor(m / 60)} h ${m % 60} min ago` : `${Math.round(m / 1440)} days ago`; };
+  const midnight = new Date().setHours(0, 0, 0, 0);
+  const today = (log) => { let ms = 0, open = null, visits = 0; for (const [t, st] of [...log].reverse()) { if (t < midnight) continue; if (st === "open") { if (open == null) { open = t; visits++; } } else if (open != null) { ms += Math.min(t - open, 3 * 3600000); open = null; } } if (open != null) ms += Math.min(now - open, 3 * 3600000); return { min: Math.round(ms / 60000), visits }; };
+  sec.append(h("ul", { class: "rows" }, list.map((x) => {
+    const online = x.state === "open" && now - x.at < 150000, t = today(x.log || []);
+    return h("li", null, h("div", { class: "row", style: { minHeight: "52px" } },
+      h("span", { class: "dot " + (online ? "on" : "off"), "aria-hidden": "true" }),
+      h("div", { class: "grow" }, h("div", { class: "title" }, x.name),
+        h("div", { class: "sub" }, online ? `Online now · on ${SCREENS[x.screen] || x.screen}` : `Last seen ${ago(now - x.at)} · ${SCREENS[x.screen] || x.screen}`)),
+      h("span", { class: "small muted num" }, t.visits ? `today ${t.visits} ${t.visits === 1 ? "visit" : "visits"}, ${t.min} min` : "not today")));
+  })));
+  const t = setTimeout(() => { if (location.hash.startsWith("#/admin")) ctx.rerender(); }, 60000); ctx.onLeave?.(() => clearTimeout(t));
+  return sec;
+}
 async function studentTab(ctx) {
   // every student who has opened the app under a name has a report in the feed; pick one
   let ids = [];
@@ -144,6 +165,7 @@ async function studentTab(ctx) {
   if (!ids.includes(studentPick)) studentPick = ids[0];
   const pretty = (id) => id.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
   const box = h("div", null);
+  box.append(await rightNow(ctx));
   if (ids.length > 1) box.append(h("div", { class: "chips", style: { marginBottom: "12px" } }, ids.map((id) => h("button", { class: "chip" + (id === studentPick ? " on" : ""), onclick: () => { studentPick = id; ctx.rerender(); } }, pretty(id)))));
   // see the app the way this student sees it: her name, her own items (like a mock from before the app), nothing sent
   box.append(h("div", { class: "viewas-card" },
@@ -164,6 +186,10 @@ async function studentTab(ctx) {
     if (hb.lastActive) bits.push(`last active ${fmtShort(hb.lastActive)}`);
     box.append(h("section", { class: "section", style: { marginTop: "8px" } }, h("div", { class: "shead" }, h("h2", null, "Habits")), h("p", null, bits.join(" · ") + "."), h("p", { class: "tiny faint" }, "Her Today screen says these things to her too, gently, one at a time.")));
   }
+  const tm = rep.time;
+  if (tm) box.append(h("section", { class: "section", style: { marginTop: "8px" } }, h("div", { class: "shead" }, h("h2", null, "Time spent"), h("span", { class: "small muted" }, "average a day, last 7 days")),
+    h("div", { class: "stats" }, stat(`${Math.round(tm.appMin7 / 7)} min`, "in the app"), stat(`${Math.round(tm.ankiMin7 / 7)} min`, "on Anki"), stat((tm.sessions7 / 7).toFixed(1), "visits"), stat(`${tm.ankiDays7}/7`, "days with Anki")),
+    h("p", { class: "small muted" }, `${tm.reviews7} cards reviewed this week, ${tm.appMin7} minutes in the app in total.`)));
   const a = rep.anki || {};
   box.append(h("section", { class: "section", style: { marginTop: "8px" } }, h("div", { class: "shead" }, h("h2", null, "Anki")),
     h("div", { class: "stats" }, stat(a.cards ?? 0, "cards"), stat(a.due ?? 0, "due now"), stat(a.reviews14 ?? 0, "reviews, 14 days"), stat(a.days14 ?? 0, "days studied, of 14")),

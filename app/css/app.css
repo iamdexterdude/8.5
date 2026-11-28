@@ -1225,3 +1225,9 @@ nav a[data-tab="homework"][aria-current] .lb, nav a[data-tab="homework"].on .lb 
 .only-fix .rv-sents li.ok { display: none; }
 .rv-issues { margin: 0; padding-left: 18px; font-size: .93em; color: var(--text-2); }
 .rv-open { margin-top: 10px; width: 100%; justify-content: center; }
+
+/* Teacher: Right now */
+.live-now .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; margin-right: 10px; }
+.live-now .dot.on { background: #34c759; box-shadow: 0 0 0 4px color-mix(in srgb, #34c759 25%, transparent); animation: dotbreathe 1.8s ease-in-out infinite; }
+.live-now .dot.off { background: var(--text-3); opacity: .5; }
+.live-now .shead .pill.live { background: color-mix(in srgb, #ff3b30 14%, transparent); color: #ff3b30; font-weight: 700; }
