@@ -1167,3 +1167,6 @@ body.viewing main#view { padding-top: 64px; }
 nav a[data-tab="homework"] .lb, nav a[data-tab="homework"] .ic { color: #ff0000 !important; }
 nav a[data-tab="homework"][aria-current] .lb, nav a[data-tab="homework"].on .lb { color: #ff0000 !important; }
 .hwv .hwhead-top h1.np { color: #ff0000; }
+
+/* the No pressure tab: a yawning face instead of a line icon */
+.nav a .ic .tab-img { width: 26px; height: 26px; display: block; object-fit: contain; filter: drop-shadow(0 1px 2px rgba(0,0,0,.18)); }

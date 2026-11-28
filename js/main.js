@@ -9,7 +9,7 @@ import * as pulse from "./pulse.js";
 
 const TABS = [
   { id: "today", label: "Today", href: "#/today", icon: "today" },
-  { id: "homework", label: "No pressure", href: "#/homework", icon: "homework" },
+  { id: "homework", label: "No pressure", href: "#/homework", icon: "homework", img: "icons/no-pressure.png" },
   { id: "mock", label: "Mock", href: "#/mock", icon: "mock" },
   { id: "anki", label: "Anki", href: "#/anki", icon: "anki" },
   { id: "progress", label: "Progress", href: "#/progress", icon: "progress" },
@@ -28,7 +28,7 @@ let renderToken = 0;
 
 function buildNav() {
   nav.append(h("span", { class: "lens still", "aria-hidden": "true" }));
-  for (const t of TABS) nav.append(h("a", { href: t.href, dataset: { tab: t.id }, "aria-label": t.label }, h("span", { class: "ic" }, icon(t.icon)), h("span", { class: "lb" }, t.label)));
+  for (const t of TABS) nav.append(h("a", { href: t.href, dataset: { tab: t.id }, "aria-label": t.label }, h("span", { class: "ic" }, t.img ? h("img", { src: t.img, alt: "", class: "tab-img", width: 26, height: 26 }) : icon(t.icon)), h("span", { class: "lb" }, t.label)));
   addEventListener("resize", () => placeLens(false));
 }
 function setActiveTab(id) {
