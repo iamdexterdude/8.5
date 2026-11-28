@@ -1169,4 +1169,4 @@ nav a[data-tab="homework"][aria-current] .lb, nav a[data-tab="homework"].on .lb 
 .hwv .hwhead-top h1.np { color: #ff0000; }
 
 /* the No pressure tab: a yawning face instead of a line icon */
-.nav a .ic .tab-img { width: 26px; height: 26px; display: block; object-fit: contain; filter: drop-shadow(0 1px 2px rgba(0,0,0,.18)); }
+.nav a .ic .tab-img { width: 30px; height: 30px; display: block; border-radius: 50%; object-fit: cover; box-shadow: 0 2px 6px rgba(0,0,0,.22); }
