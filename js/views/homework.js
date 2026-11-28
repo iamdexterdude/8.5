@@ -26,8 +26,7 @@ export default async function (ctx) {
       homework ? h("div", { class: "hwmeta num" }, p.complete ? "All done. Nobody asked you to." : `${p.tasksDone} of ${p.tasks} done${minutes ? ` · ${dur(minutes)}, if you feel like it` : ""}`) : null),
     !isToday ? h("a", { class: "btn small quiet", href: "#/homework" }, "Today") : null));
 
-  if (!homework) root.append(noHomework(date, isToday));
-  else {
+  if (homework) {   // no tasks: nothing at all below the title (Dexter's choice)
     root.append(homeworkSection(date, homework));
     const row = hw.stateOf(date);
     if (p.complete) {
